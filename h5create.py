@@ -154,8 +154,8 @@ def h5create(filename, datasetname, size, plist):
 
     try:
         with h5py.File(filename, 'a') as f:
-            if datasetname in f:
-                return "Datasetname in use."
+            if not h5xl.path_is_available_for_obj(f, datasetname, h5py.Dataset):
+                return "Can't create dataset."
 
             kwargs = {}
                 

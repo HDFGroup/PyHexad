@@ -5,6 +5,9 @@ import h5py
 import numpy
 from numpy import dtype
 
+import logging
+_log = logging.getLogger(__name__)
+
 # keywords for key/value pairs
 
 _h5xl_keywords = {
@@ -30,6 +33,48 @@ def popup(title, message):
 
 #===============================================================================
 
+def path_is_available_for_obj(f, path, obj_type):
+    """
+    Check if a path is available for the creation of an object of a certain type.
+    """
+    
+    if path == '' or path[-1] == '/': # the path is empty or has a trailing slash
+        return False
+    if path == '/' and obj_type == h5py.Group: # the root group
+        return True
+    if path == '/' and obj_type != h5py.Group: # can't have that
+        return False
+
+    is_absolute = False
+    if path[0] == '/': # get rid of a leading slash (fake array element when split)
+        is_absolute = True
+        path = path[1:]
+        
+    a = path.split('/')
+    ppath = '' # keep track of the current path
+    if is_absolute:
+        ppath = '/'
+
+    for i in range(len(a)):
+        ppath += a[i]
+        if not ppath in f: # unused -> all set
+            return True
+        else: # path is in use
+            if len(a) == 1 or i == len(a)-1: # this is the final leg
+                cur_type = f.get(ppath,getclass=True)
+                if cur_type != obj_type:
+                    return False
+                if obj_type == h5py.Group: # group exists
+                    return True
+                else: # the path is in use and not a group. can't overwrite.
+                    return False
+            else: # this is not the final leg -> must be group to continue
+                if f.get(ppath, getclass=True) != h5py.Group:
+                    return False
+        ppath += '/'
+        
+#===============================================================================
+
 def file_exists(filename):
     ret = False
     try:
@@ -53,6 +98,7 @@ def is_supported_dataset(filename, path):
     except Exception, e:
         pass
     return ret
+    
 #===============================================================================
 
 def is_object(filename, path):
@@ -135,4 +181,4 @@ def numpy_version():
         import numpy
         return numpy.version.version
     except ImportError:
-        return 'Numpy is NOT installed.'    
+        return 'Numpy is NOT installed.'
