@@ -82,7 +82,7 @@ def get_chunk_dimensions(chunk):
 @xl_func("string filename, string datasetname, int[] size, string plist : string",
          category="HDF5",
          thread_safe=False,
-         disable_function_wizard_calc=False)
+         disable_function_wizard_calc=True)
 def h5create(filename, datasetname, size, plist):
     """
     Creates a new dataset and, on success, returns a string (datasetname).

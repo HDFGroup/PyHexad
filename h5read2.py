@@ -13,14 +13,29 @@ _log = logging.getLogger(__name__)
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
 @xl_arg_doc("datasetname", "The name of the dataset.")
-@xl_func("string filename, string datasetname : string",
+@xl_arg_doc("start", "The zero-based index of the first element to be read.")
+@xl_arg_doc("count", "The number of elements to be read in each dimension.")
+@xl_arg_doc("stride", "The number of elements to be skipped between reads of count elements in each dimension.")
+
+@xl_func("string filename, string datasetname, int[] start, int[] count, int[] stride : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5read(filename, datasetname):
+def h5read2(filename, datasetname, start, count, stride):
     """
-    Reads an HDF5 dataset
+    Reads a subset of an HDF5 dataset. The subset is described by the position,
+    start, of the first element to be read, count, the number of elements to be
+    read in each dimension, and, stride, the number of elements to be skipped between
+    repeated reads of count elements along each dimension.
+    For a two-dimensional dataset, start, count, and stride are arrays of length two.
+
+    If the start falls outside the dataset, nothing is returned.
+
+    If the count exceeds the number of elements in that dimension, it is
+    automatically truncated.
+
+    If the stride exceeds the size of the dataset, nothing is returned.
     """
 
 #===============================================================================
@@ -51,12 +66,32 @@ def h5read(filename, datasetname):
         caller = pyxll.xlfCaller()
         address = caller.address
 
+        start_tup = h5xl.get_tuple(start)
+        count_tup = h5xl.get_tuple(count)
+        stride_tup = h5xl.get_tuple(stride)
+
+        # sanity check
+        if len(start_tup) != len(dsp) or len(count_tup) != len(dsp) or len(stride_tup) != len(dsp):
+            return 'Dataset rank mismatch in start, count, or stride.'
+
+        for i in range(len(dsp)):
+            if start_tup[i] < 0:
+                return 'start entries must be non-negative.'
+            # empty selection
+            if start_tup[i] >= dsp[i]:
+                return 'Empty selection.'
+            if count_tup[i] <= 0:
+                return 'Counts must be positive.'
+            # overflow?
+            if (start_tup[i] + count_tup[i]) > dsp[i]:
+                count_tup[i] = dsp[i] - start_tup[i]
+
         # we return the dimensions on success
         if len(dsp) == 1:
-            ret = '%i x 1' % dsp[0]
+            ret = '%i x 1' % count_tup[0]
         else:
-            ret = "%i x %i" % (dsp[0], dsp[1])
-        
+            ret = "%i x %i" % (count_tup[0], count_tup[1])
+
         # the update is done asynchronously so as not to block some
         # versions of Excel by updating the worksheet from a worksheet function
         def update_func():
@@ -73,22 +108,26 @@ def h5read(filename, datasetname):
                     # we can handle only 1D or 2D datasets
                     if len(dset.shape) == 1:
                         range = xl.Range(range.Resize(2,2),
-                                         range.Resize(dsp[0]+1,2))
-                        x = np.reshape(dset[...], (dsp[0],1))
+                                         range.Resize(count_tup[0]+1,2))
+                        last_row = start_tup[0] + count_tup[0]
+                        x = np.reshape(dset[start_tup[0]:last_row],
+                                       (count_tup[0],1))
                     else:
                         range = xl.Range(range.Resize(2,2),
-                                         range.Resize(dsp[0]+1, dsp[1]))
-                        x = dset[...]
+                                         range.Resize(count_tup[0]+1, count_tup[1]+1))
+                        last_row = start_tup[0] + count_tup[0]
+                        last_col = start_tup[1] + count_tup[1]
+                        x = dset[start_tup[0]:last_row,start_tup[1]:last_col]
                         
                         # print the number of columns
                         cols = xl.Range(rows.Resize(3,1),rows.Resize(3,1))
-                        cols.Value = dsp[1]
+                        cols.Value = count_tup[1]
                             
                     range.Value = np.asarray(x, dtype=np.float64)
 
                     # this looks awkward. there must be a better way...
                     rows = xl.Range(rows.Resize(2,1),rows.Resize(2,1))
-                    rows.Value = dsp[0]
+                    rows.Value = count_tup[0]
                     
             except Exception, ex:
                 _log.info(ex)

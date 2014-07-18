@@ -85,6 +85,31 @@ def file_exists(filename):
 
 #===============================================================================
 
+def get_tuple(dims):
+    """
+    Accept a list of lists and extract a dimension tuple
+    """
+
+    ret = []
+    if len(dims) == 1: # "row vector"
+        num_col = len(dims[0])
+        if num_col == 0 or num_col > 32: # rank must be positive and not exceed 32
+            return None
+        for j in range(len(dims[0])):
+            ret.append(dims[0][j])
+    else: # "colum vector"
+        num_row = len(dims)
+        if num_row > 32: # rank must not exceed 32
+            return None
+        for i in range(len(size)):
+            if len(dims[i]) != 1: # row must have exactly one column
+                return None
+            ret.append(dims[i][0])
+            
+    return ret
+    
+#===============================================================================
+
 def is_supported_dataset(filename, path):
     ret = False
     try:
