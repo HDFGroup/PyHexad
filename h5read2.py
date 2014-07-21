@@ -13,29 +13,35 @@ _log = logging.getLogger(__name__)
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
 @xl_arg_doc("datasetname", "The name of the dataset.")
-@xl_arg_doc("start", "The zero-based index of the first element to be read.")
-@xl_arg_doc("count", "The number of elements to be read in each dimension.")
-@xl_arg_doc("stride", "The number of elements to be skipped between reads of count elements in each dimension.")
+@xl_arg_doc("first", "The (one-based) index of the first element to be read.")
+@xl_arg_doc("last", "The (one-based) index of the last elements to be read.")
+@xl_arg_doc("step", "The number of elements to skip for each element read.")
 
-@xl_func("string filename, string datasetname, int[] start, int[] count, int[] stride : string",
+@xl_func("string filename, string datasetname, int[] first, int[] last, int[] step : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5read2(filename, datasetname, start, count, stride):
+def h5read2(filename, datasetname, first, last, step):
     """
     Reads a subset of an HDF5 dataset. The subset is described by the position,
-    start, of the first element to be read, count, the number of elements to be
-    read in each dimension, and, stride, the number of elements to be skipped between
-    repeated reads of count elements along each dimension.
-    For a two-dimensional dataset, start, count, and stride are arrays of length two.
+    'first', of the first element to be read, 'last', the position of the last
+    element to be read, and, 'step', the number of elements to skip for each element
+    read. For a two-dimensional dataset, 'first', 'last', and 'step' are arrays
+    of length two.
 
-    If the start falls outside the dataset, nothing is returned.
+    The positions of elements are 1-based, i.e., begin at 1 and end
+    at the extent of the respective dimension.
 
-    If the count exceeds the number of elements in that dimension, it is
-    automatically truncated.
+    If 'first' falls outside the dataset, nothing is returned.
 
-    If the stride exceeds the size of the dataset, nothing is returned.
+    If 'last' is beyond the last position of elements, it is automatically
+    adjusted to the last position.
+
+    If the 'last' is negative, all elements in that dimension beginning at
+    'start' will be read.
+
+    The element of 'step' must be positive.
     """
 
 #===============================================================================
@@ -66,31 +72,56 @@ def h5read2(filename, datasetname, start, count, stride):
         caller = pyxll.xlfCaller()
         address = caller.address
 
-        start_tup = h5xl.get_tuple(start)
-        count_tup = h5xl.get_tuple(count)
-        stride_tup = h5xl.get_tuple(stride)
+        first_tup = h5xl.get_tuple(first)
+        last_tup = h5xl.get_tuple(last)
+        step_tup = h5xl.get_tuple(step)
 
         # sanity check
-        if len(start_tup) != len(dsp) or len(count_tup) != len(dsp) or len(stride_tup) != len(dsp):
-            return 'Dataset rank mismatch in start, count, or stride.'
+        if len(first_tup) != len(dsp) or len(last_tup) != len(dsp) or len(step_tup) != len(dsp):
+            return "Dataset rank mismatch in 'first', 'last', or 'step'."
 
+        # convert to Numpy indexing
+        start = [(i-1) for i in first_tup]
+        stop = [i for i in last_tup]
+        step = [i for i in step_tup]
+            
         for i in range(len(dsp)):
-            if start_tup[i] < 0:
-                return 'start entries must be non-negative.'
+            if start[i] < 0:
+                return "'first' entries must be positive."
             # empty selection
-            if start_tup[i] >= dsp[i]:
+            if start[i] >= dsp[i]:
                 return 'Empty selection.'
-            if count_tup[i] <= 0:
-                return 'Counts must be positive.'
+            if stop[i] < 0:
+                stop[i] = dsp[i]
             # overflow?
-            if (start_tup[i] + count_tup[i]) > dsp[i]:
-                count_tup[i] = dsp[i] - start_tup[i]
+            if stop[i] > dsp[i]:
+                stop[i] = dsp[i]
+            # final check
+            if stop[i] <= start[i]:
+                return "'last' entries must be greater or equal than 'first'."
+            if step[i] < 1:
+                return "'step' entries must be positive (>= 1)."
 
+        start_tup = tuple(start)
+        stop_tup = tuple(stop)
+        step_tup = tuple(step)
+        count_tup = None
+        
         # we return the dimensions on success
         if len(dsp) == 1:
-            ret = '%i x 1' % count_tup[0]
+            cnt = (stop_tup[0]-start_tup[0])/step_tup[0]
+            if cnt > 0:
+                count_tup = (cnt, 1)
+            else:
+                count_tup = (1, 1)
         else:
-            ret = "%i x %i" % (count_tup[0], count_tup[1])
+            rows = (stop_tup[0]-start_tup[0])/step_tup[0]
+            if rows == 0: rows = 1
+            cols = (stop_tup[1]-start_tup[1])/step_tup[1]
+            if cols == 0: cols = 1
+            count_tup = (rows, cols)
+            
+        ret = "%i x %i" % (count_tup[0], count_tup[1])
 
         # the update is done asynchronously so as not to block some
         # versions of Excel by updating the worksheet from a worksheet function
@@ -109,15 +140,13 @@ def h5read2(filename, datasetname, start, count, stride):
                     if len(dset.shape) == 1:
                         range = xl.Range(range.Resize(2,2),
                                          range.Resize(count_tup[0]+1,2))
-                        last_row = start_tup[0] + count_tup[0]
-                        x = np.reshape(dset[start_tup[0]:last_row],
+                        x = np.reshape(dset[start_tup[0]:stop_tup[0]:step[0]],
                                        (count_tup[0],1))
                     else:
                         range = xl.Range(range.Resize(2,2),
                                          range.Resize(count_tup[0]+1, count_tup[1]+1))
-                        last_row = start_tup[0] + count_tup[0]
-                        last_col = start_tup[1] + count_tup[1]
-                        x = dset[start_tup[0]:last_row,start_tup[1]:last_col]
+                        x = dset[start_tup[0]:stop_tup[0]:step[0],
+                                 start_tup[1]:stop_tup[1]:step[1]]
                         
                         # print the number of columns
                         cols = xl.Range(rows.Resize(3,1),rows.Resize(3,1))
