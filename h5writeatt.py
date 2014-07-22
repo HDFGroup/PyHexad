@@ -3,19 +3,35 @@ import pyxll
 from pyxll import xl_arg_doc, xl_func
 import h5py
 import h5xl
+import numpy as np
 
 import logging
 _log = logging.getLogger(__name__)
 
+#===============================================================================
+
 @xl_arg_doc("filename", "The name of an HDF5 file.")
 @xl_arg_doc("location", "The location of the object (attribute owner).")
-@xl_arg_doc("attname", "The attribute's name.")
-@xl_arg_doc("attvalue", "The attribute's value.")
+@xl_arg_doc("attname", "The attribute name.")
+@xl_arg_doc("attvalue", "The attribute value.")
 @xl_func("string filename, string location, string attname, var attvalue: var",
-         category="HDF5")
+         category="HDF5",
+         thread_safe=False,
+         disable_function_wizard_calc=True)
 def h5writeattr(filename, location, attname, attvalue):
-    """Writes or updates the value of an HDF5 attribute"""
-            
+    """
+    Writes the value of an HDF5 attribute
+
+    Existing attributes will be overwritten.
+    """
+
+#===============================================================================
+
+    ret = None
+
+    if not h5xl.file_exists(filename):
+        return "Can't open file."
+
     try:
         with h5py.File(filename) as f:
             if location in f:
@@ -29,10 +45,13 @@ def h5writeattr(filename, location, attname, attvalue):
                         f[location].attrs[attname] = attvalue
                 else:
                     f[location].attrs[attname] = str(attvalue)
-            else:
-                h5xl.popup("Error", "Invalid location\n'%s'." % (location))
-                    
-    except IOError, io:
-        h5xl.popup("Error", "Can't open or create file\n'%s'." % (filename))
 
-    return attvalue
+                ret = attvalue
+            else:
+                return "Invalid location '%s'." % (location)
+                    
+    except Exception, ex:
+        _log.info(ex)
+        return 'Internal error.'
+
+    return ret
