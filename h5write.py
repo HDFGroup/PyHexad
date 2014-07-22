@@ -58,6 +58,8 @@ def h5write(filename, datasetname, data):
                     return "'datasetname' does not refer to an HDF5 dataset."
                 dst = f[datasetname]
 
+                # TODO: we should be a little more lenient here: if the type
+                # of 'data' can be coerced, we should allow this through
                 if dst.dtype != data.dtype:
                     return 'Element type mismatch.'
                 if dst.shape != data.shape:
