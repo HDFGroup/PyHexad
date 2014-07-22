@@ -92,6 +92,7 @@ def h5read(filename, datasetname):
                     
             except Exception, ex:
                 _log.info(ex)
+                ret = 'Internal error.'
 
         # kick off the asynchronous call to the update function
         pyxll.async_call(update_func)

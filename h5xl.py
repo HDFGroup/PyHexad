@@ -42,6 +42,7 @@ def get_tuple(dims):
     """
 
     ret = []
+    
     if len(dims) == 1: # "row vector"
         num_col = len(dims[0])
         if num_col == 0 or num_col > 32: # rank must be positive and not exceed 32
@@ -52,7 +53,7 @@ def get_tuple(dims):
         num_row = len(dims)
         if num_row > 32: # rank must not exceed 32
             return None
-        for i in range(len(size)):
+        for i in range(len(dims)):
             if len(dims[i]) != 1: # row must have exactly one column
                 return None
             ret.append(dims[i][0])

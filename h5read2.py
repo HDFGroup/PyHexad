@@ -15,7 +15,7 @@ _log = logging.getLogger(__name__)
 @xl_arg_doc("datasetname", "The name of the dataset.")
 @xl_arg_doc("first", "The (one-based) index of the first element to be read.")
 @xl_arg_doc("last", "The (one-based) index of the last elements to be read.")
-@xl_arg_doc("step", "The number of elements to skip for each element read.")
+@xl_arg_doc("step", "The read stride in each dimension.")
 
 @xl_func("string filename, string datasetname, int[] first, int[] last, int[] step : string",
          category="HDF5",
@@ -26,8 +26,8 @@ def h5read2(filename, datasetname, first, last, step):
     """
     Reads a subset of an HDF5 dataset. The subset is described by the position,
     'first', of the first element to be read, 'last', the position of the last
-    element to be read, and, 'step', the number of elements to skip for each element
-    read. For a two-dimensional dataset, 'first', 'last', and 'step' are arrays
+    element to be read, and, 'step', the read stride.
+    For a two-dimensional dataset, 'first', 'last', and 'step' are arrays
     of length two.
 
     The positions of elements are 1-based, i.e., begin at 1 and end
@@ -41,7 +41,7 @@ def h5read2(filename, datasetname, first, last, step):
     If the 'last' is negative, all elements in that dimension beginning at
     'start' will be read.
 
-    The element of 'step' must be positive.
+    The elements of 'step' must be positive.
     """
 
 #===============================================================================
