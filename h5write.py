@@ -34,11 +34,8 @@ def h5write(filename, datasetname, data):
     ret = None
 
     try:
-        with h5py.File(filename,'r+') as f:
-            ret = "I got the file."
+        with h5py.File(filename,'a') as f:
 
-            # get the dataset
-            dst = None
             if not datasetname in f: # it doesn't exist
 
                 if not h5xl.path_is_available_for_obj(f, datasetname, h5py.Dataset):
@@ -47,8 +44,8 @@ def h5write(filename, datasetname, data):
                 if not data.dtype in h5xl.supported_dtypes:
                     return "Unsupported element type in 'data'."
 
-                if len(data.shape) == 2 or len(data.shape) == 1:
-                    return "Usupported shape. 1D and 2D shapes only."
+                if not (len(data.shape) == 2 or len(data.shape) == 1):
+                    return "Unsupported shape. 1D and 2D shapes only."
 
                 f.create_dataset(datasetname, data.shape, dtype=data.dtype,
                                              data=data)
@@ -62,8 +59,12 @@ def h5write(filename, datasetname, data):
                 # of 'data' can be coerced, we should allow this through
                 if dst.dtype != data.dtype:
                     return 'Element type mismatch.'
-                if dst.shape != data.shape:
+
+                # reshape if necessary
+                if not h5xl.can_reshape(data, dst.shape):
                     return 'Shape mismatch.'
+                else:
+                    data = np.reshape(data, dst.shape)
 
                 dst[...] = data
                 

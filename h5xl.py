@@ -2,7 +2,7 @@
 import pyxll
 from pyxll import xl_func
 import h5py
-import numpy
+import numpy as np
 from numpy import dtype
 
 import logging
@@ -27,62 +27,13 @@ supported_dtypes = (dtype('float32'), dtype('float64'),
 
 #===============================================================================
 
-def popup(title, message):
-    import win32api, win32con
-    win32api.MessageBox(0, str(message), str(title), win32con.MB_ICONWARNING)
-
-#===============================================================================
-
-def path_is_available_for_obj(f, path, obj_type):
-    """
-    Check if a path is available for the creation of an object of a certain type.
-    """
-    
-    if path == '' or path[-1] == '/': # the path is empty or has a trailing slash
-        return False
-    if path == '/' and obj_type == h5py.Group: # the root group
-        return True
-    if path == '/' and obj_type != h5py.Group: # can't have that
-        return False
-
-    is_absolute = False
-    if path[0] == '/': # get rid of a leading slash (fake array element when split)
-        is_absolute = True
-        path = path[1:]
-        
-    a = path.split('/')
-    ppath = '' # keep track of the current path
-    if is_absolute:
-        ppath = '/'
-
-    for i in range(len(a)):
-        ppath += a[i]
-        if not ppath in f: # unused -> all set
-            return True
-        else: # path is in use
-            if len(a) == 1 or i == len(a)-1: # this is the final leg
-                cur_type = f.get(ppath,getclass=True)
-                if cur_type != obj_type:
-                    return False
-                if obj_type == h5py.Group: # group exists
-                    return True
-                else: # the path is in use and not a group. can't overwrite.
-                    return False
-            else: # this is not the final leg -> must be group to continue
-                if f.get(ppath, getclass=True) != h5py.Group:
-                    return False
-        ppath += '/'
-        
-#===============================================================================
-
-def file_exists(filename):
-    ret = False
+def can_reshape(src_array, dst_shape):
     try:
-        ret = h5py.h5f.is_hdf5(filename)
+        dummy = np.reshape(src_array, dst_shape)
+        return True
     except Exception, e:
-        pass
-    return ret
-
+        return False
+        
 #===============================================================================
 
 def get_tuple(dims):
@@ -144,6 +95,63 @@ def object_has_attribute(filename, path, attr):
     try:
         with h5py.File(filename, 'r') as f:
             ret = attr in f[path].attrs
+    except Exception, e:
+        pass
+    return ret
+
+#===============================================================================
+
+def path_is_available_for_obj(f, path, obj_type):
+    """
+    Check if a path is available for the creation of an object of a certain type.
+    """
+    
+    if path == '' or path[-1] == '/': # the path is empty or has a trailing slash
+        return False
+    if path == '/' and obj_type == h5py.Group: # the root group
+        return True
+    if path == '/' and obj_type != h5py.Group: # can't have that
+        return False
+
+    is_absolute = False
+    if path[0] == '/': # get rid of a leading slash (fake array element when split)
+        is_absolute = True
+        path = path[1:]
+        
+    a = path.split('/')
+    ppath = '' # keep track of the current path
+    if is_absolute:
+        ppath = '/'
+
+    for i in range(len(a)):
+        ppath += a[i]
+        if not ppath in f: # unused -> all set
+            return True
+        else: # path is in use
+            if len(a) == 1 or i == len(a)-1: # this is the final leg
+                cur_type = f.get(ppath,getclass=True)
+                if cur_type != obj_type:
+                    return False
+                if obj_type == h5py.Group: # group exists
+                    return True
+                else: # the path is in use and not a group. can't overwrite.
+                    return False
+            else: # this is not the final leg -> must be group to continue
+                if f.get(ppath, getclass=True) != h5py.Group:
+                    return False
+        ppath += '/'
+        
+#===============================================================================
+
+def popup(title, message):
+    import win32api, win32con
+    win32api.MessageBox(0, str(message), str(title), win32con.MB_ICONWARNING)
+
+
+def file_exists(filename):
+    ret = False
+    try:
+        ret = h5py.h5f.is_hdf5(filename)
     except Exception, e:
         pass
     return ret
