@@ -197,17 +197,6 @@ def h5py_version():
 
 #===============================================================================
 
-@xl_func(": bool", volatile=True)
-def numpy_is_installed():
-    """returns True if numpy is installed"""
-    try:
-        import numpy
-        return True
-    except ImportError:
-        return False
-
-#===============================================================================
-
 @xl_func(": string", volatile=True)
 def numpy_version():
     """returns the numpy version"""

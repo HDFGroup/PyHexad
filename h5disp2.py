@@ -18,14 +18,15 @@ current_col = 0
 #===============================================================================
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_func("string filename : string",
+@xl_arg_doc("location", "An HDF5 path name.")
+@xl_func("string filename, string location : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5disp(filename):
+def h5disp2(filename,location):
     """
-    Display contents of an HDF5 file
+    Display detailed contents of an HDF5 file starting at a specific location.
     """
 
 #===============================================================================
@@ -37,13 +38,27 @@ def h5disp(filename):
 
     with h5py.File(filename, 'r') as f:
 
+        if not location in f:
+            return "Invalid location specified."
+
+        # check if we have a group, use parent if not
+        start_grp = f
+        obj = f[location]
+        if f.get(location,getclass=True) != h5py.Group:
+            start_grp = obj.parent
+        else:
+            start_grp = obj
+            
         # reset the currents
         global current_row, current_col
         current_row = 0
         current_col = 0
+        # adjustment needed for the starting column 
+        col_offset = start_grp.name.count('/') + 1
         
         # generate the display
 
+        # TODO: for now we hardcode a 120x40 display. Fix this!
         MAX_ROW = 120
         MAX_COL = 40
         dty = h5py.special_dtype(vlen=str)
@@ -54,15 +69,13 @@ def h5disp(filename):
             global current_row, current_col
 
             path = posixpath.join(grp.name, name)
-            current_col = path.count('/') - 1
-            #if grp.get(name, getclass=True) != h5py.Group:
-            #    path = path.split('/')[-1]
+            current_col = path.count('/') - col_offset
 
             if current_row < MAX_ROW and current_col < MAX_COL:
                 a[current_row, current_col] = path
                 current_row += 1
 
-        f.visit(partial(print_obj, f))
+        start_grp.visit(partial(print_obj, start_grp))
 
         # get the address of the calling cell using xlfCaller
         caller = pyxll.xlfCaller()
