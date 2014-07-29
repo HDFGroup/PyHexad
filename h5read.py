@@ -77,7 +77,7 @@ def h5read(filename, datasetname):
                         x = np.reshape(dset[...], (dsp[0],1))
                     else:
                         range = xl.Range(range.Resize(2,2),
-                                         range.Resize(dsp[0]+1, dsp[1]))
+                                         range.Resize(dsp[0]+1, dsp[1]+1))
                         x = dset[...]
                         
                         # print the number of columns
