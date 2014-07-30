@@ -13,6 +13,7 @@ import logging
 _log = logging.getLogger(__name__)
 
 col_offset = (
+    # (key, offset, display name)
     ('INDEX', 0, 'INDEX'),
     ('OBJ_TYPE', 1, 'OBJECT TYPE'),
     ('NAME', 2, 'OBJECT NAME'),
@@ -48,6 +49,7 @@ def h5disp2(filename):
     with h5py.File(filename, 'r') as f:
 
         # reset the currents
+        global current_idx, current_row
         current_idx = 1
         current_row = 0
 
@@ -119,13 +121,13 @@ def h5disp2(filename):
 
         # render the header row
         for k in col_offset:
-            a[current_row,current_col+k[1]] = lines[0][k[0]]
+            a[current_row,k[1]] = lines[0][k[0]]
         current_row += 1
 
         # render the root group
         for k in col_offset:
             if k[0] in lines[1].keys():
-                a[current_row,current_col+k[1]] = lines[1][k[0]]
+                a[current_row,k[1]] = lines[1][k[0]]
         current_row += 1
 
         #render the rest
@@ -134,7 +136,7 @@ def h5disp2(filename):
                 current_row += 1
             for k in col_offset:
                 if k[0] in lines[i].keys():
-                    a[current_row,current_col+k[1]] = lines[i][k[0]]
+                    a[current_row,k[1]] = lines[i][k[0]]
             current_row += 1
 
         # get the address of the calling cell using xlfCaller
