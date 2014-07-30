@@ -55,8 +55,8 @@ def h5disp(filename):
 
             path = posixpath.join(grp.name, name)
             current_col = path.count('/') - 1
-            #if grp.get(name, getclass=True) != h5py.Group:
-            #    path = path.split('/')[-1]
+            if grp.get(name, getclass=True) != h5py.Group:
+                path = path.split('/')[-1]
 
             if current_row < MAX_ROW and current_col < MAX_COL:
                 a[current_row, current_col] = path
