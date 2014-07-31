@@ -12,21 +12,31 @@ from functools import partial
 import logging
 _log = logging.getLogger(__name__)
 
-current_row = 0
-current_col = 0
+col_offset = (
+    # (key, offset, display name)
+    ('INDEX', 0, 'INDEX'),
+    ('OBJ_TYPE', 1, 'OBJECT TYPE'),
+    ('NAME', 2, 'OBJECT NAME'),
+    ('#ATTR', 3, '#ATTRIBUTES'),
+    ('#LNK', 4, '#LINKS'),
+    ('DTYPE', 5, 'DATA TYPE'),
+    ('RANK', 6, 'RANK'),
+    ('DSPACE', 7, 'DATA SPACE')
+)
+
+current_idx = 1
 
 #===============================================================================
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "An HDF5 path name.")
-@xl_func("string filename, string location : string",
+@xl_func("string filename : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5disp1(filename,location):
+def h5disp1(filename):
     """
-    Display detailed information about a specific location in an HDF5 file.
+    Display contents of an HDF5 file in tabular form
     """
 
 #===============================================================================
@@ -38,88 +48,96 @@ def h5disp1(filename,location):
 
     with h5py.File(filename, 'r') as f:
 
-        if not location in f:
-            return "Invalid location specified."
-
-        obj = f[location]
-        cls = f.get(location,getclass=True)
-        
         # reset the currents
-        global current_row, current_col
+        global current_idx, current_row
+        current_idx = 1
         current_row = 0
-        current_col = 0
+
+        lines = []
+        
+        # the header line
+        ht = {}
+        for c in col_offset:
+            ht[c[0]] = c[2]
+        lines.append(ht)
+
+        # render the root group
+        lines.append(
+            {
+                'INDEX': 0,
+                'OBJ_TYPE': 'GROUP',
+                'NAME': '/',
+                '#ATTR': len(f.attrs.keys()),
+                '#LNK': len(f.keys())
+            })
+        
+        def print_obj(grp, name):
+
+            global current_idx
+            
+            path = posixpath.join(grp.name, name)
+            
+            obj = grp[name]
+            obj_type = grp.get(name, getclass=True)
+                
+            if obj_type == h5py.Group:
+                lines.append(
+                    {
+                        'INDEX': current_idx,
+                        'OBJ_TYPE': 'GROUP',
+                        'NAME': path,
+                        '#ATTR': len(obj.attrs.keys()),
+                        '#LNK': len(obj.keys())
+                    })
+
+            elif obj_type == h5py.Dataset:
+                lines.append(
+                    {
+                        'INDEX': current_idx,
+                        'OBJ_TYPE': 'DATASET',
+                        'NAME': name.split('/')[-1],
+                        '#ATTR': len(obj.attrs.keys()),
+                        'DTYPE': str(obj.dtype),
+                        'RANK': len(obj.shape),
+                        'DSPACE': str(obj.shape)
+                    })
+
+            else:
+                lines.append(
+                    {
+                        'INDEX': current_idx,
+                        'OBJ_TYPE': str(obj_type),
+                        'NAME': name.split('/')[-1],
+                    })
+                
+            current_idx += 1
+
+        f.visit(partial(print_obj, f))
 
         # generate the display
 
-        # TODO: for now we hardcode a 120x40 display. Fix this!
-        MAX_ROW = 120
-        MAX_COL = 40
         dty = h5py.special_dtype(vlen=str)
-        a = np.empty((MAX_ROW, MAX_COL), dtype=dty)
+        a = np.empty((2*len(lines), len(col_offset)), dtype=dty)
 
-        path = obj.name
+        # render the header row
+        for k in col_offset:
+            a[current_row,k[1]] = lines[0][k[0]]
+        current_row += 1
 
-        # render attributes
-        
-        if cls == h5py.Group or cls == h5py.Dataset or cls == h5py.NamedDatatype:
-            
-            num_attr = len(obj.attrs)
-            row = current_row
-            col = current_col
-            if num_attr > 0:
-                a[row,col] = 'Number of attributes:'
-                a[row,col+1] = num_attr
-                row += 1
-                
-                keys = obj.attrs.keys()
-                vals = obj.attrs.values()
-                for i in range(min(MAX_ROW, num_attr)):
-                    a[row+i,col+1] = keys[i]
-                    a[row+i,col+2] = str(vals[i])
-                row += num_attr
-                
-                current_row = row + 2
+        # render the root group
+        for k in col_offset:
+            if k[0] in lines[1].keys():
+                a[current_row,k[1]] = lines[1][k[0]]
+        current_row += 1
 
-        # render object specific stuff
-                
-        row = current_row
-        col = current_col
-
-        if cls == h5py.Group:
-
-            num_links = len(obj.keys())
-            a[row,col] = 'Number of links:'
-            a[row,col+1] = num_links
-            if num_links > 0:
-                a[row+1,col] = 'Link names:'
-                for i in range(min(MAX_ROW,num_links)):
-                    a[row+1+i,col+1] = obj.keys()[i]
-            current_row += num_links+2
-                    
-        elif cls == h5py.Dataset:
-
-            a[row,col] = 'Number of elements:'
-            a[row,col+1] = obj.size
-            row += 1
-
-            a[row,col] = 'Shape:'
-            if len(obj.shape) > 0:
-                for i in range(len(obj.shape)):
-                    a[row,col+1+i] = obj.shape[i]
-            else:
-                a[row,col+1] = '()'
-            row += 1
-                
-            a[row,col] = 'Type:'
-            a[row,col+1] = str(obj.dtype)
-            row += 1
-            
-            current_row = row + 2
-
-        else:
-            a[current_row, current_col] = path
-        
-        #if current_row < MAX_ROW and current_col < MAX_COL:
+        #render the rest
+        for i in range(2,len(lines)):
+            if lines[i]['OBJ_TYPE'] == 'GROUP':
+                current_row += 1
+            for k in col_offset:
+                if k[0] in lines[i].keys():
+                    a[current_row,k[1]] = lines[i][k[0]]
+            current_row += 1
 
         # get the address of the calling cell using xlfCaller
         caller = pyxll.xlfCaller()
