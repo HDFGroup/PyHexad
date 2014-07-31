@@ -12,8 +12,8 @@ from functools import partial
 import logging
 _log = logging.getLogger(__name__)
 
-current_row = 0
-current_col = 0
+current_idx = 1
+max_col = 0
 
 #===============================================================================
 
@@ -38,32 +38,45 @@ def h5disp(filename):
     with h5py.File(filename, 'r') as f:
 
         # reset the currents
-        global current_row, current_col
-        current_row = 0
-        current_col = 0
+        global current_idx, max_col
+        current_idx = 1
+        max_col = 0
         
-        # generate the display
+        lines = []
 
-        MAX_ROW = 120
-        MAX_COL = 40
-        dty = h5py.special_dtype(vlen=str)
-        a = np.empty((MAX_ROW, MAX_COL), dtype=dty)
+        # render the root group
+        lines.append((0, 1, '/'))
 
         def print_obj(grp, name):
 
-            global current_row, current_col
+            global current_idx, max_col
 
             path = posixpath.join(grp.name, name)
-            current_col = path.count('/') - 1
-            if grp.get(name, getclass=True) != h5py.Group:
-                path = path.split('/')[-1]
 
-            if current_row < MAX_ROW and current_col < MAX_COL:
-                a[current_row, current_col] = path
-                current_row += 1
+            current_col = path.count('/')
+            if max_col < current_col: max_col = current_col
+
+            if grp.get(name, getclass=True) == h5py.Group:
+                lines.append((current_idx, current_col, path))
+            else:
+                lines.append((current_idx, current_col, path.split('/')[-1]))
+
+            current_idx += 1
 
         f.visit(partial(print_obj, f))
 
+        # generate the display
+
+        dty = h5py.special_dtype(vlen=str)
+        a = np.empty((len(lines)+1, max_col+1), dtype=dty)
+
+        current_row = 0
+
+        for i in range(len(lines)):
+            a[current_row,0] = lines[i][0]
+            a[current_row,lines[i][1]] = lines[i][2]
+            current_row += 1
+        
         # get the address of the calling cell using xlfCaller
         caller = pyxll.xlfCaller()
         address = caller.address
