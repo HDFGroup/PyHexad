@@ -1,4 +1,4 @@
-h5xl
-====
+PyHexad
+=======
 
-Excel add-in for HDF5
+A PyXLL-based Excel add-in for HDF5
