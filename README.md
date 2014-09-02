@@ -1,4 +1,4 @@
 PyHexad
 =======
 
-A PyXLL-based Excel add-in for HDF5
+A **Py**XLL-based **H**DF5 **Ex**cel **ad**d-in
