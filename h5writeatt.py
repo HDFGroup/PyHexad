@@ -1,11 +1,11 @@
 
-import pyxll
-from pyxll import xl_arg_doc, xl_func
 import h5py
 import h5xl
-import numpy as np
-
 import logging
+import numpy as np
+import pyxll
+from pyxll import xl_arg_doc, xl_func
+
 _log = logging.getLogger(__name__)
 
 #===============================================================================
@@ -27,6 +27,18 @@ def h5writeattr(filename, location, attname, attvalue):
 
 #===============================================================================
 
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+        
+    if not isinstance(location, str):
+        raise TypeError, 'String expected.'
+        
+    if not isinstance(attname, str):
+        raise TypeError, 'String expected.'
+
+    if attval is None:
+        raise ValueError, 'Value expected.'
+        
     ret = None
 
     if not h5xl.file_exists(filename):

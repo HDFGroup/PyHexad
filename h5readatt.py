@@ -1,10 +1,10 @@
 
-import pyxll
-from pyxll import xl_arg_doc, xl_func
 import h5py
 import h5xl
-
 import logging
+import pyxll
+from pyxll import xl_arg_doc, xl_func
+
 _log = logging.getLogger(__name__)
 
 #===============================================================================
@@ -22,6 +22,15 @@ def h5readattr(filename, location, attr):
     """
 
 #===============================================================================
+
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(location, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(attr, str):
+        raise TypeError, 'String expected.'
 
     if not h5xl.file_exists(filename):
         return "Can't open file."

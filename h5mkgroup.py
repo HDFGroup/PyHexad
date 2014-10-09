@@ -10,7 +10,7 @@ _log = logging.getLogger(__name__)
 #===============================================================================
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "The name of the HDF5 group.")
+@xl_arg_doc("groupname", "The name of the HDF5 group.")
 @xl_func("string filename, string groupname: string",
          category="HDF5",
          thread_safe=False,
@@ -21,6 +21,12 @@ def h5mkgroup(filename, groupname):
     """
 
 #===============================================================================
+
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(groupname, str):
+        raise TypeError, 'String expected.'
 
     # WHAT COULD GO WRONG?
     #

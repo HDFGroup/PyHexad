@@ -1,11 +1,11 @@
 
-import pyxll
-from pyxll import xl_arg_doc, xl_func, xl_macro
 import h5py
 import h5xl
-import numpy as np
-
 import logging
+import numpy as np
+import pyxll
+from pyxll import xl_arg_doc, xl_func, xl_macro
+
 _log = logging.getLogger(__name__)
 
 #==============================================================================
@@ -43,6 +43,24 @@ def h5write2(filename, datasetname, data, first, last, step):
 
 #==============================================================================
 
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+        
+    if not isinstance(datasetname, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(data, list) or isinstance(data, np.ndarray):
+        raise TypeError, 'List or NDArray expected.'
+
+    if not isinstance(first, list):
+        raise TypeError, 'List expected.'
+        
+    if not isinstance(last, list):
+        raise TypeError, 'List expected.'
+        
+    if not isinstance(step, list):
+        raise TypeError, 'List expected.'
+        
     ret = None
 
     try:

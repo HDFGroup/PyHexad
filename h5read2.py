@@ -46,6 +46,21 @@ def h5read2(filename, datasetname, first, last, step):
 
 #===============================================================================
 
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+        
+    if not isinstance(datasetname, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(first, list):
+        raise TypeError, 'List expected.'
+        
+    if not isinstance(last, list):
+        raise TypeError, 'List expected.'
+        
+    if not isinstance(step, list):
+        raise TypeError, 'List expected.'
+
     ret = None
     
     if not h5xl.file_exists(filename):

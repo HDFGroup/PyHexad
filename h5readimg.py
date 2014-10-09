@@ -16,7 +16,13 @@ import os
 @xl_func("string filename, string location: string", category="HDF5")
 def h5readimg(filename, location):
     """Reads an HDF5 image (dataset)"""
-            
+    
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(location, str):
+        raise TypeError, 'String expected.'
+
     try:
         with h5py.File(filename) as f:
             # find the dataset and render the image in a temporary file

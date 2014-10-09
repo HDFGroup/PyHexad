@@ -1,10 +1,10 @@
 
-from pyxll import xl_arg_doc, xl_func
 import h5py
 import h5xl
-import numpy as np
-
 import logging
+import numpy as np
+from pyxll import xl_arg_doc, xl_func
+
 _log = logging.getLogger(__name__)
 
 supported_types = ('double', 'int64', 'int32', 'int16', 'int8',
@@ -83,7 +83,7 @@ def get_chunk_dimensions(chunk):
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5mkarray(filename, datasetname, size, plist):
+def h5mkarray(filename, datasetname, size, plist=None):
     """
     Creates a new dataset and, on success, returns a string (datasetname).
     A new HDF5 file be created, if it doesn't exist already.
@@ -128,6 +128,19 @@ def h5mkarray(filename, datasetname, size, plist):
     Default: false
     """
 #===============================================================================
+
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(datasetname, str):
+        raise TypeError, 'String expected.'
+
+    if not isinstance(size, list):
+        raise TypeError, 'List expected.'
+
+    if plist != None:
+        if not isinstance(plist, str):
+            raise TypeError, 'String expected.'
 
     # WHAT COULD GO WRONG?
     #

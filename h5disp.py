@@ -1,15 +1,15 @@
 
 import automation
-import pyxll
-from pyxll import xl_arg_doc, xl_func
-import h5py
-import h5xl
-import numpy as np
-import posixpath
 import functools
 from functools import partial
-
+import h5py
+import h5xl
 import logging
+import numpy as np
+import posixpath
+import pyxll
+from pyxll import xl_arg_doc, xl_func
+
 _log = logging.getLogger(__name__)
 
 current_idx = 1
@@ -23,12 +23,19 @@ max_col = 0
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5disp(filename):
+def h5disp(filename, location=None):
     """
     Display contents of an HDF5 file
     """
 
 #===============================================================================
+
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+
+    if location is not None:
+        if not isinstance(location, str):
+            raise TypeError, 'String expected.'
 
     ret = None
     

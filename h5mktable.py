@@ -1,6 +1,7 @@
 
-import numpy as np
+
 import h5py
+import numpy as np
 from table_helpers import dtype_from_heading
 
 # run a few simple tests
