@@ -83,7 +83,7 @@ def get_chunk_dimensions(chunk):
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5create(filename, datasetname, size, plist):
+def h5mkarray(filename, datasetname, size, plist):
     """
     Creates a new dataset and, on success, returns a string (datasetname).
     A new HDF5 file be created, if it doesn't exist already.
