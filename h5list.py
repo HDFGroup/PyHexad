@@ -34,7 +34,7 @@ current_idx = 1
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5disp1(filename):
+def h5list(filename):
     """
     Display contents of an HDF5 file in tabular form
     """
