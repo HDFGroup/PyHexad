@@ -15,7 +15,7 @@ _log = logging.getLogger(__name__)
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=False)
-def h5mkgrp(filename, groupname):
+def h5mkgroup(filename, groupname):
     """
     Creates an HDF5 group (and missing intermediate groups or the file)
     """
