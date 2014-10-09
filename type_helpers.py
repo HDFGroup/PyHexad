@@ -38,7 +38,7 @@ def dims_tuple_string(s):
     that Numpy wants (DIM0,) instead of (DIM0)
     """
     if not isinstance(s, str):
-        raise Type, 'String expected'
+        raise TypeError, 'String expected.'
 
     dims = s.strip()
     a = dims.split(' ')
@@ -62,7 +62,7 @@ def parse_dtype(s):
     Numpy dtype object. 
     """
     if not isinstance(s, str):
-        raise Type, 'String expected'
+        raise TypeError, 'String expected.'
 
     t = s
     if s.find(':') > 0:
