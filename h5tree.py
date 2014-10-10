@@ -31,7 +31,7 @@ max_col = 0
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5disp(filename, location=None):
+def h5tree(filename, location=None):
     """
     Display contents of an HDF5 file in hierarchical form
     """
