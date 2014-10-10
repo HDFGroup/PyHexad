@@ -1,16 +1,18 @@
 
 import automation
-import pyxll
-from pyxll import xl_arg_doc, xl_func
-import h5py
-import h5xl
-import numpy as np
-import posixpath
 import functools
 from functools import partial
-
+import h5py
+import h5xl
 import logging
+import numpy as np
+import posixpath
+import pyxll
+from pyxll import xl_arg_doc, xl_func
+
 _log = logging.getLogger(__name__)
+
+# the heading layout
 
 col_offset = (
     # (key, offset, display name)
@@ -29,7 +31,8 @@ current_idx = 1
 #===============================================================================
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_func("string filename : string",
+@xl_arg_doc("location", "An HDF5 path name.")
+@xl_func("string filename, string location : var",
          category="HDF5",
          thread_safe=False,
          macro=True,
@@ -41,18 +44,34 @@ def h5list(filename):
 
 #===============================================================================
 
-    ret = None
-    
-    if not h5xl.file_exists(filename):
-        return "Can't open file."
+    if not isinstance(filename, str):
+        raise TypeError, 'String expected.'
+
+    if location is not None:
+        if not isinstance(location, str):
+            raise TypeError, 'String expected.'
+            
+    if not file_exists(filename):
+        raise IOError, "Can't open file."
+
 
     with h5py.File(filename, 'r') as f:
 
-        # reset the currents
+        base = f
+        if location != '':
+            if not location in f:
+                return 'Invalid location.'
+            else:
+                base = f[location]
+        
+        # reset the current position
+        
         global current_idx, current_row
         current_idx = 1
         current_row = 0
 
+        # this is our "screen", which consists of lines
+                
         lines = []
         
         # the header line
@@ -162,6 +181,4 @@ def h5list(filename):
         # kick off the asynchronous call to the update function
         pyxll.async_call(update_func)
 
-        ret = 'Enjoy the show!'
-        
-        return ret
+        return '\0'

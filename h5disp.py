@@ -33,7 +33,7 @@ max_col = 0
          disable_function_wizard_calc=True)
 def h5disp(filename, location=None):
     """
-    Display contents of an HDF5 file
+    Display contents of an HDF5 file in hierarchical form
     """
 
 #===============================================================================
