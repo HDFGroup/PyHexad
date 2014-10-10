@@ -16,11 +16,9 @@ from pyxll import xl_arg_doc, xl_func
 _log = logging.getLogger(__name__)
 
 # keep track of the current pixel position in these globals
-# TODO: Add safeguards so that we don't exceed the Excel row and column
-#       count limits!
 
-current_idx = 1
-max_col = 0
+current_idx = 0
+max_col = 1
 
 #===============================================================================
 
@@ -63,18 +61,21 @@ def h5tree(filename, location=None):
 
     with h5py.File(filename, 'r') as f:
 
+        # initialize the current position
+        
+        global current_idx, max_col
+        current_idx = 0
+        max_col = 1
+
         base = f
+        base_type = h5py.Group
+        
         if location != '':
             if not location in f:
                 return 'Invalid location.'
             else:
                 base = f[location]
-
-        # reset the current position
-        
-        global current_idx, max_col
-        current_idx = 1
-        max_col = 0
+                base_type = f.get(location, getclass=True)
 
         # this is our "screen", which consists of lines
         
@@ -86,22 +87,23 @@ def h5tree(filename, location=None):
             lines.append((0, 1, '/'))
         else:
             lines.append((0, 1, base.name))
-
+        current_idx += 1
+            
+        #======================================================================
         # this is the callback for rendering links
         
         def print_obj(grp, name):
-            
+
             global current_idx, max_col
 
             # make sure we don't "overdraw"
-            
             if current_idx >= Limits.EXCEL_MAX_ROWS or max_col >= Limits.EXCEL_MAX_COLS:
                 return 1
 
             path = posixpath.join(grp.name, name)
-            
             current_col = path.count('/')
-            if max_col < current_col: max_col = current_col
+            if max_col < current_col:
+                max_col = current_col
 
             # render the full path only for groups
             # otherwise just the link name
@@ -113,9 +115,13 @@ def h5tree(filename, location=None):
 
             current_idx += 1
 
+        #=======================================================================
+
         # start "going places"
+        # if this is not a group, there's nowhere to go
             
-        base.visit(partial(print_obj, base))
+        if base_type == h5py.Group:
+            base.visit(partial(print_obj, base))
 
         # generate the display in a Numpy array
         # QUESTION: is that redundant??? we have a list of lists already...
@@ -134,6 +140,7 @@ def h5tree(filename, location=None):
         caller = pyxll.xlfCaller()
         address = caller.address
 
+        #=======================================================================
         # the update is done asynchronously so as not to block some
         # versions of Excel by updating the worksheet from a worksheet function
         def update_func():
@@ -149,6 +156,8 @@ def h5tree(filename, location=None):
             except Exception, ex:
                 _log.info(ex)
                 ret = 'Internal error.'
+
+        #=======================================================================
 
         # kick off the asynchronous call to the update function
         pyxll.async_call(update_func)

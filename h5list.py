@@ -1,9 +1,12 @@
 
 import automation
+import config
+from config import Limits
+import file_helpers
+from file_helpers import file_exists
 import functools
 from functools import partial
 import h5py
-import h5xl
 import logging
 import numpy as np
 import posixpath
@@ -16,17 +19,63 @@ _log = logging.getLogger(__name__)
 
 col_offset = (
     # (key, offset, display name)
-    ('INDEX', 0, 'INDEX'),
+    ('INDEX',    0, 'INDEX'),
     ('OBJ_TYPE', 1, 'OBJECT TYPE'),
-    ('NAME', 2, 'OBJECT NAME'),
-    ('#ATTR', 3, '#ATTRIBUTES'),
-    ('#LNK', 4, '#LINKS'),
-    ('DTYPE', 5, 'DATA TYPE'),
-    ('RANK', 6, 'RANK'),
-    ('DSPACE', 7, 'DATA SPACE')
+    ('NAME',     2, 'OBJECT NAME'),
+    ('#ATTR',    3, '#ATTRIBUTES'),
+    ('#LNK',     4, '#LINKS'),
+    ('DTYPE',    5, 'DATA TYPE'),
+    ('RANK',     6, 'RANK'),
+    ('DSPACE',   7, 'DATA SPACE')
 )
 
-current_idx = 1
+# global index
+
+current_idx = 0
+
+#===============================================================================
+
+def render(grp, name):
+    """
+    render function for HDF5 objects
+    """
+
+    if not (isinstance(grp, h5py.File) or isinstance(grp, h5py.Group)):
+        raise TypeError, 'HDF5 file or group expected.'
+
+    if not isinstance(name, basestring):
+        raise TypeError, 'String expected.'
+    
+    path = posixpath.join(grp.name, name)    
+    obj = grp[name]
+    obj_type = grp.get(name, getclass=True)
+
+    global current_idx
+    
+    if obj_type == h5py.Group:
+        return {
+            'INDEX': current_idx,
+            'OBJ_TYPE': 'GROUP',
+            'NAME': path,
+            '#ATTR': len(obj.attrs.keys()),
+            '#LNK': len(obj.keys())
+        }
+    elif obj_type == h5py.Dataset:
+        return {
+            'INDEX': current_idx,
+            'OBJ_TYPE': 'DATASET',
+            'NAME': name.split('/')[-1],
+            '#ATTR': len(obj.attrs.keys()),
+            'DTYPE': str(obj.dtype),
+            'RANK': len(obj.shape),
+            'DSPACE': str(obj.shape)
+        }
+    else:
+        return {
+            'INDEX': current_idx,
+            'OBJ_TYPE': str(obj_type),
+            'NAME': name.split('/')[-1],
+        }
 
 #===============================================================================
 
@@ -37,7 +86,7 @@ current_idx = 1
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5list(filename):
+def h5list(filename, location):
     """
     Display contents of an HDF5 file in tabular form
     """
@@ -54,84 +103,55 @@ def h5list(filename):
     if not file_exists(filename):
         raise IOError, "Can't open file."
 
-
     with h5py.File(filename, 'r') as f:
 
+        # initialize the current position
+        
+        global current_idx, current_row
+        current_idx = 0
+        current_row = 0
+
         base = f
+        base_type = h5py.Group
+
         if location != '':
             if not location in f:
                 return 'Invalid location.'
             else:
                 base = f[location]
-        
-        # reset the current position
-        
-        global current_idx, current_row
-        current_idx = 1
-        current_row = 0
+                base_type = f.get(location, getclass=True)                
+                baseline = render(f, location)
+        else:
+            baseline = {
+                'INDEX': current_idx,
+                'OBJ_TYPE': 'GROUP',
+                'NAME': '/',
+                '#ATTR': len(f.attrs.keys()),
+                '#LNK': len(f.keys())
+            }
+        current_idx += 1
 
         # this is our "screen", which consists of lines
                 
         lines = []
         
-        # the header line
+        # the header line and the baseline
+        
         ht = {}
         for c in col_offset:
             ht[c[0]] = c[2]
         lines.append(ht)
-
-        # render the root group
-        lines.append(
-            {
-                'INDEX': 0,
-                'OBJ_TYPE': 'GROUP',
-                'NAME': '/',
-                '#ATTR': len(f.attrs.keys()),
-                '#LNK': len(f.keys())
-            })
+        lines.append(baseline)
         
         def print_obj(grp, name):
-
-            global current_idx
-            
-            path = posixpath.join(grp.name, name)
-            
-            obj = grp[name]
-            obj_type = grp.get(name, getclass=True)
-                
-            if obj_type == h5py.Group:
-                lines.append(
-                    {
-                        'INDEX': current_idx,
-                        'OBJ_TYPE': 'GROUP',
-                        'NAME': path,
-                        '#ATTR': len(obj.attrs.keys()),
-                        '#LNK': len(obj.keys())
-                    })
-
-            elif obj_type == h5py.Dataset:
-                lines.append(
-                    {
-                        'INDEX': current_idx,
-                        'OBJ_TYPE': 'DATASET',
-                        'NAME': name.split('/')[-1],
-                        '#ATTR': len(obj.attrs.keys()),
-                        'DTYPE': str(obj.dtype),
-                        'RANK': len(obj.shape),
-                        'DSPACE': str(obj.shape)
-                    })
-
-            else:
-                lines.append(
-                    {
-                        'INDEX': current_idx,
-                        'OBJ_TYPE': str(obj_type),
-                        'NAME': name.split('/')[-1],
-                    })
-                
+            global current_idx            
+            lines.append(render(grp, name))
             current_idx += 1
 
-        f.visit(partial(print_obj, f))
+        # if this is not a group, there's nowhere to go
+            
+        if base_type == h5py.Group:
+            base.visit(partial(print_obj, base))
 
         # generate the display
 
@@ -139,6 +159,7 @@ def h5list(filename):
         a = np.empty((2*len(lines), len(col_offset)), dtype=dty)
 
         # render the header row
+
         for k in col_offset:
             a[current_row,k[1]] = lines[0][k[0]]
         current_row += 1
@@ -162,6 +183,7 @@ def h5list(filename):
         caller = pyxll.xlfCaller()
         address = caller.address
 
+        #=======================================================================
         # the update is done asynchronously so as not to block some
         # versions of Excel by updating the worksheet from a worksheet function
         def update_func():
@@ -177,6 +199,8 @@ def h5list(filename):
             except Exception, ex:
                 _log.info(ex)
                 ret = 'Internal error.'
+
+        #=======================================================================
 
         # kick off the asynchronous call to the update function
         pyxll.async_call(update_func)
