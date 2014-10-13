@@ -1,3 +1,9 @@
+"""
+We use H5Ovisit to traverse the hierarchy starting from a given location.
+We render the structure in tabular form where objects in an HDF5 group
+are listed under that group heading. The table is sparse, because most
+attributes apply only to certain object types.
+"""
 
 import automation
 import config
@@ -93,24 +99,30 @@ def h5list(filename, location):
 
 #===============================================================================
 
+
     if not isinstance(filename, str):
-        raise TypeError, 'String expected.'
+        return "'filename' must be a string."
 
     if location is not None:
         if not isinstance(location, str):
-            raise TypeError, 'String expected.'
+            return "'location' must be a string."
             
     if not file_exists(filename):
-        raise IOError, "Can't open file."
+        return "Can't open file."
 
     with h5py.File(filename, 'r') as f:
 
         # initialize the current position
         
-        global current_idx, current_row
+        global current_idx
         current_idx = 0
-        current_row = 0
-
+        
+        # this is our "screen", which consists of lines
+                
+        lines = []
+        
+        # determine the base location, type, and render it
+        
         base = f
         base_type = h5py.Group
 
@@ -130,12 +142,6 @@ def h5list(filename, location):
                 '#LNK': len(f.keys())
             }
         current_idx += 1
-
-        # this is our "screen", which consists of lines
-                
-        lines = []
-        
-        # the header line and the baseline
         
         ht = {}
         for c in col_offset:
@@ -143,12 +149,17 @@ def h5list(filename, location):
         lines.append(ht)
         lines.append(baseline)
         
+        #======================================================================
+        # this is the callback for rendering links
+
         def print_obj(grp, name):
             global current_idx            
             lines.append(render(grp, name))
             current_idx += 1
+            
+        #======================================================================
 
-        # if this is not a group, there's nowhere to go
+        # if this is an HDF5  group, start "going places"
             
         if base_type == h5py.Group:
             base.visit(partial(print_obj, base))
@@ -158,6 +169,8 @@ def h5list(filename, location):
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((2*len(lines), len(col_offset)), dtype=dty)
 
+        current_row = 0
+        
         # render the header row
 
         for k in col_offset:

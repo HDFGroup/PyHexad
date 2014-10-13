@@ -6,6 +6,11 @@ The cell position where to render the link name of an object is as follows:
 
 row    - the current position in "document order"
 column - the "level" = the number of group ancestors
+
+Questions:
+
+1. What's a good error handling strategy?
+2 . How do we communicate with the user?
 """
 
 import automation
@@ -43,18 +48,7 @@ def h5tree(filename, location=None):
     Display contents of an HDF5 file in hierarchical form
     """
     
-#===============================================================================
-
-"""
-Questions:
-
-1. What's a good error handling strategy?
-2 . How do we communicate with the user?
-"""
-
-#===============================================================================
-
-if not isinstance(filename, str):
+    if not isinstance(filename, str):
         return "'filename' must be a string."
 
     if location is not None:
@@ -107,8 +101,7 @@ if not isinstance(filename, str):
             global current_idx, max_col
 
             # make sure we don't "overdraw"
-            if current_idx >= Limits.EXCEL_MAX_ROWS
-            or max_col >= Limits.EXCEL_MAX_COLS:
+            if current_idx >= Limits.EXCEL_MAX_ROWS or max_col >= Limits.EXCEL_MAX_COLS:
                 return 1
 
             path = posixpath.join(grp.name, name)
