@@ -1,3 +1,12 @@
+"""
+We use H5Ovisit to traverse the hierarchy starting from a given location.
+H5Ovisit introduces a traversal order that is akin to XML document order.
+A worksheet can be viewed as a 2D grid of rows and columns.
+The cell position where to render the link name of an object is as follows:
+
+row    - the current position in "document order"
+column - the "level" = the number of group ancestors
+"""
 
 import automation
 import config
@@ -17,8 +26,8 @@ _log = logging.getLogger(__name__)
 
 # keep track of the current pixel position in these globals
 
-current_idx = 0
-max_col = 1
+current_idx = -1
+max_col = -1
 
 #===============================================================================
 
@@ -33,28 +42,27 @@ def h5tree(filename, location=None):
     """
     Display contents of an HDF5 file in hierarchical form
     """
+    
+#===============================================================================
+
+"""
+Questions:
+
+1. What's a good error handling strategy?
+2 . How do we communicate with the user?
+"""
 
 #===============================================================================
 
-    """
-    We use H5Ovisit to traverse the hierarchy starting from a given location.
-    H5Ovisit introduces a traversal order that is akin to XML document order.
-    A worksheet can be viewed as a 2D grid of rows and columns.
-    The cell position where to render the link name of an object is as follows:
-
-    row    - the current position in "document order"
-    column - the "level" = the number of group ancestors
-    """
-
-    if not isinstance(filename, str):
-        raise TypeError, 'String expected.'
+if not isinstance(filename, str):
+        return "'filename' must be a string."
 
     if location is not None:
         if not isinstance(location, str):
-            raise TypeError, 'String expected.'
+            return "'location' must be a string."
             
     if not file_exists(filename):
-        raise IOError, "Can't open file."
+        return "Can't open file."
 
     # if a location was specified, we'll find out if it's meaningful only
     # after opening the file
@@ -67,6 +75,8 @@ def h5tree(filename, location=None):
         current_idx = 0
         max_col = 1
 
+        # determine the starting object and its type
+        
         base = f
         base_type = h5py.Group
         
@@ -97,7 +107,8 @@ def h5tree(filename, location=None):
             global current_idx, max_col
 
             # make sure we don't "overdraw"
-            if current_idx >= Limits.EXCEL_MAX_ROWS or max_col >= Limits.EXCEL_MAX_COLS:
+            if current_idx >= Limits.EXCEL_MAX_ROWS
+            or max_col >= Limits.EXCEL_MAX_COLS:
                 return 1
 
             path = posixpath.join(grp.name, name)
@@ -117,8 +128,7 @@ def h5tree(filename, location=None):
 
         #=======================================================================
 
-        # start "going places"
-        # if this is not a group, there's nowhere to go
+        # if this is an HDF5  group, start "going places"
             
         if base_type == h5py.Group:
             base.visit(partial(print_obj, base))
@@ -143,6 +153,7 @@ def h5tree(filename, location=None):
         #=======================================================================
         # the update is done asynchronously so as not to block some
         # versions of Excel by updating the worksheet from a worksheet function
+
         def update_func():
             xl = automation.xl_app()
             range = xl.Range(address)
