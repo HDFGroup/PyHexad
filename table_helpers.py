@@ -2,6 +2,8 @@
 import numpy as np
 from type_helpers import parse_dtype
 
+#===============================================================================
+
 def parse_heading(s):
     """
     When passed a correctly formatted header, this function returns a list with
@@ -52,6 +54,7 @@ def parse_heading(s):
             
     return lst
 
+#===============================================================================
 
 def dtype_from_heading(s):
     """
@@ -72,5 +75,7 @@ def dtype_from_heading(s):
 
     if len(check) != len(lst)/2:
         raise Exception, 'Duplicate column name in heading found.'
-        
+
     return np.dtype(descr)
+
+#===============================================================================

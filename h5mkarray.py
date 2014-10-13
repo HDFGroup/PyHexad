@@ -3,43 +3,6 @@ Creates a new dataset and, on success, returns a string (datasetname).
 A new HDF5 file be created, if it doesn't exist already.
 Missing intermediate HDF5 groups will be generated automatically.
 Existing datasets will NOT be overwritten and an error generated.
-
-Up to 32 dimensions are supported. Dimensions must be non-zero. A negative
-dimension is treated as unlimited and its absolute value will be used as
-the initial size.
-
-Dataset creation properties are specified as a list of name and value pair
-arguments: Name1,Value1,...,NameN,ValueN.
-
-Name: Datatype
-Purpose: Defines the datatype of the dataset.
-Values: [single, double, int8, int16, int32, int64, uint8, uint16, uint32, uint64]
-Default: double
-
-Name: ChunkSize
-Purpose: Defines the chunking layout of the dataset.
-Values: An array of positive integers of the same rank as the dataset
-Default: Not chunked.
-
-Name: Deflate
-Purpose: Enables GZIP compression.
-Values: [0-9]
-Default: 0 (no compression)
-
-Name: FillValue
-Purpose: Defines the fill value for numeric data sets.
-Values: Literal that can be converted to a value of the dataset element type.
-Default: 0
-
-Name: Fletcher32
-Purpose: Enable Fletcher32 checksum generation for the dataset.
-Values: Boolean
-Default: false
-
-Name: Shuffle
-Purpose: Enable the Shuffle filter.
-Values: Boolean
-Default: false
 """
 
 import h5_helpers
