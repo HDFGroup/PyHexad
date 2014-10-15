@@ -92,7 +92,7 @@ def render(grp, name):
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5list(filename, location):
+def h5showList(filename, location):
     """
     Display contents of an HDF5 file in tabular form
     """
