@@ -18,9 +18,9 @@ _log = logging.getLogger(__name__)
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5read(filename, datasetname):
+def h5readArray(filename, datasetname):
     """
-    Reads an HDF5 dataset
+    Reads an HDF5 array
     """
 
 #===============================================================================
