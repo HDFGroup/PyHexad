@@ -25,7 +25,7 @@ _log = logging.getLogger(__name__)
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5mktable(filename, datasetname, heading, plist=None):
+def h5newTable(filename, datasetname, heading, plist=None):
     """
     Creates a new HDF5 table ("compound dataset").
     """
