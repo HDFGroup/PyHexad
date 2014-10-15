@@ -18,7 +18,7 @@ _log = logging.getLogger(__name__)
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5writeattr(filename, location, attname, attvalue):
+def h5writeAttribute(filename, location, attname, attvalue):
     """
     Writes the value of an HDF5 attribute
 
