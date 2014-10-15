@@ -30,6 +30,65 @@ scalar_dtypes = {
     "USHORT":  np.uint16
     }
 
+# Excel subsitution types
+
+dtype_excel_substitute = {
+    np.double: np.double,
+    np.int8:   np.int32,
+    np.int16:  np.int32,
+    np.int32:  np.int32,
+    np.int64:  np.int32,
+    np.single: np.double,
+    np.uint8:  np.int32,
+    np.uint16: np.int32,
+    np.uint32: np.int32,
+    np.uint64: np.int32
+    }
+
+#===============================================================================
+
+def is_supported_h5array_type(dty):
+
+    if not isinstance(dty, np.dtype):
+        raise TypeError, 'Numpy dtype expected.'
+        
+    return (dty in scalar_dtypes.values()) or (dty.kind == 'S')
+
+#===============================================================================
+
+def is_supported_h5table_type(dty):
+
+    if not isinstance(dty, np.dtype):
+        raise TypeError, 'Numpy dtype expected.'
+
+    if dty.fields is None:
+        return False
+
+    for k in dty.fields:
+        if not is_supported_h5array_type(dty.fields[k][0]):
+            return False
+
+    return True
+    
+#===============================================================================
+
+def excel_dtype(dty):
+
+    if not isinstance(dty, np.dtype):
+        raise TypeError, 'Numpy dtype expected.'
+
+    if dty.fields is None:
+        if dty in dtype_excel_substitute.keys():
+            return dtype_excel_substitute[dty]
+        else:
+            raise Exception, 'Unsupported scalar type.'
+    else:
+        spec = []
+        for k in dty.fields:
+            spec.append((k, excel_dtype(dty.fields[k][0])))
+        return np.dtype(spec)
+            
+#===============================================================================
 
 def dims_tuple_string(s):
     """
@@ -55,6 +114,7 @@ def dims_tuple_string(s):
             result = result + ','
     return result
 
+#===============================================================================
 
 def parse_dtype(s):
     """
