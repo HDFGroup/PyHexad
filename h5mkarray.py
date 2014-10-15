@@ -27,7 +27,7 @@ _log = logging.getLogger(__name__)
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5mkarray(filename, datasetname, size, plist=None):
+def h5newArray(filename, datasetname, size, plist=None):
     """
     Creates a new multi-diensional HDF5 dataset of a scalar datatype.
     """
