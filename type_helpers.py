@@ -6,43 +6,45 @@ import numpy as np
 # supported scalar types
 
 scalar_dtypes = {
-    "BYTE":    np.int8,
-    "DOUBLE":  np.double,
-    "FLOAT":   np.single,
-    "FLOAT32": np.single,
-    "FLOAT64": np.double,
-    "INT":     np.int32,
-    "INT8":    np.int8,
-    "INT16":   np.int16,
-    "INT32":   np.int32,
-    "INT64":   np.int64,
-    "LONG":    np.int64,
-    "SHORT":   np.int16,
-    "SINGLE":  np.single,
+    "BYTE":    np.dtype(np.int8),
+    "DOUBLE":  np.dtype(np.float64),
+    "FLOAT":   np.dtype(np.float32),
+    "FLOAT32": np.dtype(np.float32),
+    "FLOAT64": np.dtype(np.float64),
+    "INT":     np.dtype(np.int32),
+    "INT8":    np.dtype(np.int8),
+    "INT16":   np.dtype(np.int16),
+    "INT32":   np.dtype(np.int32),
+    "INT64":   np.dtype(np.int64),
+    "LONG":    np.dtype(np.int64),
+    "SHORT":   np.dtype(np.int16),
+    "SINGLE":  np.dtype(np.float32),
     "STRING":  h5py.special_dtype(vlen=str),
-    "UBYTE":   np.uint8,
-    "UINT":    np.uint32,
-    "UINT8":   np.uint8,
-    "UINT16":  np.uint16,
-    "UINT32":  np.uint32,
-    "UINT64":  np.uint64,
-    "ULONG":   np.uint64,
-    "USHORT":  np.uint16
+    "UBYTE":   np.dtype(np.uint8),
+    "UINT":    np.dtype(np.uint32),
+    "UINT8":   np.dtype(np.uint8),
+    "UINT16":  np.dtype(np.uint16),
+    "UINT32":  np.dtype(np.uint32),
+    "UINT64":  np.dtype(np.uint64),
+    "ULONG":   np.dtype(np.uint64),
+    "USHORT":  np.dtype(np.uint16)
     }
 
 # Excel subsitution types
 
 dtype_excel_substitute = {
-    np.double: np.double,
-    np.int8:   np.int32,
-    np.int16:  np.int32,
-    np.int32:  np.int32,
-    np.int64:  np.int32,
-    np.single: np.double,
-    np.uint8:  np.int32,
-    np.uint16: np.int32,
-    np.uint32: np.int32,
-    np.uint64: np.int32
+    np.dtype(np.double):  np.dtype(np.float64),
+    np.dtype(np.float32): np.dtype(np.float64),
+    np.dtype(np.float64): np.dtype(np.float64),
+    np.dtype(np.int8):    np.dtype(np.int32),
+    np.dtype(np.int16):   np.dtype(np.int32),
+    np.dtype(np.int32):   np.dtype(np.int32),
+    np.dtype(np.int64):   np.dtype(np.int32),
+    np.dtype(np.single):  np.dtype(np.float64),
+    np.dtype(np.uint8):   np.dtype(np.int32),
+    np.dtype(np.uint16):  np.dtype(np.int32),
+    np.dtype(np.uint32):  np.dtype(np.int32),
+    np.dtype(np.uint64):  np.dtype(np.int32)
     }
 
 #===============================================================================

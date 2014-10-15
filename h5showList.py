@@ -18,6 +18,8 @@ import numpy as np
 import posixpath
 import pyxll
 from pyxll import xl_arg_doc, xl_func
+import type_helpers
+from type_helpers import is_supported_h5array_type, is_supported_h5table_type
 
 _log = logging.getLogger(__name__)
 
@@ -67,9 +69,18 @@ def render(grp, name):
             '#LNK': len(obj.keys())
         }
     elif obj_type == h5py.Dataset:
+
+        # determine what kind of dataset
+        flavor = 'DATASET'
+        dty = obj.dtype
+        if is_supported_h5array_type(dty):
+            flavor = 'ARRAY'
+        elif is_supported_h5table_type(dty):
+            flavor = 'TABLE'
+
         return {
             'INDEX': current_idx,
-            'OBJ_TYPE': 'DATASET',
+            'OBJ_TYPE': flavor,
             'NAME': name.split('/')[-1],
             '#ATTR': len(obj.attrs.keys()),
             'DTYPE': str(obj.dtype),

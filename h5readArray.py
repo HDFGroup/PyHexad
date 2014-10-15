@@ -1,41 +1,50 @@
 
 import automation
+import file_helpers
+from file_helpers import file_exists
+import h5py
+import logging
+import numpy as np
 import pyxll
 from pyxll import xl_arg_doc, xl_func
-import h5py
-import h5xl
-import numpy as np
+import type_helpers
+from type_helpers import is_supported_h5array_type, excel_dtype
 
-import logging
 _log = logging.getLogger(__name__)
 
 #===============================================================================
 
 @xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("datasetname", "The name of the dataset.")
-@xl_func("string filename, string datasetname : string",
+@xl_arg_doc("arrayname", "The name of the HDF5 array.")
+@xl_func("string filename, string arrayname : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5readArray(filename, datasetname):
+def h5readArray(filename, arrayname):
     """
     Reads an HDF5 array
     """
 
 #===============================================================================
 
-    ret = None
-    
-    if not h5xl.file_exists(filename):
+    ret = '\0'
+
+    if not isinstance(filename, str):
+        return "'filename' must be a string."
+
+    if not isinstance(arrayname, str):
+        return "'arrayname' must be a string."
+            
+    if not file_exists(filename):
         return "Can't open file."
 
     with h5py.File(filename, 'r') as f:
 
         # do we have a dataset?
-        if (not datasetname in f) or (f.get(datasetname, getclass=True) != h5py.Dataset):
+        if (not arrayname in f) or (f.get(arrayname, getclass=True) != h5py.Dataset):
             return "Can't open dataset."
-        dst = f[datasetname]
+        dst = f[arrayname]
 
         # is it the right shape?
         dsp = dst.shape
@@ -44,9 +53,9 @@ def h5readArray(filename, datasetname):
 
         # has it the right type?
         dty = dst.dtype
-        if dty not in h5xl.supported_dtypes:
+        if not is_supported_h5array_type:
             return "Unsupported dataset element type."
-
+            
         # get the address of the calling cell using xlfCaller
         caller = pyxll.xlfCaller()
         address = caller.address
@@ -67,7 +76,9 @@ def h5readArray(filename, datasetname):
             
             try:
                 with h5py.File(filename, 'r') as f:
-                    dset = f[datasetname]
+                    dset = f[arrayname]
+                    mty = excel_dtype(dst.dtype)
+
                     x = None
                     
                     # we can handle only 1D or 2D datasets
@@ -84,7 +95,7 @@ def h5readArray(filename, datasetname):
                         cols = xl.Range(rows.Resize(3,1),rows.Resize(3,1))
                         cols.Value = dsp[1]
                             
-                    range.Value = np.asarray(x, dtype=np.float64)
+                    range.Value = np.asarray(x, dtype=mty)
 
                     # this looks awkward. there must be a better way...
                     rows = xl.Range(rows.Resize(2,1),rows.Resize(2,1))
