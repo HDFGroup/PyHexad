@@ -16,7 +16,7 @@ _log = logging.getLogger(__name__)
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5readattr(filename, location, attr):
+def h5readAttribute(filename, location, attr):
     """
     Reads and returns the value of an HDF5 attribute.
     """
