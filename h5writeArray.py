@@ -17,7 +17,7 @@ _log = logging.getLogger(__name__)
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5write(filename, datasetname, data):
+def h5writeArray(filename, datasetname, data):
     """
     Writes data to an HDF5 dataset
 
