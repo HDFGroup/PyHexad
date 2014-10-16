@@ -1,17 +1,10 @@
-"""
-We use H5Ovisit to traverse the hierarchy starting from a given location.
-H5Ovisit introduces a traversal order that is akin to XML document order.
-A worksheet can be viewed as a 2D grid of rows and columns.
-The cell position where to render the link name of an object is as follows:
-
-row    - the current position in "document order"
-column - the "level" = the number of group ancestors
-
-Questions:
-
-1. What's a good error handling strategy?
-2 . How do we communicate with the user?
-"""
+# We use H5Ovisit to traverse the hierarchy starting from a given location.
+# H5Ovisit introduces a traversal order that is akin to XML document order.
+# A worksheet can be viewed as a 2D grid of rows and columns.
+# The cell position where to render the link name of an object is as follows:
+#
+# row    - the current position in "document order"
+# column - the "level" = the number of group ancestors
 
 import automation
 import config
@@ -29,115 +22,107 @@ from pyxll import xl_arg_doc, xl_func
 
 _log = logging.getLogger(__name__)
 
-# keep track of the current pixel position in these globals
-
-current_idx = -1
-max_col = -1
-
 #===============================================================================
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "An HDF5 path. (Default: '/')")
-@xl_func("string filename, string location : var",
-         category="HDF5",
-         thread_safe=False,
-         macro=True,
-         disable_function_wizard_calc=True)
-def h5showTree(filename, location=None):
-    """
-    Display contents of an HDF5 file in hierarchical form
-    """
+def render_tree(loc):
+
+    result = []
     
-    if not isinstance(filename, str):
-        return "'filename' must be a string."
+    if isinstance(loc, h5py.File) or isinstance(loc, h5py.Group):
 
-    if location is not None:
-        if not isinstance(location, str):
-            return "'location' must be a string."
-            
-    if not file_exists(filename):
-        return "Can't open file."
+        result.append((1, loc.name))
 
-    # if a location was specified, we'll find out if it's meaningful only
-    # after opening the file
-
-    with h5py.File(filename, 'r') as f:
-
-        # initialize the current position
-        
-        global current_idx, max_col
-        current_idx = 0
-        max_col = 1
-
-        # determine the starting object and its type
-        
-        base = f
-        base_type = h5py.Group
-        
-        if location != '':
-            if not location in f:
-                return 'Invalid location.'
-            else:
-                base = f[location]
-                base_type = f.get(location, getclass=True)
-
-        # this is our "screen", which consists of lines
-        
-        lines = []
-
-        # render the base location
-        
-        if base == f:
-            lines.append((0, 1, '/'))
-        else:
-            lines.append((0, 1, base.name))
-        current_idx += 1
-            
         #======================================================================
         # this is the callback for rendering links
         
         def print_obj(grp, name):
 
-            global current_idx, max_col
-
-            # make sure we don't "overdraw"
-            if current_idx >= Limits.EXCEL_MAX_ROWS or max_col >= Limits.EXCEL_MAX_COLS:
-                return 1
-
             path = posixpath.join(grp.name, name)
-            current_col = path.count('/')
-            if max_col < current_col:
-                max_col = current_col
+            col = path.count('/')
 
             # render the full path only for groups
             # otherwise just the link name
             
             if grp.get(name, getclass=True) == h5py.Group:
-                lines.append((current_idx, current_col, path))
+                result.append((col, path))
             else:
-                lines.append((current_idx, current_col, path.split('/')[-1]))
-
-            current_idx += 1
+                result.append((col, path.split('/')[-1]))
 
         #=======================================================================
 
-        # if this is an HDF5  group, start "going places"
-            
-        if base_type == h5py.Group:
-            base.visit(partial(print_obj, base))
+        loc.visit(partial(print_obj, loc))
+        
+    elif isinstance(loc, h5py.Dataset) or isintance(loc, h5py.Datatype) or isinstance(loc, h5py.SoftLink) or isinstance(loc, h5py.ExternalLink):
+        
+        result.append(loc.name)
+        
+    else:
+        raise TypeError, "'location' is not an HDF5 handle."
 
+    # assign row numbers and determine the maximum row and column
+    max_col = 1
+    for line in result:
+        if line[0] > max_col:
+            max_col = line[0]
+
+    return result, max_col
+
+#===============================================================================
+
+@xl_func("string filename, string location : string",
+         category="HDF5",
+         thread_safe=False,
+         macro=True,
+         disable_function_wizard_calc=True)
+def h5showTree(filename, location):
+    """
+    Display contents of an HDF5 file in hierarchical form
+    filename: the name of an HDF5 file
+    location: an HDF5 path name (optional)
+    """
+    
+    if not isinstance(filename, str):
+        raise TypeError, "'filename' must be a string."
+
+    if not isinstance(location, str):
+            raise TypeError, "'location' must be a string."
+            
+    if not file_exists(filename):
+        return "Can't open file '%s' or the file is not an HDF5 file." % (filename)
+
+    # if a location was specified, we'll find out if it's meaningful only
+    # after opening the file
+
+    with h5py.File(filename, 'r') as f:
+        
+        hnd = f
+
+        if location != '':
+            if not location in f:
+                return 'Invalid location.'
+            else:
+                hnd = f[location]
+
+        # render the tree as a list of lines
+
+        lines = []
+        max_col = 0
+        
+        lines, max_col = render_tree(hnd)
+        
+        if len(lines) >= Limits.EXCEL_MAX_ROWS or max_col >= Limits.EXCEL_MAX_COLS:
+            return 'The number objects in the file or the depth of the hierarchy exceeds the maximum number of rows or columns of an Excel worksheet.'
+            
         # generate the display in a Numpy array
-        # QUESTION: is that redundant??? we have a list of lists already...
 
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((len(lines)+1, max_col+1), dtype=dty)
 
-        current_row = 0
-
-        for i in range(len(lines)):
-            a[current_row,0] = lines[i][0]
-            a[current_row,lines[i][1]] = lines[i][2]
-            current_row += 1
+        row = 0
+        for l in lines:
+            a[row,0] = row
+            a[row, l[0]] = l[1]
+            row += 1
         
         # get the address of the calling cell using xlfCaller
         caller = pyxll.xlfCaller()
