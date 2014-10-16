@@ -59,7 +59,7 @@ def render_tree(loc):
     else:
         raise TypeError, "'location' is not an HDF5 handle."
 
-    # assign row numbers and determine the maximum row and column
+    # determine the maximum column index
     max_col = 1
     for line in result:
         if line[0] > max_col:
