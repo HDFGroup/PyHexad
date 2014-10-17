@@ -25,7 +25,12 @@ _log = logging.getLogger(__name__)
 #===============================================================================
 
 def render_tree(loc):
-
+    # Create a list of tuples (col, name), where 'col' is the
+    # column index and 'name' is a link or HDF5 path name.
+    # The row index is the position in the list.
+    #
+    # Returns the list and the maximum column index.
+    
     result = []
     
     if isinstance(loc, h5py.File) or isinstance(loc, h5py.Group):
@@ -34,7 +39,7 @@ def render_tree(loc):
 
         #======================================================================
         # this is the callback for rendering links
-        
+        #
         def print_obj(grp, name):
 
             path = posixpath.join(grp.name, name)
@@ -47,14 +52,15 @@ def render_tree(loc):
                 result.append((col, path))
             else:
                 result.append((col, path.split('/')[-1]))
-
+        #
         #=======================================================================
 
         loc.visit(partial(print_obj, loc))
         
-    elif isinstance(loc, h5py.Dataset) or isintance(loc, h5py.Datatype) or isinstance(loc, h5py.SoftLink) or isinstance(loc, h5py.ExternalLink):
+    elif isinstance(loc, h5py.Dataset) or isintance(loc, h5py.Datatype) or \
+         isinstance(loc, h5py.SoftLink) or isinstance(loc, h5py.ExternalLink):
         
-        result.append(loc.name)
+        result.append((1, loc.name))
         
     else:
         raise TypeError, "'location' is not an HDF5 handle."
@@ -62,8 +68,7 @@ def render_tree(loc):
     # determine the maximum column index
     max_col = 1
     for line in result:
-        if line[0] > max_col:
-            max_col = line[0]
+        if line[0] > max_col: max_col = line[0]
 
     return result, max_col
 
@@ -88,15 +93,17 @@ def h5showTree(filename, location):
             raise TypeError, "'location' must be a string."
             
     if not file_exists(filename):
-        return "Can't open file '%s' or the file is not an HDF5 file." % (filename)
+        return "Can't open file '%s' or the file is not an HDF5 file." %  \
+            (filename)
 
+    ret = '\0'
+    
     # if a location was specified, we'll find out if it's meaningful only
     # after opening the file
 
     with h5py.File(filename, 'r') as f:
         
         hnd = f
-
         if location != '':
             if not location in f:
                 return 'Invalid location.'
@@ -110,8 +117,11 @@ def h5showTree(filename, location):
         
         lines, max_col = render_tree(hnd)
         
-        if len(lines) >= Limits.EXCEL_MAX_ROWS or max_col >= Limits.EXCEL_MAX_COLS:
-            return 'The number objects in the file or the depth of the hierarchy exceeds the maximum number of rows or columns of an Excel worksheet.'
+        if len(lines) >= Limits.EXCEL_MAX_ROWS or \
+           max_col >= Limits.EXCEL_MAX_COLS:
+            return 'The number objects in the file or the depth of the' \
+                'hierarchy exceeds the maximum number of rows or columns' \
+                'of an Excel worksheet.'
             
         # generate the display in a Numpy array
 
@@ -119,6 +129,7 @@ def h5showTree(filename, location):
         a = np.empty((len(lines)+1, max_col+1), dtype=dty)
 
         row = 0
+        # l -> (col, name)
         for l in lines:
             a[row,0] = row
             a[row, l[0]] = l[1]
@@ -151,4 +162,4 @@ def h5showTree(filename, location):
         # kick off the asynchronous call to the update function
         pyxll.async_call(update_func)
 
-        return '\0'
+        return ret
