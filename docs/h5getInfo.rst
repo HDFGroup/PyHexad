@@ -1,7 +1,7 @@
 
-.. _h5showTree:
+.. _h5getInfo:
 
-``h5showTree``
+``h5getInfo``
 --------------
 
 ``h5showTree`` displays the contents of an HDF5 file in *hierarchical* or tree
@@ -65,11 +65,7 @@ Display detailed information about the HDF5 object a starting at location
 
 See Also
 ^^^^^^^^
-
-:ref:`h5getInfo`
-:ref:`h5showList`
+[`h5getInfo`](https://github.com/HDFGroup/PyHexad/wiki/Reference-:-h5getInfo), [`h5showList`](https://github.com/HDFGroup/PyHexad/wiki/Reference-:-h5showList)
 
 PyXLL Function
 ^^^^^^^^^^^^^^
-.. currentmodule:: h5showTree
-.. autofunction:: h5showTree

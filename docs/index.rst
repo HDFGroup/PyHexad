@@ -12,9 +12,11 @@ Contents:
    :maxdepth: 2
 
    introduction
-   reference
-   h5showTree
-
+   display
+   arrays
+   tables
+   attributes
+   
 Indices and tables
 ==================
 
