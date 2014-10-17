@@ -82,8 +82,9 @@ def render_tree(loc):
 def h5showTree(filename, location):
     """
     Display contents of an HDF5 file in hierarchical form
-    filename: the name of an HDF5 file
-    location: an HDF5 path name (optional)
+    
+    :param filename: the name of an HDF5 file
+    :param location: an HDF5 path name (optional)
     """
     
     if not isinstance(filename, str):
