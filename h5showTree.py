@@ -85,6 +85,7 @@ def h5showTree(filename, location):
     
     :param filename: the name of an HDF5 file
     :param location: an HDF5 path name (optional)
+    :returns: A string
     """
     
     if not isinstance(filename, str):
