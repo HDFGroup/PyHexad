@@ -1,9 +1,7 @@
-"""
-We use H5Ovisit to traverse the hierarchy starting from a given location.
-We render the structure in tabular form where objects in an HDF5 group
-are listed under that group heading. The table is sparse, because most
-attributes apply only to certain object types.
-"""
+# We use H5Ovisit to traverse the hierarchy starting from a given location.
+# We render the structure in tabular form where objects in an HDF5 group
+# are listed under that group heading. The table is sparse, because most
+# attributes apply only to certain object types.
 
 import automation
 import config
@@ -23,23 +21,21 @@ from type_helpers import is_supported_h5array_type, is_supported_h5table_type
 
 _log = logging.getLogger(__name__)
 
-# the heading layout
+#===============================================================================
+
+# the table heading layout
 
 col_offset = (
     # (key, offset, display name)
-    ('INDEX',    0, 'INDEX'),
-    ('OBJ_TYPE', 1, 'OBJECT TYPE'),
-    ('NAME',     2, 'OBJECT NAME'),
-    ('#ATTR',    3, '#ATTRIBUTES'),
-    ('#LNK',     4, '#LINKS'),
-    ('DTYPE',    5, 'DATA TYPE'),
-    ('RANK',     6, 'RANK'),
-    ('DSPACE',   7, 'DATA SPACE')
+#    ('INDEX',    0, 'INDEX'),
+    ('OBJ_TYPE', 0, 'OBJECT TYPE'),
+    ('NAME',     1, 'OBJECT NAME'),
+    ('#ATTR',    2, '#ATTRIBUTES'),
+    ('#LNK',     3, '#LINKS'),
+    ('DTYPE',    4, 'DATA TYPE'),
+    ('RANK',     5, 'RANK'),
+    ('DSPACE',   6, 'DATA SPACE')
 )
-
-# global index
-
-current_idx = 0
 
 #===============================================================================
 
@@ -58,11 +54,8 @@ def render(grp, name):
     obj = grp[name]
     obj_type = grp.get(name, getclass=True)
 
-    global current_idx
-    
     if obj_type == h5py.Group:
         return {
-            'INDEX': current_idx,
             'OBJ_TYPE': 'GROUP',
             'NAME': path,
             '#ATTR': len(obj.attrs.keys()),
@@ -79,7 +72,6 @@ def render(grp, name):
             flavor = 'TABLE'
 
         return {
-            'INDEX': current_idx,
             'OBJ_TYPE': flavor,
             'NAME': name.split('/')[-1],
             '#ATTR': len(obj.attrs.keys()),
@@ -89,119 +81,99 @@ def render(grp, name):
         }
     else:
         return {
-            'INDEX': current_idx,
             'OBJ_TYPE': str(obj_type),
             'NAME': name.split('/')[-1],
         }
 
 #===============================================================================
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "An HDF5 path name.")
-@xl_func("string filename, string location : var",
+def render_table(loc):
+
+    result = []
+
+    ht = {}
+    for c in col_offset:
+        ht[c[0]] = c[2]
+    result.append(ht)
+
+    if isinstance(loc, h5py.File) or isinstance(loc, h5py.Group):
+
+        #======================================================================
+        # this is the callback for rendering links
+        def print_obj(grp, name):
+            result.append(render(grp, name))
+        #
+        #======================================================================
+
+        loc.visit(partial(print_obj, loc))
+        
+    elif isinstance(loc, h5py.Dataset) or isintance(loc, h5py.Datatype) or \
+         isinstance(loc, h5py.SoftLink) or isinstance(loc, h5py.ExternalLink):
+
+        result.append(render(loc.parent, loc.name.split('/')[-1]))
+
+    else:
+        raise TypeError, "'location' is not an HDF5 handle."
+
+    return result
+
+#===============================================================================
+
+@xl_func("string filename, string location : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
 def h5showList(filename, location):
     """
-    Display contents of an HDF5 file in tabular form
+    Display contents of an HDF5 file in hierarchical form
+    
+    :param filename: the name of an HDF5 file
+    :param location: an HDF5 path name (optional)
+    :returns: A string
     """
 
-#===============================================================================
-
-
     if not isinstance(filename, str):
-        return "'filename' must be a string."
+        raise TypeError, "'filename' must be a string."
 
-    if location is not None:
-        if not isinstance(location, str):
-            return "'location' must be a string."
+    if not isinstance(location, str):
+            raise TypeError, "'location' must be a string."
             
     if not file_exists(filename):
-        return "Can't open file."
+        return "Can't open file '%s' or the file is not an HDF5 file." %  \
+            (filename)
+
+    ret = '\0'
 
     with h5py.File(filename, 'r') as f:
 
-        # initialize the current position
-        
-        global current_idx
-        current_idx = 0
-        
-        # this is our "screen", which consists of lines
-                
-        lines = []
-        
-        # determine the base location, type, and render it
-        
-        base = f
-        base_type = h5py.Group
-
+        hnd = f
         if location != '':
             if not location in f:
                 return 'Invalid location.'
             else:
-                base = f[location]
-                base_type = f.get(location, getclass=True)                
-                baseline = render(f, location)
-        else:
-            baseline = {
-                'INDEX': current_idx,
-                'OBJ_TYPE': 'GROUP',
-                'NAME': '/',
-                '#ATTR': len(f.attrs.keys()),
-                '#LNK': len(f.keys())
-            }
-        current_idx += 1
+                hnd = f[location]
+
+        # render the tree as a list of lines
+
+        lines = render_table(hnd)
         
-        ht = {}
-        for c in col_offset:
-            ht[c[0]] = c[2]
-        lines.append(ht)
-        lines.append(baseline)
-        
-        #======================================================================
-        # this is the callback for rendering links
-
-        def print_obj(grp, name):
-            global current_idx            
-            lines.append(render(grp, name))
-            current_idx += 1
+        if len(lines) >= Limits.EXCEL_MAX_ROWS:
+            return 'The number objects in the file exceeds the maximum number of rows' \
+                'of an Excel worksheet.'
             
-        #======================================================================
-
-        # if this is an HDF5  group, start "going places"
-            
-        if base_type == h5py.Group:
-            base.visit(partial(print_obj, base))
-
-        # generate the display
+        # generate the display in a Numpy array
 
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((2*len(lines), len(col_offset)), dtype=dty)
 
-        current_row = 0
+        row = 0
         
-        # render the header row
-
-        for k in col_offset:
-            a[current_row,k[1]] = lines[0][k[0]]
-        current_row += 1
-
-        # render the root group
-        for k in col_offset:
-            if k[0] in lines[1].keys():
-                a[current_row,k[1]] = lines[1][k[0]]
-        current_row += 1
-
-        #render the rest
-        for i in range(2,len(lines)):
-            if lines[i]['OBJ_TYPE'] == 'GROUP':
-                current_row += 1
+        for i in range(0,len(lines)):
             for k in col_offset:
                 if k[0] in lines[i].keys():
-                    a[current_row,k[1]] = lines[i][k[0]]
-            current_row += 1
+                    a[row,k[1]] = lines[i][k[0]]
+            row += 1
 
         # get the address of the calling cell using xlfCaller
         caller = pyxll.xlfCaller()

@@ -130,6 +130,8 @@ def h5showTree(filename, location):
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((len(lines)+1, max_col+1), dtype=dty)
 
+        # add row numbers on the fly
+        
         row = 0
         # l -> (col, name)
         for l in lines:
