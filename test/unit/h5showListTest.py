@@ -42,91 +42,91 @@ class h5showListTest(unittest.TestCase):
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 7)
+            self.assertEqual(len(lst), 8)
 
     def test2(self):
         file_name = 'compound.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 2)
+            self.assertEqual(len(lst), 3)
 
     def test3(self):
         file_name = 'compound_attr.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 1)
+            self.assertEqual(len(lst), 2)
 
     def test4(self):
         file_name = 'empty.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 1)
+            self.assertEqual(len(lst), 2)
 
     def test5(self):
         file_name = 'group100.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 101)
+            self.assertEqual(len(lst), 102)
 
     def test6(self):
         file_name = 'hdfeos5.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 101)
+            self.assertEqual(len(lst), 102)
 
     def test7(self):
         file_name = 'namedtype.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 3)
+            self.assertEqual(len(lst), 4)
 
     def test8(self):
         file_name = 'tall.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 10)
+            self.assertEqual(len(lst), 11)
 
     def test8(self):
         file_name = 'tall_with_udlink.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 10)
+            self.assertEqual(len(lst), 11)
 
     def test9(self):
         file_name = 'tgroup.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 14)
+            self.assertEqual(len(lst), 15)
 
     def test9(self):
         file_name = 'tref.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 5)
+            self.assertEqual(len(lst), 6)
 
     def test10(self):
         file_name = 'tstr.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 6)
+            self.assertEqual(len(lst), 7)
 
     def test11(self):
         file_name = 'zerodim.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
             lst = render_table(loc)
-            self.assertEqual(len(lst), 2)
+            self.assertEqual(len(lst), 3)
 
 if __name__ == '__main__':
     #setup test files
