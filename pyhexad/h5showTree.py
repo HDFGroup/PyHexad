@@ -87,7 +87,8 @@ def render_tree(loc, path):
         else: # we should never get here
             raise Exception, 'What kind of hardlink is this???'
         
-    elif isinstance(species, h5py.SoftLink) or isinstance(species, h5py.ExternalLink):
+    elif isinstance(species, h5py.SoftLink) or \
+         isinstance(species, h5py.ExternalLink):
         # we don't follow symlinks 4 now
         result.append((1, loc.name + '/' + path))
         
@@ -133,8 +134,7 @@ def h5showTree(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
-        path = location
-        
+        path = location        
         if path != '':
             if not path in f:
                 return 'Invalid location.'

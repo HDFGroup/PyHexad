@@ -10,6 +10,8 @@ import file_helpers
 from file_helpers import file_exists
 import functools
 from functools import partial
+import h5_helpers
+from h5_helpers import path_is_valid_wrt_loc
 import h5py
 import logging
 import numpy as np
@@ -41,7 +43,7 @@ col_offset = (
 
 #===============================================================================
 
-def render(grp, name):
+def render_row(grp, name):
     """
     render function for HDF5 objects
     """
@@ -101,8 +103,18 @@ def render(grp, name):
 
 #===============================================================================
 
-def render_table(loc):
+def render_table(loc, path):
+    """
+    Returns a list of sparse rows startting with the "table heading".
+    """
 
+    # check if the (loc, path) combo is valid
+    is_valid, species = path_is_valid_wrt_loc(loc, path)
+    
+    if not is_valid:
+        raise Exception, 'The specified path is invalid with respect to' \
+            ' the location provided.'
+    
     result = []
 
     # line for table heading
@@ -111,30 +123,43 @@ def render_table(loc):
         ht[c[0]] = c[2]
     result.append(ht)
 
-    if isinstance(loc, h5py.File) or isinstance(loc, h5py.Group):
-
-        # patch the name for the root group
-        name = loc.name.split('/')[-1]
-        if name == '': name = '/'
+    if species is None or isinstance(species, h5py.HardLink):
+        # loc is file or group, or path is hardlink
         
-        result.append(render(loc.parent, name))
+        hnd = loc
+        if path != '/':
+            hnd = loc[path]
+    
+        if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
 
-        #======================================================================
-        # this is the callback for rendering links
-        def print_obj(grp, name):
-            result.append(render(grp, name))
-        #
-        #======================================================================
-
-        loc.visit(partial(print_obj, loc))
+            # patch the name for the root group
+            name = hnd.name.split('/')[-1]
+            if name == '': name = '/'
         
-    elif isinstance(loc, h5py.Dataset) or isintance(loc, h5py.Datatype) or \
-         isinstance(loc, h5py.SoftLink) or isinstance(loc, h5py.ExternalLink):
+            result.append(render_row(hnd.parent, name))
 
-        result.append(render(loc.parent, loc.name.split('/')[-1]))
+            #======================================================================
+            # this is the callback for rendering links
+            def print_obj(grp, name):
+                result.append(render_row(grp, name))
+            #
+            #======================================================================
 
-    else:
-        raise TypeError, "'location' is not an HDF5 handle."
+            hnd.visit(partial(print_obj, hnd))
+
+        elif isinstance(hnd, h5py.Dataset) or isinstance(hnd, h5py.Datatype):
+            
+            result.append(render_row(hnd.parent, hnd.name.split('/')[-1]))
+
+        else: # we should never get here
+            raise Exception, 'What kind of hardlink is this???'
+        
+
+    elif isinstance(species, h5py.SoftLink) or \
+         isinstance(species, h5py.ExternalLink):
+        # we don't follow symlinks 4 now
+
+        result.append(render_row(hnd.parent, hnd.name.split('/')[-1]))
 
     return result
 
@@ -156,10 +181,8 @@ def h5showList(filename, location):
 
     if not isinstance(filename, str):
         raise TypeError, "'filename' must be a string."
-
     if not isinstance(location, str):
             raise TypeError, "'location' must be a string."
-            
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)
@@ -168,16 +191,21 @@ def h5showList(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
-        hnd = f
-        if location != '':
-            if not location in f:
+        path = location        
+        if path != '':
+            if not path in f:
                 return 'Invalid location.'
-            else:
-                hnd = f[location]
+        else:
+            path = '/'
 
+        is_valid, dummy = path_is_valid_wrt_loc(f, path)
+
+        if not is_valid:
+            return 'Invalid location specified.'
+                
         # render the tree as a list of lines
 
-        lines = render_table(hnd)
+        lines = render_table(f, path)
         
         if len(lines) >= Limits.EXCEL_MAX_ROWS:
             return 'The number objects in the file exceeds the maximum number' \
