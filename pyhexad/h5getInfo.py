@@ -1,7 +1,3 @@
-"""
-Display detailed information about HDF5 objects, including HDF5 attributes
-and their values.
-"""
 
 import automation
 import config
@@ -16,33 +12,40 @@ import numpy as np
 import posixpath
 import pyxll
 from pyxll import xl_arg_doc, xl_func
+import renderer
+from renderer import draw
 
 _log = logging.getLogger(__name__)
 
 #===============================================================================
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "An HDF5 path name.")
-@xl_func("string filename, string location : var",
+@xl_func("string filename, string location : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
          disable_function_wizard_calc=True)
-def h5getInfo(filename,location):
+def h5getInfo(filename, location):
     """
     Display detailed information about a specific location in an HDF5 file.
+        
+    :param filename: the name of an HDF5 file
+    :param location: an HDF5 path name (optional)
+    :returns: A string
     """
 
 #===============================================================================
 
     if not isinstance(filename, str):
-        return "'filename' must be a string."
+        raise TypeError, "'filename' must be a string."
 
     if not isinstance(location, str):
-        return "'location' must be a string."
+            raise TypeError, "'location' must be a string."
             
     if not file_exists(filename):
-        return "Can't open file."
+        return "Can't open file '%s' or the file is not an HDF5 file." %  \
+            (filename)
+
+    ret = '\0'
 
     with h5py.File(filename, 'r') as f:
 
@@ -60,7 +63,7 @@ def h5getInfo(filename,location):
 
         # render attributes
         
-        if cls == h5py.Group or cls == h5py.Dataset or cls == h5py.NamedDatatype:
+        if cls == h5py.Group or cls == h5py.Dataset or cls == h5py.Datatype:
             
             num_attr = len(obj.attrs)
             if num_attr > 0:
@@ -87,12 +90,16 @@ def h5getInfo(filename,location):
             lines.append(('Shape:', str(obj.shape)))
             lines.append(('Type:', str(obj.dtype)))
 
-        else:
-            pass
+        elif cls == h5py.Datatype:
 
+            lines.append(('Type:', str(obj.dtype)))
+
+        else:
+
+            lines.append(('Type:', str(cls)))
 
         # copy lines into Numpy array
-        # Is that really necessary?
+        # Is that really necessary? No. Fix this!
             
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((len(lines)+1, 2), dtype=dty)
@@ -103,30 +110,7 @@ def h5getInfo(filename,location):
             row += 1
             if row >= Limits.EXCEL_MAX_ROWS:
                 break
-        
-        # get the address of the calling cell using xlfCaller
-        caller = pyxll.xlfCaller()
-        address = caller.address
 
-        #=======================================================================
-        # the update is done asynchronously so as not to block some
-        # versions of Excel by updating the worksheet from a worksheet function
-        def update_func():
-            xl = automation.xl_app()
-            range = xl.Range(address)
-            
-            try:
-                with h5py.File(filename, 'r') as f:
-                    range = xl.Range(range.Resize(2,1),
-                                     range.Resize(a.shape[0], a.shape[1]))
-                    range.Value = np.asarray(a, dtype=dty)
+        renderer.draw(a)
 
-            except Exception, ex:
-                _log.info(ex)
-                ret = 'Internal error.'
-        #=======================================================================
-
-        # kick off the asynchronous call to the update function
-        pyxll.async_call(update_func)
-
-        return '\0'
+        return ret

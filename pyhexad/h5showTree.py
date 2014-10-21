@@ -19,6 +19,8 @@ import numpy as np
 import posixpath
 import pyxll
 from pyxll import xl_arg_doc, xl_func
+import renderer
+from renderer import draw
 
 _log = logging.getLogger(__name__)
 
@@ -139,31 +141,6 @@ def h5showTree(filename, location):
             a[row, l[0]] = l[1]
             row += 1
         
-        # get the address of the calling cell using xlfCaller
-        caller = pyxll.xlfCaller()
-        address = caller.address
-
-        #=======================================================================
-        # the update is done asynchronously so as not to block some
-        # versions of Excel by updating the worksheet from a worksheet function
-
-        def update_func():
-            xl = automation.xl_app()
-            range = xl.Range(address)
-            
-            try:
-                with h5py.File(filename, 'r') as f:
-                    range = xl.Range(range.Resize(2,1),
-                                     range.Resize(a.shape[0], a.shape[1]))
-                    range.Value = np.asarray(a, dtype=dty)
-
-            except Exception, ex:
-                _log.info(ex)
-                ret = 'Internal error.'
-
-        #=======================================================================
-
-        # kick off the asynchronous call to the update function
-        pyxll.async_call(update_func)
+        renderer.draw(a)
 
         return ret
