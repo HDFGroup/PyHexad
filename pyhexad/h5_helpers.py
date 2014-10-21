@@ -3,6 +3,36 @@ import h5py
 
 #===============================================================================
 
+def is_h5_location_handle(loc):
+    return (isinstance(loc, h5py.File) or isinstance(loc, h5py.Group))
+
+#===============================================================================
+
+def path_is_valid_wrt_loc(loc, path):
+    """
+    Returns if 'path' is valid with respect to location 'loc'.
+    If so, the second return value is the type of link or None,
+    if the path is '/'.
+    """
+
+    if is_h5_location_handle(loc) and isinstance(path, str) and (path in loc):
+        if path != '/':
+            known_link_type = True
+            try:
+                # h5py throws an error when it encounters an unknown link type
+                lty = loc.get(path, getlink=True)
+            except:
+                known_link_type = False
+                lty = None
+                pass
+            return (known_link_type, lty)
+        else:
+            return (True, None)
+    else:
+        return (False, None)
+
+#===============================================================================
+
 def is_object(filename, path):
     """
     Check if there is an object at 'path' in 'filename'.

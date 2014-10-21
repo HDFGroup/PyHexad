@@ -41,15 +41,19 @@ class h5showTreeTest(unittest.TestCase):
         file_name = 'cadchftickdata.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 7)
             self.assertEqual(max_col, 1)
-
+            lst, max_col = render_tree(loc, '/18-09-2011')
+            self.assertEqual(len(lst), 1)
+            self.assertEqual(max_col, 1)
+            self.assertRaises(TypeError, render_tree, 'Hello, World!')
+            
     def test2(self):
         file_name = 'compound.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 2)
             self.assertEqual(max_col, 1)
 
@@ -57,7 +61,7 @@ class h5showTreeTest(unittest.TestCase):
         file_name = 'compound_attr.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 1)
             self.assertEqual(max_col, 1)
 
@@ -65,7 +69,7 @@ class h5showTreeTest(unittest.TestCase):
         file_name = 'empty.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 1)
             self.assertEqual(max_col, 1)
 
@@ -73,7 +77,7 @@ class h5showTreeTest(unittest.TestCase):
         file_name = 'group100.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 101)
             self.assertEqual(max_col, 1)
 
@@ -81,7 +85,7 @@ class h5showTreeTest(unittest.TestCase):
         file_name = 'hdfeos5.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 101)
             self.assertEqual(max_col, 5)
 
@@ -89,55 +93,68 @@ class h5showTreeTest(unittest.TestCase):
         file_name = 'namedtype.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 3)
+            self.assertEqual(max_col, 1)
+            lst, max_col = render_tree(loc, 'dtype_simple')
+            self.assertEqual(len(lst), 1)
             self.assertEqual(max_col, 1)
 
     def test8(self):
         file_name = 'tall.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 10)
             self.assertEqual(max_col, 3)
+            lst, max_col = render_tree(loc, '/g1/g1.2/g1.2.1')
+            self.assertEqual(len(lst), 1)
+            self.assertEqual(max_col, 1)
+            lst, max_col = render_tree(loc, '/g1/g1.2/g1.2.1/slink')
+            self.assertEqual(len(lst), 1)
+            self.assertEqual(max_col, 1)
 
-    def test8(self):
+    def test9(self):
         file_name = 'tall_with_udlink.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 10)
             self.assertEqual(max_col, 3)
+            lst, max_col = render_tree(loc, '/g1/g1.2/extlink')
+            self.assertEqual(len(lst), 1)
+            self.assertEqual(max_col, 1)
+            self.assertRaises(Exception, render_tree, loc, '/g2/udlink')
 
-    def test9(self):
+    def test10(self):
         file_name = 'tgroup.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 14)
             self.assertEqual(max_col, 3)
 
-    def test9(self):
+    def test11(self):
         file_name = 'tref.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 5)
             self.assertEqual(max_col, 2)
 
-    def test10(self):
+    def test12(self):
         file_name = 'tstr.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 6)
             self.assertEqual(max_col, 1)
 
-    def test11(self):
+    def test13(self):
         file_name = 'zerodim.h5'
         getFile(file_name)
         with h5py.File(file_name) as loc:
-            lst, max_col = render_tree(loc)
+            lst, max_col = render_tree(loc, '/')
             self.assertEqual(len(lst), 2)
             self.assertEqual(max_col, 1)
 
