@@ -12,10 +12,11 @@ Contents:
    :maxdepth: 2
 
    introduction
-   display
-   arrays
-   tables
-   attributes
+   display/index.rst
+   arrays/index.rst
+   tables/index.rst
+   attributes/index.rst
+   images/index.rst
    
 Indices and tables
 ==================

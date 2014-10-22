@@ -1,17 +1,17 @@
 
 .. _h5showList:
 
-``h5showList``
---------------
+A Tabular View: ``h5showList``
+------------------------------
 
-``h5showTree`` displays the contents of an HDF5 file in *hierarchical* or tree
-view form. Starting at the HDF5 root group, all HDF5 objects in the HDF5 file
-are visited recursively. Representations of HDF5 objects which are "deeper"
-in the HDF5 hierarchy appear on a worksheet in cells farther to the right.
-This mimics a tree-view within the confines of a worksheet.
+``h5showList`` displays the contents of an HDF5 file in *tabular* form. If no
+alternative location is specified, starting at the HDF5 root group,
+all HDF5 objects in the HDF5 file are visited recursively.
+HDF5 objects are clustered by their "parent HDF5 group", and object
+properties, such as HDF5 attribute count, are shown in cells to the right.
+The specifics displayed depend on the HDF5 object kind.
 
-Excel UDF Syntax
-^^^^^^^^^^^^^^^^
+.. rubric:: Excel UDF Syntax
 
 ::
 
@@ -20,8 +20,8 @@ Excel UDF Syntax
   h5showTree(filename, location)
 
 
-Input Arguments
-^^^^^^^^^^^^^^^
+.. rubric:: Input Arguments
+
 +----------+------------------------------------------------------------+
 |Argument  |Description                                                 |
 +==========+============================================================+
@@ -30,44 +30,39 @@ Input Arguments
 |`location`|A text string (path) specifying where to begin the traversal|
 +----------+------------------------------------------------------------+
 
-Return Value
-^^^^^^^^^^^^
-On success, ``h5showTree`` populates a range of cells with the requested
-information.
+.. rubric:: Return Value
+
+On success, ``h5showList`` populates a range of cells with different
+HDF5 object properties in tabular form.
 
 On error, an error message (string) is returned.
 
-Error Conditions
-^^^^^^^^^^^^^^^^
+.. rubric:: Error Conditions
+
 The following conditions will create an error:
 
 1. An invalid file name
    
-  1. An empty string or a string that contains characters not supported by
+   * An empty string or a string that contains characters not supported by
      the operating system
-  2. It refers to a file system location for which the user has insufficient
+   * It refers to a file system location for which the user has insufficient
      access privileges
      
 2. An invalid location
    
-  1. An empty string
-  2. No HDF5 object exists at the specified location
+   * An empty string
+   * No HDF5 object exists at the specified location
 
-Examples
-^^^^^^^^
-Display detailed information about the HDF5 object a starting at location
-``/HDFEOS/GRIDS`` in file ``file.he5``.
+.. rubric:: Examples
+
+Display in table form information about the HDF5 objects in file ``file.h5``,
+beginning traversal at location ``/HDFEOS/GRIDS/SET2/Data Fields``.
 
 ::
    
-   h5showTree("file.he5", "/HDFEOS/GRIDS")
+   h5showList("file.h5", "/HDFEOS/GRIDS/SET2/Data Fields")
 
 
-See Also
-^^^^^^^^
-[`h5getInfo`](https://github.com/HDFGroup/PyHexad/wiki/Reference-:-h5getInfo), [`h5showList`](https://github.com/HDFGroup/PyHexad/wiki/Reference-:-h5showList)
+.. rubric:: See Also
 
-PyXLL Function
-^^^^^^^^^^^^^^
-.. currentmodule:: pyhexad
-.. autofunction:: h5showList
+:ref:`h5getInfo`, :ref:`h5showTree`
