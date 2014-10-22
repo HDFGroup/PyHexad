@@ -49,11 +49,10 @@ def render_tree(loc, path):
     result = []
     
     if species is None or isinstance(species, h5py.HardLink):
-        # loc is file or group, or path is hardlink
+        # the location is loc is a file or group, or the path is a hardlink
         
         hnd = loc
-        if path != '/':
-            hnd = loc[path]
+        if path != '/': hnd = loc[path]
         
         if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
 
@@ -94,8 +93,8 @@ def render_tree(loc, path):
         
     else:
         # could be a user-defined link, which we ignore 4 now
-        pass
-
+        result.append((1, 'Unknown link type found.'))
+        
     # determine the maximum column index
     max_col = 0
     for line in result:
@@ -118,6 +117,8 @@ def h5showTree(filename, location):
     :param location: an HDF5 path name (optional)
     :returns: A string
     """
+
+    # sanity check
     
     if not isinstance(filename, str):
         raise TypeError, "'filename' must be a string."
@@ -134,6 +135,8 @@ def h5showTree(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
+        # normalize the HDF5 path
+
         path = location        
         if path != '':
             if not path in f:
@@ -141,8 +144,9 @@ def h5showTree(filename, location):
         else:
             path = '/'
 
-        is_valid, dummy = path_is_valid_wrt_loc(f, path)
+        # Is this a valid location?
 
+        is_valid, dummy = path_is_valid_wrt_loc(f, path)
         if not is_valid:
             return 'Invalid location specified.'
             

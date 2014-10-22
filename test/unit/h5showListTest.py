@@ -103,6 +103,7 @@ class h5showListTest(unittest.TestCase):
             self.assertEqual(len(lst), 11)
             lst = render_table(loc, '/g1/g1.2/extlink')
             self.assertEqual(len(lst), 2)
+            self.assertRaises(Exception, render_table, loc, '/g2/udlink')
 
     def test9(self):
         file_name = 'tgroup.h5'
