@@ -21,6 +21,77 @@ _log = logging.getLogger(__name__)
 
 #===============================================================================
 
+def render_info(loc, path):
+    """
+    Returns a list of key/value pairs (more or less)
+    """
+
+    # check if the (loc, path) combo is valid
+    is_valid, species = path_is_valid_wrt_loc(loc, path)
+    
+    if not is_valid:
+        raise Exception, 'The specified path is invalid with respect to' \
+            ' the location provided.'
+    
+    result = []
+
+    if species is None or isinstance(species, h5py.HardLink):
+        # the location is loc is a file or group, or the path is a hardlink
+        
+        hnd = loc
+        if path != '/': hnd = loc[path]
+
+        num_attr = len(hnd.attrs)
+        if num_attr > 0:
+            result.append(('Number of attributes:', num_attr))
+            keys = hnd.attrs.keys()
+            vals = hnd.attrs.values()
+            for i in range(num_attr):
+                result.append((keys[i], str(vals[i])))
+            
+        if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
+
+            num_links = len(hnd.keys())
+            result.append(('Number of links:', num_links))
+            if num_links > 0:
+                result.append(('Link names:', '\0'))
+                a = hnd.keys()
+                for i in range(num_links):
+                    result.append(('\0', a[i]))        
+
+        elif isinstance(hnd, h5py.Dataset):
+
+            result.append(('Number of elements:', hnd.size))
+            result.append(('Shape:', str(hnd.shape)))
+            result.append(('Type:', str(hnd.dtype)))
+
+        elif isinstance(hnd, h5py.Datatype):
+
+            result.append(('Type:', str(hnd.dtype)))
+
+        else: # we should never get here
+            raise Exception, 'What kind of hardlink is this???'
+
+    elif isinstance(species, h5py.SoftLink) or \
+         isinstance(species, h5py.ExternalLink):
+        # we don't follow symlinks 4 now
+
+        if isinstance(species, h5py.SoftLink):
+            result.append(('Link:', 'SoftLink'))
+            result.append(('Destination:', species.path))
+        else: # external link
+            result.append(('Link:', 'ExternalLink'))
+            result.append(('Destination:', 'file://' + species.filename + \
+                          '/' + species.path))
+
+    else:
+        # could be a user-defined link, which we ignore 4 now
+        result.append(('Link:', 'Unknown link type.'))
+
+    return result
+
+#===============================================================================
+
 @xl_func("string filename, string location : string",
          category="HDF5",
          thread_safe=False,
@@ -68,61 +139,8 @@ def h5getInfo(filename, location):
 
         # generate the display - at the moment there are only two columns
 
-        lines = []
-        
-        if species is None or isinstance(species, h5py.HardLink):
-            # the location is loc is a file or group, or the path is a hardlink
-        
-            hnd = f
-            if path != '/': hnd = f[path]
+        lines = render_info(f, path)
 
-            num_attr = len(hnd.attrs)
-            if num_attr > 0:
-                lines.append(('Number of attributes:', num_attr))
-                keys = hnd.attrs.keys()
-                vals = hnd.attrs.values()
-                for i in range(num_attr):
-                    lines.append((keys[i], str(vals[i])))
-            
-            if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
-
-                num_links = len(hnd.keys())
-                lines.append(('Number of links:', num_links))
-                if num_links > 0:
-                    lines.append(('Link names:', '\0'))
-                    a = hnd.keys()
-                    for i in range(num_links):
-                        lines.append(('\0', a[i]))        
-
-            elif isinstance(hnd, h5py.Dataset):
-
-                lines.append(('Number of elements:', hnd.size))
-                lines.append(('Shape:', str(hnd.shape)))
-                lines.append(('Type:', str(hnd.dtype)))
-
-            elif isinstance(hnd, h5py.Datatype):
-
-                lines.append(('Type:', str(hnd.dtype)))
-
-            else: # we should never get here
-                raise Exception, 'What kind of hardlink is this???'
-
-        elif isinstance(species, h5py.SoftLink) or \
-             isinstance(species, h5py.ExternalLink):
-            # we don't follow symlinks 4 now
-
-            if isinstance(species, h5py.SoftLink):
-                lines.append(('Link:', 'SoftLink'))
-                lines.append(('Destination:', species.path))
-            else: # external link
-                lines.append(('Link:', 'ExternalLink'))
-                lines.append(('Destination:', 'file://' + species.filename + \
-                              '/' + species.path))
-
-        else:
-            # could be a user-defined link, which we ignore 4 now
-            lines.append(('Link:', 'Unknown link type.'))
-                
         # copy lines into Numpy array
         # Is that really necessary? No. Fix this!
             
