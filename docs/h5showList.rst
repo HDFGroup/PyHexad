@@ -69,5 +69,5 @@ See Also
 
 PyXLL Function
 ^^^^^^^^^^^^^^
-.. currentmodule:: h5showList
+.. currentmodule:: pyhexad
 .. autofunction:: h5showList

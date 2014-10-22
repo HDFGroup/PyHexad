@@ -71,5 +71,5 @@ See Also
 
 PyXLL Function
 ^^^^^^^^^^^^^^
-.. currentmodule:: h5showTree
+.. currentmodule:: pyhexad
 .. autofunction:: h5showTree
