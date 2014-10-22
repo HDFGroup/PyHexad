@@ -92,6 +92,8 @@ class h5showListTest(unittest.TestCase):
         with h5py.File(file_name) as loc:
             lst = render_table(loc, '/')
             self.assertEqual(len(lst), 11)
+            lst = render_table(loc, '/g1/g1.2/g1.2.1/slink')
+            self.assertEqual(len(lst), 2)
 
     def test8(self):
         file_name = 'tall_with_udlink.h5'
@@ -99,6 +101,8 @@ class h5showListTest(unittest.TestCase):
         with h5py.File(file_name) as loc:
             lst = render_table(loc, '/')
             self.assertEqual(len(lst), 11)
+            lst = render_table(loc, '/g1/g1.2/extlink')
+            self.assertEqual(len(lst), 2)
 
     def test9(self):
         file_name = 'tgroup.h5'

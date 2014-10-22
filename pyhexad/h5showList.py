@@ -38,7 +38,8 @@ col_offset = (
     ('#LNK',     4, '#LINKS'),
     ('DTYPE',    5, 'DATA TYPE'),
     ('RANK',     6, 'RANK'),
-    ('DSPACE',   7, 'DATA SPACE')
+    ('DSPACE',   7, 'DATA SPACE'),
+    ('DEST',     8, 'DESTINATION')
 )
 
 #===============================================================================
@@ -157,9 +158,20 @@ def render_table(loc, path):
 
     elif isinstance(species, h5py.SoftLink) or \
          isinstance(species, h5py.ExternalLink):
-        # we don't follow symlinks 4 now
+        # we don't follow symlinks 4 now, just print the destination
 
-        result.append(render_row(hnd.parent, hnd.name.split('/')[-1]))
+        lnk = loc.get(path, getlink=True)
+        ht = {}
+        ht['NAME'] = loc.name + '/' + path
+        
+        if isinstance(species, h5py.SoftLink):
+            ht['OBJ_TYPE'] = 'SOFTLINK'
+            ht['DEST'] = lnk.path
+        else:
+            ht['OBJ_TYPE'] = 'EXTERNALLINK'
+            ht['DEST'] = 'file://' + lnk.filename + '/' + lnk.path
+
+        result.append(ht)
 
     return result
 
