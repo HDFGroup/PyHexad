@@ -6,6 +6,8 @@ import file_helpers
 from file_helpers import file_exists
 import functools
 from functools import partial
+import h5_helpers
+from h5_helpers import path_is_valid_wrt_loc
 import h5py
 import logging
 import numpy as np
@@ -35,12 +37,12 @@ def h5getInfo(filename, location):
 
 #===============================================================================
 
+    # sanity check
+    
     if not isinstance(filename, str):
         raise TypeError, "'filename' must be a string."
-
     if not isinstance(location, str):
             raise TypeError, "'location' must be a string."
-            
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)
@@ -49,55 +51,78 @@ def h5getInfo(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
-        if not location in f:
-            return 'Invalid location.'
+        # normalize the HDF5 path
 
-        obj = f[location]
-        cls = f.get(location,getclass=True)
-        
+        path = location        
+        if path != '':
+            if not path in f:
+                return 'Invalid location.'
+        else:
+            path = '/'
+
+        # Is this a valid location?
+
+        is_valid, species = path_is_valid_wrt_loc(f, path)
+        if not is_valid:
+            return 'Invalid location specified.'
+
         # generate the display - at the moment there are only two columns
 
         lines = []
-
-        path = obj.name
-
-        # render attributes
         
-        if cls == h5py.Group or cls == h5py.Dataset or cls == h5py.Datatype:
-            
-            num_attr = len(obj.attrs)
+        if species is None or isinstance(species, h5py.HardLink):
+            # the location is loc is a file or group, or the path is a hardlink
+        
+            hnd = f
+            if path != '/': hnd = f[path]
+
+            num_attr = len(hnd.attrs)
             if num_attr > 0:
                 lines.append(('Number of attributes:', num_attr))
-                keys = obj.attrs.keys()
-                vals = obj.attrs.values()
+                keys = hnd.attrs.keys()
+                vals = hnd.attrs.values()
                 for i in range(num_attr):
                     lines.append((keys[i], str(vals[i])))
-        
-        # render object specific stuff
-                
-        if cls == h5py.Group:
             
-            num_links = len(obj.keys())
-            lines.append(('Number of links:', num_links))
-            if num_links > 0:
-                lines.append(('Link names:', '\0'))
-                for i in range(num_links):
-                    lines.append(('\0', obj.keys()[i]))
+            if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
 
-        elif cls == h5py.Dataset:
+                num_links = len(hnd.keys())
+                lines.append(('Number of links:', num_links))
+                if num_links > 0:
+                    lines.append(('Link names:', '\0'))
+                    a = hnd.keys()
+                    for i in range(num_links):
+                        lines.append(('\0', a[i]))        
 
-            lines.append(('Number of elements:', obj.size))
-            lines.append(('Shape:', str(obj.shape)))
-            lines.append(('Type:', str(obj.dtype)))
+            elif isinstance(hnd, h5py.Dataset):
 
-        elif cls == h5py.Datatype:
+                lines.append(('Number of elements:', hnd.size))
+                lines.append(('Shape:', str(hnd.shape)))
+                lines.append(('Type:', str(hnd.dtype)))
 
-            lines.append(('Type:', str(obj.dtype)))
+            elif isinstance(hnd, h5py.Datatype):
+
+                lines.append(('Type:', str(hnd.dtype)))
+
+            else: # we should never get here
+                raise Exception, 'What kind of hardlink is this???'
+
+        elif isinstance(species, h5py.SoftLink) or \
+             isinstance(species, h5py.ExternalLink):
+            # we don't follow symlinks 4 now
+
+            if isinstance(species, h5py.SoftLink):
+                lines.append(('Link:', 'SoftLink'))
+                lines.append(('Destination:', species.path))
+            else: # external link
+                lines.append(('Link:', 'ExternalLink'))
+                lines.append(('Destination:', 'file://' + species.filename + \
+                              '/' + species.path))
 
         else:
-
-            lines.append(('Type:', str(cls)))
-
+            # could be a user-defined link, which we ignore 4 now
+            lines.append(('Link:', 'Unknown link type.'))
+                
         # copy lines into Numpy array
         # Is that really necessary? No. Fix this!
             

@@ -160,16 +160,15 @@ def render_table(loc, path):
          isinstance(species, h5py.ExternalLink):
         # we don't follow symlinks 4 now, just print the destination
 
-        lnk = loc.get(path, getlink=True)
         ht = {}
         ht['NAME'] = loc.name + '/' + path
         
         if isinstance(species, h5py.SoftLink):
             ht['OBJ_TYPE'] = 'SOFTLINK'
-            ht['DEST'] = lnk.path
+            ht['DEST'] = species.path
         else:
             ht['OBJ_TYPE'] = 'EXTERNALLINK'
-            ht['DEST'] = 'file://' + lnk.filename + '/' + lnk.path
+            ht['DEST'] = 'file://' + species.filename + '/' + species.path
 
         result.append(ht)
 
