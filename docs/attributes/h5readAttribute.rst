@@ -4,7 +4,8 @@
 Reading Attributes: ``h5readAttribute``
 ---------------------------------------
 
-``h5readAttribute`` reads and renders the value of an HDF5 attribute.
+``h5readAttribute`` reads and renders the value of an HDF5 attribute as
+a string.
 
 .. rubric:: Excel UDF Syntax
 
@@ -14,19 +15,19 @@ Reading Attributes: ``h5readAttribute``
 
 .. rubric:: Input Arguments
 
-+----------+---------------------------------------------------------------+
-|Argument  |Description                                                    |
-+==========+===============================================================+
-|`filename`|A text string specifying the name of an HDF5 file              |
-+----------+---------------------------------------------------------------+
-|`location`|A text string (path) specifying the location of an HDF5 object |
-+----------+---------------------------------------------------------------+
-|`attr`    |A text string, the attrubte's name                             |
-+----------+---------------------------------------------------------------+
++------------+---------------------------------------------------------------+
+|Argument    |Description                                                    |
++============+===============================================================+
+|``filename``|A text string specifying the name of an HDF5 file              |
++------------+---------------------------------------------------------------+
+|``location``|A text string (path) specifying the location of an HDF5 object |
++------------+---------------------------------------------------------------+
+|``attr``    |A text string, the attribute's name                            |
++------------+---------------------------------------------------------------+
 
 .. rubric:: Return Value
 
-On success, ``h5readAttribute`` populates a cell or range of cells with
+On success, ``h5readAttribute`` populates a cell with a string rendering of
 the attribute value.
 
 On error, an error message (string) is returned.
@@ -59,9 +60,17 @@ The following conditions will create an error:
 Read the ``Units`` attribute of a dataset.
 
 ::
-   
-   h5readAttribute("GSSTF.2b.2008.01.01.he5",
-                   "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water",
+
+   h5readAttribute("GSSTF.2b.2008.01.01.he5", \
+                   "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", \
 		   "Units")
+
+Read the ``HDFEOSVersion`` attribute of the object at ``/HDFEOS INFORMATION``.
+
+::
+
+   h5readAttribute(Sheet1!A1,"/HDFEOS INFORMATION", "HDFEOSVersion")
+   		   
+.. note:: The file name is retrieved from cell ``A1`` on the worksheet ``Sheet1``
 
 .. rubric:: See Also

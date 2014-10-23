@@ -1,6 +1,9 @@
 
+import file_helpers
+from file_helpers import file_exists
+import h5_helpers
+from h5_helpers import path_is_valid_wrt_loc
 import h5py
-import h5xl
 import logging
 import pyxll
 from pyxll import xl_arg_doc, xl_func
@@ -9,47 +12,51 @@ _log = logging.getLogger(__name__)
 
 #===============================================================================
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "The location of the object (attribute owner).")
-@xl_arg_doc("attr", "The attribute's name.")
-@xl_func("string filename, string location, string attr: var",
+@xl_func("string filename, string location, string attr: string",
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
 def h5readAttribute(filename, location, attr):
     """
-    Reads and returns the value of an HDF5 attribute.
+    Reads and returns a string repesentation of the value of an HDF5 attribute.
+    
+    :param filename: the name of an HDF5 file
+    :param location: the location of a HDF5 object 
+    :param attr:     the name of an HDF5 attribute
+    :returns: A string
     """
-
-#===============================================================================
 
     if not isinstance(filename, str):
         raise TypeError, 'String expected.'
-
     if not isinstance(location, str):
         raise TypeError, 'String expected.'
-
     if not isinstance(attr, str):
         raise TypeError, 'String expected.'
-
-    if not h5xl.file_exists(filename):
-        return "Can't open file."
+    if not file_exists(filename):
+        return "Can't open file '%s' or the file is not an HDF5 file." %  \
+            (filename)
 
     with h5py.File(filename, 'r') as f:
-        try:
-            if location in f: # valid location?
-                cls = f.get(location, getclass=True)
-                if (cls == h5py.Dataset or cls == h5py.Group): # object?
-                    if attr in f[location].attrs: # valid attribute name?
-                        # best effort to read the attribute
-                        # string instead of typed value... (TODO: Fix this!)
-                        return str(f[location].attrs[attr])
-                    else:
-                        return "Can't open attribute."
-                else:
-                    return "No object at location."
+
+        path = location        
+        if path != '':
+            if not path in f:
+                return "Invalid location '%s'." % (path)
+        else:
+            path = '/'
+
+        is_valid, species = path_is_valid_wrt_loc(f, path)
+
+        if not is_valid:
+            return 'Invalid location specified.'
+
+        # Is there an object at location and does it have that attribute? 
+
+        obj = f.get(path)
+        if obj is not None:
+            if attr in obj.attrs:
+                return str(obj.attrs[attr])
             else:
-                return "Can't open location."
-        except Exception, e:
-            _log.info(e)
-            return "Internal error."
+                return "No attribute named '%s' found." % attr
+        else:
+            return "No object at location '%s'." % location
