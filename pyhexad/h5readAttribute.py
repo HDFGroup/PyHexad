@@ -4,11 +4,8 @@ from file_helpers import file_exists
 import h5_helpers
 from h5_helpers import path_is_valid_wrt_loc
 import h5py
-import logging
 import pyxll
-from pyxll import xl_arg_doc, xl_func
-
-_log = logging.getLogger(__name__)
+from pyxll import xl_func
 
 #===============================================================================
 
