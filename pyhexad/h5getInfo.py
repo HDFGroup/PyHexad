@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 def render_info(loc, path):
     """
     Returns a list of key/value pairs (more or less)
+
+
+    Parameters
+    ----------
+    loc: an h5py file handler
+        An open file handler where to search.
+    path: str
+        the path into the file that we are interested in.
     """
 
     # check if the (loc, path) combo is valid

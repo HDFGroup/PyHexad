@@ -7,8 +7,9 @@ def is_h5_location_handle(loc):
     """
     Returns if 'loc' is a valid location handle.
     Only HDF5 file or group handles are valid location handles.
+
     """
-    return (isinstance(loc, h5py.File) or isinstance(loc, h5py.Group))
+    return isinstance(loc, (h5py.File, h5py.Group))
 
 #===============================================================================
 
@@ -20,6 +21,7 @@ def path_is_valid_wrt_loc(loc, path):
     is the type of link or None, if the path is '/'.
     If the path is invalid wrt. location, the second argument is
     always none.
+
     """
 
     if is_h5_location_handle(loc) and isinstance(path, str) and (path in loc):
