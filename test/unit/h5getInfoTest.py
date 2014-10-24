@@ -19,6 +19,8 @@ def get_test_file(name):
     """ Return the absolute path to the given test file. """
     return os.path.join(TEST_FILES_DIRECTORY, name)
 
+# It is not clear what this function does. It does way more than getting a
+# file and does not return a file. 
 def get_file(name, tgt=None, ro=False):
     src = os.path.join(TEST_FILES_DIRECTORY, name)
     logger.info("copying file to this directory: {}".format(src))

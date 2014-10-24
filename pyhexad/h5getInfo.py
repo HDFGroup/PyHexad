@@ -1,21 +1,11 @@
 
-import automation
-import config
 from config import Limits
-import file_helpers
 from file_helpers import file_exists
-import functools
-from functools import partial
-import h5_helpers
 from h5_helpers import path_is_valid_wrt_loc
 import h5py
 import logging
 import numpy as np
-import posixpath
-import pyxll
-from pyxll import xl_arg_doc, xl_func
 import renderer
-from renderer import draw
 
 _log = logging.getLogger(__name__)
 
