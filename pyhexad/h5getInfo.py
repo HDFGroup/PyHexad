@@ -6,6 +6,7 @@ import h5py
 import logging
 import numpy as np
 import renderer
+from pyxll import xl_func
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def render_info(loc, path):
 
     Parameters
     ----------
-    loc: an h5py file handler
+    loc: h5py.File
         An open file handler where to search.
     path: str
         the path into the file that we are interested in.
@@ -36,7 +37,7 @@ def render_info(loc, path):
 
     if species is None or isinstance(species, h5py.HardLink):
         # the location is loc is a file or group, or the path is a hardlink
-        
+
         hnd = loc
         if path != '/': hnd = loc[path]
 
@@ -99,7 +100,7 @@ def render_info(loc, path):
 def h5getInfo(filename, location):
     """
     Display detailed information about a specific location in an HDF5 file.
-        
+
     :param filename: the name of an HDF5 file
     :param location: an HDF5 path name (optional)
     :returns: A string
@@ -132,7 +133,7 @@ def h5getInfo(filename, location):
 
         # Is this a valid location?
 
-        is_valid, species = path_is_valid_wrt_loc(f, path)
+        is_valid, _ = path_is_valid_wrt_loc(f, path)
         if not is_valid:
             return 'Invalid location specified.'
 
@@ -142,7 +143,7 @@ def h5getInfo(filename, location):
 
         # copy lines into Numpy array
         # Is that really necessary? No. Fix this!
-            
+
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((len(lines)+1, 2), dtype=dty)
 

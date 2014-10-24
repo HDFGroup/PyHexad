@@ -31,7 +31,7 @@ def path_is_valid_wrt_loc(loc, path):
                 # h5py throws an error when it encounters an unknown link type,
                 # e.g., user-defined links
                 lty = loc.get(path, getlink=True)
-            except:
+            except: #FIXME: what kind of error is raised by h5py?
                 known_link_type = False
                 lty = None
                 pass
