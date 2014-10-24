@@ -26,11 +26,12 @@ def render_info(loc, path):
 
     # check if the (loc, path) combo is valid
     is_valid, species = path_is_valid_wrt_loc(loc, path)
-    
+
     if not is_valid:
-        raise Exception, 'The specified path is invalid with respect to' \
-            ' the location provided.'
-    
+        raise ValueError(
+            'The specified path is invalid with respect to the location provided.'
+        )
+
     result = []
 
     if species is None or isinstance(species, h5py.HardLink):
