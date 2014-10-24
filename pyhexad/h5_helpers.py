@@ -26,16 +26,16 @@ def path_is_valid_wrt_loc(loc, path):
 
     if is_h5_location_handle(loc) and isinstance(path, str) and (path in loc):
         if path != '/':
-            known_link_type = True
             try:
                 # h5py throws an error when it encounters an unknown link type,
                 # e.g., user-defined links
-                lty = loc.get(path, getlink=True)
+                link_type = loc.get(path, getlink=True)
+                known_link_type = True
             except: #FIXME: what kind of error is raised by h5py?
                 known_link_type = False
-                lty = None
+                link_type = None
                 pass
-            return (known_link_type, lty)
+            return (known_link_type, link_type)
         else:
             # '/' is always valid with respect to a valid location
             return (True, None)
