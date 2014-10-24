@@ -14,7 +14,8 @@ def is_h5_location_handle(loc):
 #===============================================================================
 
 def path_is_valid_wrt_loc(loc, path):
-    """
+    """ Returns a tuple with the path_validity and the link type.
+
     Returns if 'path' is valid with respect to location 'loc'.
     The first return value (bool) indicates the validity.
     If the path is valid wrt. location, the second return value

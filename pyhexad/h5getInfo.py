@@ -30,7 +30,8 @@ def render_info(loc, path):
 
     if not is_valid:
         raise ValueError(
-            'The specified path is invalid with respect to the location provided.'
+            'The specified path is invalid with respect to the location'
+            ' provided.'
         )
 
     result = []
@@ -38,26 +39,24 @@ def render_info(loc, path):
     if species is None or isinstance(species, h5py.HardLink):
         # the location is loc is a file or group, or the path is a hardlink
 
-        hnd = loc
-        if path != '/': hnd = loc[path]
+        hnd = loc if path == '/' else loc[path]
 
         num_attr = len(hnd.attrs)
         if num_attr > 0:
             result.append(('Number of attributes:', num_attr))
             keys = hnd.attrs.keys()
             vals = hnd.attrs.values()
-            for i in range(num_attr):
-                result.append((keys[i], str(vals[i])))
-            
-        if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
+            for key, val in zip(keys, vals):
+                result.append((key, str(val)))
 
+        if isinstance(hnd, (h5py.File, h5py.Group)):
             num_links = len(hnd.keys())
             result.append(('Number of links:', num_links))
             if num_links > 0:
                 result.append(('Link names:', '\0'))
-                a = hnd.keys()
-                for i in range(num_links):
-                    result.append(('\0', a[i]))        
+                keys = hnd.keys()
+                for key in keys:
+                    result.append(('\0', key))
 
         elif isinstance(hnd, h5py.Dataset):
 
@@ -70,20 +69,17 @@ def render_info(loc, path):
             result.append(('Type:', str(hnd.dtype)))
 
         else: # we should never get here
-            raise Exception, 'What kind of hardlink is this???'
+            raise ValueError('What kind of hardlink is this???')
 
-    elif isinstance(species, h5py.SoftLink) or \
-         isinstance(species, h5py.ExternalLink):
+    elif isinstance(species, h5py.SoftLink):
         # we don't follow symlinks 4 now
+        result.append(('Link:', 'SoftLink'))
+        result.append(('Destination:', species.path))
 
-        if isinstance(species, h5py.SoftLink):
-            result.append(('Link:', 'SoftLink'))
-            result.append(('Destination:', species.path))
-        else: # external link
-            result.append(('Link:', 'ExternalLink'))
-            result.append(('Destination:', 'file://' + species.filename + \
-                          '/' + species.path))
-
+    elif isinstance(species, h5py.ExternalLink):
+        result.append(('Link:', 'ExternalLink'))
+        result.append(('Destination:', 'file://{}/{}'.format(
+            species.filename, species.path)))
     else:
         # could be a user-defined link, which we ignore 4 now
         result.append(('Link:', 'Unknown link type.'))
