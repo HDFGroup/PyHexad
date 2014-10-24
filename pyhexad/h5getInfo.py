@@ -7,7 +7,7 @@ import logging
 import numpy as np
 import renderer
 
-_log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 #===============================================================================
 
