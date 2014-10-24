@@ -4,6 +4,80 @@ import numpy as np
 
 #===============================================================================
 
+def is_dims_array(a):
+    """Determines if argument is a Numpy ndarray of integers"""
+
+    if not isinstance(a, np.ndarray): return False
+    if a.ndim != 1: return False
+    if a.size > 32: return False
+    if not np.issubdtype(a.dtype, np.int): return False
+    if a.size == 0: return True
+
+    return True
+
+#===============================================================================
+
+def is_non_zero_dims_array(a):
+    """Determines if argument is a Numpy ndarray of non-zero integers"""
+
+    if not is_dims_array(a): return False
+    if np.count_non_zero(a) == len(a): return True
+
+    return False
+
+#===============================================================================
+
+def is_non_negative_dims_array(a):
+    """Determines if argument is a Numpy ndarray of non-negative integers"""
+
+    if not is_dims_array(a): return False
+    if np.amax(a) >= 0: return True
+
+    return False
+
+#===============================================================================
+
+def is_positive_dims_array(a):
+    """Determines if argument is a Numpy ndarray of positive integers"""
+
+    if not is_dims_array(a): return False
+    if np.amax(a) > 0: return True
+
+    return False
+
+#===============================================================================
+
+def is_valid_hyperslab_spec(shape, first=None, last=None, step=None):
+    """
+    Determines if (first, last, step) describe a valid hyperslab selection
+    on shape.
+
+    CAUTION: we assume that shape is 0-based and that the hyperslab is 1-based
+    """
+
+    if not is_positive_dims_array(shape): return False
+    
+    rk = len(shape)
+    if first is not None:
+        if not is_non_negative_dims_array(first): return False
+        if len(first) != rk: return False
+    if last is not None:
+        if not is_non_negative_dims_array(last): return False
+        if len(last) != rk: return False
+    if step is not None:
+        if not is_non_negative_dims_array(step): return False
+        if len(step) != rk: return False
+
+    if first is not None and last is not None:
+        if not np.greater_equal(last, first): return False
+
+    if step is not None and last is not None:
+        if np.greater_equal(step, last): return False
+        
+    return True
+
+#===============================================================================
+
 def get_dimensions(size):
     """
     'size' is a list of lists and we have to construct

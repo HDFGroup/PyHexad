@@ -3,7 +3,33 @@ import h5py
 from h5py import special_dtype
 import numpy as np
 
-# supported scalar types
+# supported element dtypes for HDF5 arrays
+
+h5array_dtypes = {
+    "BYTE":    np.dtype(np.int8),
+    "DOUBLE":  np.dtype(np.float64),
+    "FLOAT":   np.dtype(np.float32),
+    "FLOAT32": np.dtype(np.float32),
+    "FLOAT64": np.dtype(np.float64),
+    "INT":     np.dtype(np.int32),
+    "INT8":    np.dtype(np.int8),
+    "INT16":   np.dtype(np.int16),
+    "INT32":   np.dtype(np.int32),
+    "INT64":   np.dtype(np.int64),
+    "LONG":    np.dtype(np.int64),
+    "SHORT":   np.dtype(np.int16),
+    "SINGLE":  np.dtype(np.float32),
+    "UBYTE":   np.dtype(np.uint8),
+    "UINT":    np.dtype(np.uint32),
+    "UINT8":   np.dtype(np.uint8),
+    "UINT16":  np.dtype(np.uint16),
+    "UINT32":  np.dtype(np.uint32),
+    "UINT64":  np.dtype(np.uint64),
+    "ULONG":   np.dtype(np.uint64),
+    "USHORT":  np.dtype(np.uint16)
+}
+
+# supported column dtypes for HDF5 tables
 
 scalar_dtypes = {
     "BYTE":    np.dtype(np.int8),
@@ -28,7 +54,7 @@ scalar_dtypes = {
     "UINT64":  np.dtype(np.uint64),
     "ULONG":   np.dtype(np.uint64),
     "USHORT":  np.dtype(np.uint16)
-    }
+}
 
 # Excel subsitution types
 
@@ -45,23 +71,23 @@ dtype_excel_substitute = {
     np.dtype(np.uint16):  np.dtype(np.int32),
     np.dtype(np.uint32):  np.dtype(np.int32),
     np.dtype(np.uint64):  np.dtype(np.int32)
-    }
+}
 
 #===============================================================================
 
 def is_supported_h5array_type(dty):
 
     if not isinstance(dty, np.dtype):
-        raise TypeError, 'Numpy dtype expected.'
+        return False
         
-    return (dty in scalar_dtypes.values()) or (dty.kind == 'S')
+    return (dty in h5array_dtypes.values())
 
 #===============================================================================
 
 def is_supported_h5table_type(dty):
 
     if not isinstance(dty, np.dtype):
-        raise TypeError, 'Numpy dtype expected.'
+        return False
 
     if dty.fields is None:
         return False

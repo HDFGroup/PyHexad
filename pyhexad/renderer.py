@@ -7,15 +7,11 @@ import pyxll
 
 _log = logging.getLogger(__name__)
 
-def draw(x, dty=None):
+def draw(x):
 
-    if not (isinstance(x, list) or isinstance(x, np.ndarray)):
-        raise TypeError, 'List or NDArray expected.'
+    if not isinstance(x, np.ndarray):
+        raise TypeError, 'Numpy ndarray expected.'
 
-    if dty is not None:
-        if not isinstance(dty, np.dtype):
-            raise TypeError, 'Numpy dtype expected.'
-        
     # get the address of the calling cell using xlfCaller
     caller = pyxll.xlfCaller()
     address = caller.address
