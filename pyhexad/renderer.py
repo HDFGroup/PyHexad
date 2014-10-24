@@ -26,10 +26,7 @@ def draw(x):
         try:
             range = xl.Range(range.Resize(2,1),
                              range.Resize(x.shape[0]+1, x.shape[1]))
-            if dty != None:
-                range.Value = np.asarray(x, dtype=x.dtype)
-            else:
-                range.Value = x
+            range.Value = x
 
         except Exception, ex:
             _log.info(ex)
