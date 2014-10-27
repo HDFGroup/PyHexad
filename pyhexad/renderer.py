@@ -1,11 +1,11 @@
 
 import logging
 
-import automation
+import h5py
 import numpy as np
 import pyxll
 
-import type_helpers
+import automation
 from type_helpers import excel_dtype
 
 logger = logging.getLogger(__name__)
@@ -41,8 +41,11 @@ def draw(x):
                 raise ValueError('Array rank must be 1 or 2.')
 
             # we can handle only strings, int32, and float64
-            range.Value = np.asarray(y, dtype=excel_dtype(y.dtype))
-
+            if y.dtype != h5py.special_dtype(vlen=str):
+                range.Value = np.asarray(y, dtype=excel_dtype(y.dtype))
+            else:
+                range.Value = y
+                
         except Exception, ex:
             logger.info(ex)
     #

@@ -8,25 +8,22 @@ row    - the current position in "document order"
 column - the "level" = the number of group ancestors
 """
 
-import automation
-import config
-from config import Limits
-import file_helpers
-from file_helpers import file_exists
 import functools
 from functools import partial
-import h5py
-import h5_helpers
-from h5_helpers import path_is_valid_wrt_loc
-import logging
-import numpy as np
 import posixpath
-import pyxll
-from pyxll import xl_arg_doc, xl_func
-import renderer
-from renderer import draw
+import logging
 
-_log = logging.getLogger(__name__)
+import h5py
+import numpy as np
+from pyxll import xl_func
+
+import automation
+from config import Limits
+from file_helpers import file_exists
+from h5_helpers import path_is_valid_wrt_loc
+import renderer
+
+logger = logging.getLogger(__name__)
 
 #===============================================================================
 
@@ -43,22 +40,21 @@ def render_tree(loc, path):
     is_valid, species = path_is_valid_wrt_loc(loc, path)
     
     if not is_valid:
-        raise Exception, 'The specified path is invalid with respect to' \
-            ' the location provided.'
+        raise Exception('The specified path is invalid with respect to' \
+                        ' the location provided.')
 
     result = []
     
     if species is None or isinstance(species, h5py.HardLink):
         # the location is loc is a file or group, or the path is a hardlink
         
-        hnd = loc
-        if path != '/': hnd = loc[path]
+        hnd = loc if path == '/' else loc[path]
         
-        if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
+        if isinstance(hnd, (h5py.File, h5py.Group)):
 
             result.append((1, hnd.name))
 
-            #======================================================================
+            #==================================================================
             # this is the callback for rendering links
             #
             def print_obj(grp, name):
@@ -74,20 +70,19 @@ def render_tree(loc, path):
                 else:
                     result.append((col, path.split('/')[-1]))
             #
-            #=======================================================================
+            #==================================================================
 
             # WARNING: does not visit broken symlinks!
             hnd.visit(partial(print_obj, hnd)) 
         
-        elif isinstance(hnd, h5py.Dataset) or isinstance(hnd, h5py.Datatype):
+        elif isinstance(hnd, (h5py.Dataset, h5py.Datatype)):
         
             result.append((1, hnd.name))
 
         else: # we should never get here
             raise Exception, 'What kind of hardlink is this???'
         
-    elif isinstance(species, h5py.SoftLink) or \
-         isinstance(species, h5py.ExternalLink):
+    elif isinstance(species, (h5py.SoftLink, h5py.ExternalLink)):
         # we don't follow symlinks 4 now
         result.append((1, loc.name + '/' + path))
         
@@ -121,9 +116,9 @@ def h5showTree(filename, location):
     # sanity check
     
     if not isinstance(filename, str):
-        raise TypeError, "'filename' must be a string."
+        raise TypeError("'filename' must be a string.")
     if not isinstance(location, str):
-            raise TypeError, "'location' must be a string."
+            raise TypeError("'location' must be a string.")
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)

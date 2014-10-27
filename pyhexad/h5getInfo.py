@@ -1,12 +1,14 @@
 
+import logging
+
+import h5py
+import numpy as np
+from pyxll import xl_func
+
 from config import Limits
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
-import h5py
-import logging
-import numpy as np
 import renderer
-from pyxll import xl_func
 
 logger = logging.getLogger(__name__)
 

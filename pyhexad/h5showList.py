@@ -3,27 +3,23 @@
 # are listed under that group heading. The table is sparse, because most
 # attributes apply only to certain object types.
 
-import automation
-import config
-from config import Limits
-import file_helpers
-from file_helpers import file_exists
 import functools
 from functools import partial
-import h5_helpers
-from h5_helpers import path_is_valid_wrt_loc
-import h5py
 import logging
-import numpy as np
 import posixpath
-import pyxll
-from pyxll import xl_arg_doc, xl_func
+
+import h5py
+import numpy as np
+from pyxll import xl_func
+
+import automation
+from config import Limits
+from file_helpers import file_exists
+from h5_helpers import path_is_valid_wrt_loc
 import renderer
-from renderer import draw
-import type_helpers
 from type_helpers import is_supported_h5array_type, is_supported_h5table_type
 
-_log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 #===============================================================================
 
@@ -49,11 +45,11 @@ def render_row(grp, name):
     render function for HDF5 objects
     """
 
-    if not (isinstance(grp, h5py.File) or isinstance(grp, h5py.Group)):
-        raise TypeError, 'HDF5 file or group expected.'
+    if not (isinstance(grp, (h5py.File, h5py.Group))):
+        raise TypeError('HDF5 file or group expected.')
 
     if not isinstance(name, basestring):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
     
     path = posixpath.join(grp.name, name)    
     obj = grp[name]
@@ -113,8 +109,8 @@ def render_table(loc, path):
     is_valid, species = path_is_valid_wrt_loc(loc, path)
     
     if not is_valid:
-        raise Exception, 'The specified path is invalid with respect to' \
-            ' the location provided.'
+        raise Exception('The specified path is invalid with respect to' \
+                        ' the location provided.')
     
     result = []
 
@@ -127,11 +123,9 @@ def render_table(loc, path):
     if species is None or isinstance(species, h5py.HardLink):
         # loc is file or group, or path is hardlink
         
-        hnd = loc
-        if path != '/':
-            hnd = loc[path]
+        hnd = loc if path == '/' else loc[path]
     
-        if isinstance(hnd, h5py.File) or isinstance(hnd, h5py.Group):
+        if isinstance(hnd, (h5py.File, h5py.Group)):
 
             # patch the name for the root group
             name = hnd.name.split('/')[-1]
@@ -139,25 +133,24 @@ def render_table(loc, path):
         
             result.append(render_row(hnd.parent, name))
 
-            #======================================================================
+            #==================================================================
             # this is the callback for rendering links
             def print_obj(grp, name):
                 result.append(render_row(grp, name))
             #
-            #======================================================================
+            #==================================================================
 
             hnd.visit(partial(print_obj, hnd))
 
-        elif isinstance(hnd, h5py.Dataset) or isinstance(hnd, h5py.Datatype):
+        elif isinstance(hnd, (h5py.Dataset, h5py.Datatype)):
             
             result.append(render_row(hnd.parent, hnd.name.split('/')[-1]))
 
         else: # we should never get here
-            raise Exception, 'What kind of hardlink is this???'
+            raise Exception('What kind of hardlink is this???')
         
 
-    elif isinstance(species, h5py.SoftLink) or \
-         isinstance(species, h5py.ExternalLink):
+    elif isinstance(species, (h5py.SoftLink, h5py.ExternalLink)):
         # we don't follow symlinks 4 now, just print the destination
 
         ht = {}
@@ -191,9 +184,9 @@ def h5showList(filename, location):
     """
 
     if not isinstance(filename, str):
-        raise TypeError, "'filename' must be a string."
+        raise TypeError("'filename' must be a string.")
     if not isinstance(location, str):
-            raise TypeError, "'location' must be a string."
+            raise TypeError("'location' must be a string.")
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)

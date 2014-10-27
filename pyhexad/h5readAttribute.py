@@ -1,11 +1,9 @@
 
-import file_helpers
-from file_helpers import file_exists
-import h5_helpers
-from h5_helpers import path_is_valid_wrt_loc
 import h5py
-import pyxll
 from pyxll import xl_func
+
+from file_helpers import file_exists
+from h5_helpers import path_is_valid_wrt_loc
 
 #===============================================================================
 

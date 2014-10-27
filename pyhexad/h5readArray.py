@@ -1,16 +1,13 @@
-# Standard library imports
+
 import logging
 
-# Third-party imports
 import h5py
 import numpy as np
 from pyxll import xl_func
 
-# Local imports
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
 import renderer
-from renderer import draw
 from shape_helpers import is_valid_hyperslab_spec, lol_2_ndarray
 from type_helpers import is_supported_h5array_type
 
