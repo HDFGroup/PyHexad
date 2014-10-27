@@ -7,33 +7,36 @@ def is_h5_location_handle(loc):
     """
     Returns if 'loc' is a valid location handle.
     Only HDF5 file or group handles are valid location handles.
+
     """
-    return (isinstance(loc, h5py.File) or isinstance(loc, h5py.Group))
+    return isinstance(loc, (h5py.File, h5py.Group))
 
 #===============================================================================
 
 def path_is_valid_wrt_loc(loc, path):
-    """
+    """ Returns a tuple with the path_validity and the link type.
+
     Returns if 'path' is valid with respect to location 'loc'.
     The first return value (bool) indicates the validity.
     If the path is valid wrt. location, the second return value
     is the type of link or None, if the path is '/'.
     If the path is invalid wrt. location, the second argument is
     always none.
+
     """
 
     if is_h5_location_handle(loc) and isinstance(path, str) and (path in loc):
         if path != '/':
-            known_link_type = True
             try:
                 # h5py throws an error when it encounters an unknown link type,
                 # e.g., user-defined links
-                lty = loc.get(path, getlink=True)
-            except:
+                link_type = loc.get(path, getlink=True)
+                known_link_type = True
+            except: #FIXME: what kind of error is raised by h5py?
                 known_link_type = False
-                lty = None
+                link_type = None
                 pass
-            return (known_link_type, lty)
+            return (known_link_type, link_type)
         else:
             # '/' is always valid with respect to a valid location
             return (True, None)
