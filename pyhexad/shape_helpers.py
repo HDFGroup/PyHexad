@@ -170,3 +170,21 @@ def get_chunk_dimensions(chunk):
     return tuple(chunk)
 
 #===============================================================================
+
+def lol_2_ndarray(lol):
+    """
+    Converts a list of lists into a Numpy ndarray.
+
+    Returns a tuple with the Numpy ndarray and an error message.
+    """
+
+    a = None
+    ret = '\0'
+    
+    try:
+        nd = np.asarray(lol, dtype=np.int32)
+        a = np.reshape(nd, (nd.size,))
+    except:
+        ret = 'Not an integer array.'
+
+    return (a, ret)

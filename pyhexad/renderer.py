@@ -1,16 +1,19 @@
-# TODO: add type and shape checking, list conversion
+
+import logging
 
 import automation
-import logging
 import numpy as np
 import pyxll
 
-_log = logging.getLogger(__name__)
+import type_helpers
+from type_helpers import excel_dtype
+
+logger = logging.getLogger(__name__)
 
 def draw(x):
 
     if not isinstance(x, np.ndarray):
-        raise TypeError, 'Numpy ndarray expected.'
+        raise TypeError('Numpy ndarray expected.')
 
     # get the address of the calling cell using xlfCaller
     caller = pyxll.xlfCaller()
@@ -22,15 +25,26 @@ def draw(x):
     def update_func():
         xl = automation.xl_app()
         range = xl.Range(address)
-            
+        y = None
+        
         try:
-            range = xl.Range(range.Resize(2,1),
-                             range.Resize(x.shape[0]+1, x.shape[1]))
-            range.Value = x
+            if x.ndim == 1:
+                range = xl.Range(range.Resize(2,1),
+                                 range.Resize(x.shape[0]+1, 1))
+                # we need to reshape a 1D vector into a 2D array
+                y = np.reshape(x, (x.shape[0],1))
+            elif x.ndim == 2:
+                range = xl.Range(range.Resize(2,1),
+                                 range.Resize(x.shape[0]+1, x.shape[1]))
+                y = x
+            else:
+                raise ValueError('Array rank must be 1 or 2.')
+
+            # we can handle only strings, int32, and float64
+            range.Value = np.asarray(y, dtype=excel_dtype(y.dtype))
 
         except Exception, ex:
-            _log.info(ex)
-            ret = 'Internal error.'
+            logger.info(ex)
     #
     #=======================================================================
 

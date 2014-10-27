@@ -4,26 +4,25 @@ import logging
 # Third-party imports
 import h5py
 import numpy as np
-import pyxll
 from pyxll import xl_func
 
 # Local imports
-import automation
-import file_helpers
 from file_helpers import file_exists
-import h5_helpers
 from h5_helpers import path_is_valid_wrt_loc
-import shape_helpers
-from shape_helpers import is_valid_hyperslab_spec
-import type_helpers
-from type_helpers import is_supported_h5array_type, excel_dtype
+import renderer
+from renderer import draw
+from shape_helpers import is_valid_hyperslab_spec, lol_2_ndarray
+from type_helpers import is_supported_h5array_type
 
 logger = logging.getLogger(__name__)
 
 #===============================================================================
 
 def get_ndarray(loc, path, first = None, last = None, step = None):
-
+    """
+    Returns a tuple with the Numpy ndarray and an error message.
+    """
+    
     # Is this a valid location?
     is_valid, species = path_is_valid_wrt_loc(loc, path)
     if not is_valid:
@@ -79,11 +78,9 @@ def get_ndarray(loc, path, first = None, last = None, step = None):
     else:        
         return (None, 'Unsupported HDF5 array rank.')
     
-    return (None, 'Error')
-
 #===============================================================================
 
-@xl_func("string filename, string arrayname, numpy_array<int> first, numpy_array<int> last, numpy_array<int> step : string",
+@xl_func("string filename, string arrayname, var first, var last, var step : string",
          category="HDF5",
          thread_safe=False,
          macro=True,
@@ -106,29 +103,48 @@ def h5readArray(filename, arrayname, first, last, step):
     # sanity check
 
     if not isinstance(filename, str):
-        raise TypeError, "'filename' must be a string."
-    if not isinstance(arrayname, str):
-            raise TypeError, "'arrayname' must be a string."
-    if first is not None:
-        if not isinstance(first, np.ndarray):
-            raise TypeError, "'first' must be a Numpy ndarray."
-    if last is not None:
-        if not isinstance(last, np.ndarray):
-            raise TypeError, "'last' must be a Numpy ndarray."
-    if first is not None:
-        if not isinstance(step, np.ndarray):
-            raise TypeError, "'step' must be a Numpy ndarray."
+        return "'filename' must be a string."
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)
 
-    ret = '\0'
+    if not isinstance(arrayname, str):
+        return "'arrayname' must be a string."
+
+
+    # we get the hyperslab spec. arguments as list of lists
+    # => for simplicity, convert to Numpy arrays
+    
+    ndfirst = None
+    if first is not None:
+        if not isinstance(first, list):
+            return "'first' must be an integer array."
+        else:
+            ndfirst, ret = lol_2_ndarray(first)
+            if ndfirst is None: return ret
+
+    ndlast = None
+    if last is not None:
+        if not isinstance(last, list):
+            return "'last' must be an integer array."
+        else:
+            ndlast, ret = lol_2_ndarray(last)
+            if ndlast is None: return ret
+
+    ndstep = None
+    if step is not None:
+        if not isinstance(step, list):
+            return "'step' must be an integer array."
+        else:
+            ndstep, ret = lol_2_ndarray(step)
+            if ndstep is None: return ret
+            
     
     with h5py.File(filename, 'r') as f:
 
-        x, ret = get_ndarray(f, arrayname, first, last, step)
+        x, ret = get_ndarray(f, arrayname, ndfirst, ndlast, ndstep)
 
         if x is not None:
-            ret = renderer.draw(x)
+            renderer.draw(x)
         
     return ret
