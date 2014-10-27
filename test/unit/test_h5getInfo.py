@@ -34,7 +34,6 @@ def get_file(name, tgt=None, ro=False):
         logger.info('make read-only')
         os.chmod(tgt, stat.S_IREAD)
 
-
 class H5getInfoTest(unittest.TestCase):
 
     def test_render_info_tickdata(self):
@@ -47,7 +46,7 @@ class H5getInfoTest(unittest.TestCase):
             lst = render_info(loc, '/18-09-2011')
             self.assertEqual(len(lst), 3)
 
-            with self.assertRaise(TypeError):
+            with self.assertRaises(TypeError):
                 render_info('Hello World')
 
     def test_render_info_compound_data(self):
