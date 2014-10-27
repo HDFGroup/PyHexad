@@ -37,7 +37,8 @@ def get_file(name, tgt=None, ro=False):
 
 class H5readArrayTest(unittest.TestCase):
 
-    def test6(self):
+    def test1D(self):
+        
         file_name = get_test_file('hdfeos5.h5')
 
         with h5py.File(file_name) as loc:
@@ -57,9 +58,9 @@ class H5readArrayTest(unittest.TestCase):
 
             a, msg = get_ndarray(loc, \
                                  '/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Latitude', \
-                                 np.asarray((10,)), np.asarray((20,)),
-                                 np.asarray((3,)))
-            self.assertEqual(a.size, 4)
+                                 np.asarray((10,)), np.asarray((20,)), \
+                                 np.asarray((2,)))
+            self.assertEqual(a.size, 6)
 
             a, msg = get_ndarray(loc, \
                                  '/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Latitude', \
@@ -77,6 +78,54 @@ class H5readArrayTest(unittest.TestCase):
                                  None, None, np.asarray((10,)))
             self.assertEqual(a.size, 556)
 
+    def test2D(self):
+        
+        file_name = get_test_file('hdfeos5.h5')
+
+        with h5py.File(file_name) as loc:
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3')
+            self.assertEqual(a.shape[0], 5554)
+            self.assertEqual(a.shape[1], 145)
+
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3', \
+                                 np.asarray((10,20)))
+            self.assertEqual(a.shape[0], 5545)
+            self.assertEqual(a.shape[1], 126)
+
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3', \
+                                 np.asarray((10,20)), np.asarray((15,26)))
+            self.assertEqual(a.shape[0], 6)
+            self.assertEqual(a.shape[1], 7)
+
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3', \
+                                 np.asarray((10,20)), np.asarray((15,26)), \
+                                 np.asarray((2,3)))
+            self.assertEqual(a.shape[0], 3)
+            self.assertEqual(a.shape[1], 3)
+
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3', \
+                                 None, np.asarray((15,26)), np.asarray((2,3)))
+            self.assertEqual(a.shape[0], 8)
+            self.assertEqual(a.shape[1], 9)
+
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3', \
+                                 np.asarray((10,20)), None, np.asarray((2,3)))
+            self.assertEqual(a.shape[0], 2773)
+            self.assertEqual(a.shape[1], 42)
+
+            a, msg = get_ndarray(loc, \
+                                 '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3', \
+                                 None, None, np.asarray((2,3)))
+            self.assertEqual(a.shape[0], 2777)
+            self.assertEqual(a.shape[1], 49)
+
+            
 if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)

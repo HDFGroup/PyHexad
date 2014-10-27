@@ -1,20 +1,24 @@
+# Standard library imports
+import logging
 
+# Third-party imports
+import h5py
+import numpy as np
+import pyxll
+from pyxll import xl_func
+
+# Local imports
 import automation
 import file_helpers
 from file_helpers import file_exists
 import h5_helpers
 from h5_helpers import path_is_valid_wrt_loc
-import h5py
-import logging
-import numpy as np
-import pyxll
-from pyxll import xl_func
 import shape_helpers
 from shape_helpers import is_valid_hyperslab_spec
 import type_helpers
 from type_helpers import is_supported_h5array_type, excel_dtype
 
-_log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 #===============================================================================
 
@@ -47,19 +51,13 @@ def get_ndarray(loc, path, first = None, last = None, step = None):
         return None, 'Invalid hyperslab specification.'
 
     # The hyperslab selection is 1-based => Convert it to 0-based Numpy notation.
+
     rk = len(dsp)
     if rk == 1:
         
-        start = 0
-        stop = dsp[0]
-        stride = 1
-
-        if first is not None:
-            start = first[0]-1
-        if last is not None:
-            stop = last[0]
-        if step is not None:
-            stride = step[0]
+        start = 0     if first is None else first[0]-1
+        stop = dsp[0] if last  is None else last[0]
+        stride = 1    if step  is None else step[0]
 
         slc = slice(start, stop, stride)
         x = dst[slc]
@@ -68,10 +66,17 @@ def get_ndarray(loc, path, first = None, last = None, step = None):
         
     elif rk == 2:
 
-        (None, 'Unimplemented.')
+        start = [0,0]           if first is None else [first[0]-1, first[1]-1]
+        stop = [dsp[0], dsp[1]] if last  is None else [last[0]   , last[1]]
+        stride = [1, 1]         if step  is None else [step[0]   , step[1]]
 
-    else:
-        
+        slc0 = slice(start[0], stop[0], stride[0])
+        slc1 = slice(start[1], stop[1], stride[1])
+        x = dst[slc0, slc1]
+
+        return (x, '%d x %d' % (x.shape[0], x.shape[1]))
+
+    else:        
         return (None, 'Unsupported HDF5 array rank.')
     
     return (None, 'Error')

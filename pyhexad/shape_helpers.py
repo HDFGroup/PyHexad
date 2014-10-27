@@ -69,10 +69,10 @@ def is_valid_hyperslab_spec(shape, first=None, last=None, step=None):
         if len(step) != rk: return False
 
     if first is not None and last is not None:
-        if not np.greater_equal(last, first): return False
+        if not np.greater_equal(last, first).all(): return False
 
     if step is not None and last is not None:
-        if np.greater_equal(step, last): return False
+        if np.greater_equal(step, last).all(): return False
         
     return True
 
