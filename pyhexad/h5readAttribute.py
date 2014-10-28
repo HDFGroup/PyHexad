@@ -5,7 +5,8 @@ from pyxll import xl_func
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
 
-#===============================================================================
+#==============================================================================
+
 
 @xl_func("string filename, string location, string attr: string",
          category="HDF5",
@@ -14,28 +15,28 @@ from h5_helpers import path_is_valid_wrt_loc
 def h5readAttribute(filename, location, attr):
     """
     Reads and returns a string repesentation of the value of an HDF5 attribute.
-    
+
     :param filename: the name of an HDF5 file
-    :param location: the location of a HDF5 object 
+    :param location: the location of a HDF5 object
     :param attr:     the name of an HDF5 attribute
     :returns: A string
     """
 
     if not isinstance(filename, str):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
     if not isinstance(location, str):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
     if not isinstance(attr, str):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)
 
     with h5py.File(filename, 'r') as f:
 
-        path = location        
+        path = location
         if path != '':
-            if not path in f:
+            if path not in f:
                 return "Invalid location '%s'." % (path)
         else:
             path = '/'
@@ -45,7 +46,7 @@ def h5readAttribute(filename, location, attr):
         if not is_valid:
             return 'Invalid location specified.'
 
-        # Is there an object at location and does it have that attribute? 
+        # Is there an object at location and does it have that attribute?
 
         obj = f.get(path)
         if obj is not None:

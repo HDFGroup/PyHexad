@@ -3,7 +3,6 @@
 # are listed under that group heading. The table is sparse, because most
 # attributes apply only to certain object types.
 
-import functools
 from functools import partial
 import logging
 import posixpath
@@ -12,7 +11,6 @@ import h5py
 import numpy as np
 from pyxll import xl_func
 
-import automation
 from config import Limits
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
@@ -21,7 +19,8 @@ from type_helpers import is_supported_h5array_type, is_supported_h5table_type
 
 logger = logging.getLogger(__name__)
 
-#===============================================================================
+#==============================================================================
+
 
 # the table heading layout, more columns to follow...
 
@@ -38,7 +37,8 @@ col_offset = (
     ('DEST',     8, 'DESTINATION')
 )
 
-#===============================================================================
+#==============================================================================
+
 
 def render_row(grp, name):
     """
@@ -50,8 +50,8 @@ def render_row(grp, name):
 
     if not isinstance(name, basestring):
         raise TypeError('String expected.')
-    
-    path = posixpath.join(grp.name, name)    
+
+    path = posixpath.join(grp.name, name)
     obj = grp[name]
     obj_type = grp.get(name, getclass=True)
 
@@ -98,7 +98,8 @@ def render_row(grp, name):
             'NAME': name.split('/')[-1],
         }
 
-#===============================================================================
+#==============================================================================
+
 
 def render_table(loc, path):
     """
@@ -107,11 +108,11 @@ def render_table(loc, path):
 
     # check if the (loc, path) combo is valid
     is_valid, species = path_is_valid_wrt_loc(loc, path)
-    
+
     if not is_valid:
-        raise Exception('The specified path is invalid with respect to' \
+        raise Exception('The specified path is invalid with respect to'
                         ' the location provided.')
-    
+
     result = []
 
     # line for table heading
@@ -122,15 +123,16 @@ def render_table(loc, path):
 
     if species is None or isinstance(species, h5py.HardLink):
         # loc is file or group, or path is hardlink
-        
+
         hnd = loc if path == '/' else loc[path]
-    
+
         if isinstance(hnd, (h5py.File, h5py.Group)):
 
             # patch the name for the root group
             name = hnd.name.split('/')[-1]
-            if name == '': name = '/'
-        
+            if name == '':
+                name = '/'
+
             result.append(render_row(hnd.parent, name))
 
             #==================================================================
@@ -143,19 +145,18 @@ def render_table(loc, path):
             hnd.visit(partial(print_obj, hnd))
 
         elif isinstance(hnd, (h5py.Dataset, h5py.Datatype)):
-            
+
             result.append(render_row(hnd.parent, hnd.name.split('/')[-1]))
 
-        else: # we should never get here
+        else:  # we should never get here
             raise Exception('What kind of hardlink is this???')
-        
 
     elif isinstance(species, (h5py.SoftLink, h5py.ExternalLink)):
         # we don't follow symlinks 4 now, just print the destination
 
         ht = {}
         ht['NAME'] = loc.name + '/' + path
-        
+
         if isinstance(species, h5py.SoftLink):
             ht['OBJ_TYPE'] = 'SOFTLINK'
             ht['DEST'] = species.path
@@ -167,7 +168,8 @@ def render_table(loc, path):
 
     return result
 
-#===============================================================================
+#==============================================================================
+
 
 @xl_func("string filename, string location : string",
          category="HDF5",
@@ -177,7 +179,7 @@ def render_table(loc, path):
 def h5showList(filename, location):
     """
     Display contents of an HDF5 file in hierarchical form
-    
+
     :param filename: the name of an HDF5 file
     :param location: an HDF5 path name (optional)
     :returns: A string
@@ -195,9 +197,9 @@ def h5showList(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
-        path = location        
+        path = location
         if path != '':
-            if not path in f:
+            if path not in f:
                 return 'Invalid location.'
         else:
             path = '/'
@@ -206,23 +208,23 @@ def h5showList(filename, location):
 
         if not is_valid:
             return 'Invalid location specified.'
-                
+
         # render the tree as a list of lines
 
         lines = render_table(f, path)
-        
+
         if len(lines) >= Limits.EXCEL_MAX_ROWS:
             return 'The number objects in the file exceeds the maximum number' \
                 'of rows of an Excel worksheet.'
-            
+
         # generate the display in a Numpy array & patch in the INDEX column
 
         dty = h5py.special_dtype(vlen=str)
         a = np.empty((len(lines), len(col_offset)), dtype=dty)
 
         row = 0
-        
-        for i in range(0,len(lines)):
+
+        for i in range(0, len(lines)):
             a[row, 0] = row-1
             for k in col_offset:
                 key = k[0]

@@ -1,9 +1,8 @@
 
-import pyxll
-from pyxll import xl_menu, xl_func, xl_macro
-
 import logging
 _log = logging.getLogger(__name__)
+
+import pyxll
 
 try:
     import win32com.client
@@ -22,7 +21,7 @@ except ImportError:
 # as it will always be the correct handle - ie the handle
 # to the correct instance of Excel.
 #
-# The window object can be wrapped as a 
+# The window object can be wrapped as a
 # win32com.client.Dispatch object to make it
 # easier to use, as shown in these examples.
 #
@@ -36,6 +35,7 @@ except ImportError:
 # For more information about the Excel object model
 # see MSDN or the object browser in the Excel VBA editor.
 #
+
 
 def xl_app():
     """returns a Dispatch object for the current Excel instance"""

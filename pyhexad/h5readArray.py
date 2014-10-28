@@ -13,29 +13,31 @@ from type_helpers import is_supported_h5array_type
 
 logger = logging.getLogger(__name__)
 
-#===============================================================================
+#==============================================================================
 
-def get_ndarray(loc, path, first = None, last = None, step = None):
+
+def get_ndarray(loc, path, first=None, last=None, step=None):
     """
     Returns a tuple with the Numpy ndarray and an error message.
     """
-    
+
     # Is this a valid location?
     is_valid, species = path_is_valid_wrt_loc(loc, path)
     if not is_valid:
         return (None, 'Invalid location specified.')
-        
+
     # Do we have a dataset?
     if (loc.get(path) is None) or \
        (loc.get(path, getclass=True) != h5py.Dataset):
-        return (None, "Can't open HDF5 array '%s'." % (arrayname))
-            
+        return (None, "Can't open HDF5 array '%s'." % (path))
+
     dst = loc[path]
 
     # Does it have the right shape?
     # TODO: how does h5py represent NULL dataspaces?
     dsp = dst.shape
-    if len(dsp) > 2: return (None, 'Unsupported dataset shape.')
+    if len(dsp) > 2:
+        return (None, 'Unsupported dataset shape.')
 
     # Does it have the right type?
     dty = dst.dtype
@@ -46,11 +48,11 @@ def get_ndarray(loc, path, first = None, last = None, step = None):
     if not is_valid_hyperslab_spec(np.asarray(dsp), first, last, step):
         return None, 'Invalid hyperslab specification.'
 
-    # The hyperslab selection is 1-based => Convert it to 0-based Numpy notation.
+    # The hyperslab selection is 1-based => Convert it to 0-based notation.
 
     rk = len(dsp)
     if rk == 1:
-        
+
         start = 0     if first is None else first[0]-1
         stop = dsp[0] if last  is None else last[0]
         stride = 1    if step  is None else step[0]
@@ -59,10 +61,10 @@ def get_ndarray(loc, path, first = None, last = None, step = None):
         x = dst[slc]
 
         return (x, '%d x 1' % x.size)
-        
+
     elif rk == 2:
 
-        start = [0,0]           if first is None else [first[0]-1, first[1]-1]
+        start = [0, 0]          if first is None else [first[0]-1, first[1]-1]
         stop = [dsp[0], dsp[1]] if last  is None else [last[0]   , last[1]]
         stride = [1, 1]         if step  is None else [step[0]   , step[1]]
 
@@ -72,10 +74,11 @@ def get_ndarray(loc, path, first = None, last = None, step = None):
 
         return (x, '%d x %d' % (x.shape[0], x.shape[1]))
 
-    else:        
+    else:
         return (None, 'Unsupported HDF5 array rank.')
-    
-#===============================================================================
+
+#==============================================================================
+
 
 @xl_func("string filename, string arrayname, var first, var last, var step : string",
          category="HDF5",
@@ -86,11 +89,11 @@ def h5readArray(filename, arrayname, first, last, step):
     """
     Reads elements of an HDF5 array. Specify a rectilinear (strided) subregion
     via 'first' and 'last' ('stride').
-    
+
     :param filename: the name of an HDF5 file
     :param arrayname: the name of an HDF5 array
-    :param first: the (one-based) index of the first element to be read (optional)
-    :param last: the (one-based) index of the last element to be read (optional)
+    :param first: the (1-based) index of the first element to be read (optional)
+    :param last: the (1-based) index of the last element to be read (optional)
     :param stride: the read stride in each dimension
     :returns: A string
     """
@@ -108,17 +111,17 @@ def h5readArray(filename, arrayname, first, last, step):
     if not isinstance(arrayname, str):
         return "'arrayname' must be a string."
 
-
     # we get the hyperslab spec. arguments as list of lists
     # => for simplicity, convert to Numpy arrays
-    
+
     ndfirst = None
     if first is not None:
         if not isinstance(first, list):
             return "'first' must be an integer array."
         else:
             ndfirst, ret = lol_2_ndarray(first)
-            if ndfirst is None: return ret
+            if ndfirst is None:
+                return ret
 
     ndlast = None
     if last is not None:
@@ -126,7 +129,8 @@ def h5readArray(filename, arrayname, first, last, step):
             return "'last' must be an integer array."
         else:
             ndlast, ret = lol_2_ndarray(last)
-            if ndlast is None: return ret
+            if ndlast is None:
+                return ret
 
     ndstep = None
     if step is not None:
@@ -134,14 +138,14 @@ def h5readArray(filename, arrayname, first, last, step):
             return "'step' must be an integer array."
         else:
             ndstep, ret = lol_2_ndarray(step)
-            if ndstep is None: return ret
-            
-    
+            if ndstep is None:
+                return ret
+
     with h5py.File(filename, 'r') as f:
 
         x, ret = get_ndarray(f, arrayname, ndfirst, ndlast, ndstep)
 
         if x is not None:
             renderer.draw(x)
-        
+
     return ret

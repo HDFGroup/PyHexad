@@ -10,6 +10,7 @@ from type_helpers import excel_dtype
 
 logger = logging.getLogger(__name__)
 
+
 def draw(x):
 
     if not isinstance(x, np.ndarray):
@@ -26,15 +27,15 @@ def draw(x):
         xl = automation.xl_app()
         range = xl.Range(address)
         y = None
-        
+
         try:
             if x.ndim == 1:
-                range = xl.Range(range.Resize(2,1),
+                range = xl.Range(range.Resize(2, 1),
                                  range.Resize(x.shape[0]+1, 1))
                 # we need to reshape a 1D vector into a 2D array
-                y = np.reshape(x, (x.shape[0],1))
+                y = np.reshape(x, (x.shape[0], 1))
             elif x.ndim == 2:
-                range = xl.Range(range.Resize(2,1),
+                range = xl.Range(range.Resize(2, 1),
                                  range.Resize(x.shape[0]+1, x.shape[1]))
                 y = x
             else:
@@ -45,7 +46,7 @@ def draw(x):
                 range.Value = np.asarray(y, dtype=excel_dtype(y.dtype))
             else:
                 range.Value = y
-                
+
         except Exception, ex:
             logger.info(ex)
     #

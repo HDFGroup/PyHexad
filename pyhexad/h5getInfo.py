@@ -12,7 +12,8 @@ import renderer
 
 logger = logging.getLogger(__name__)
 
-#===============================================================================
+#==============================================================================
+
 
 def render_info(loc, path):
     """
@@ -70,7 +71,7 @@ def render_info(loc, path):
 
             result.append(('Type:', str(hnd.dtype)))
 
-        else: # we should never get here
+        else:  # we should never get here
             raise ValueError('What kind of hardlink is this???')
 
     elif isinstance(species, h5py.SoftLink):
@@ -88,7 +89,8 @@ def render_info(loc, path):
 
     return result
 
-#===============================================================================
+#==============================================================================
+
 
 @xl_func("string filename, string location : string",
          category="HDF5",
@@ -104,14 +106,14 @@ def h5getInfo(filename, location):
     :returns: A string
     """
 
-#===============================================================================
+#==============================================================================
 
     # sanity check
-    
+
     if not isinstance(filename, str):
-        raise TypeError, "'filename' must be a string."
+        raise TypeError("'filename' must be a string.")
     if not isinstance(location, str):
-            raise TypeError, "'location' must be a string."
+            raise TypeError("'location' must be a string.")
     if not file_exists(filename):
         return "Can't open file '%s' or the file is not an HDF5 file." %  \
             (filename)
@@ -122,9 +124,9 @@ def h5getInfo(filename, location):
 
         # normalize the HDF5 path
 
-        path = location        
+        path = location
         if path != '':
-            if not path in f:
+            if path not in f:
                 return 'Invalid location.'
         else:
             path = '/'
