@@ -4,6 +4,7 @@ from type_helpers import parse_dtype
 
 #===============================================================================
 
+
 def parse_heading(s):
     """
     When passed a correctly formatted header, this function returns a list with

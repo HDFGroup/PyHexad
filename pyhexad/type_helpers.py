@@ -94,7 +94,9 @@ def is_supported_h5table_type(dty):
         return False
 
     for k in dty.fields:
-        if not is_supported_h5array_type(dty.fields[k][0]):
+        field_type = dty.fields[k][0]
+        if not (is_supported_h5array_type(field_type) or
+                field_type.char == 'S'):
             return False
 
     return True
@@ -114,8 +116,12 @@ def excel_dtype(dty):
             raise Exception('Unsupported scalar type.')
     else:
         spec = []
-        for k in dty.fields:
-            spec.append((k, excel_dtype(dty.fields[k][0])))
+        for n in dty.names:
+            field_type = dty.fields[n][0]
+            if field_type.char != 'S':
+                spec.append((n, excel_dtype(field_type)))
+            else:
+                spec.append((n, field_type))
         return np.dtype(spec)
 
 #==============================================================================
