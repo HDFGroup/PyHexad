@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PyHexad's documentation!
-===================================
+Welcome to the PyHexad User's Guide!
+====================================
 
 Contents:
 

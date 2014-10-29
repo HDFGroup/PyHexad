@@ -12,11 +12,14 @@ a strided rectilinear subset of an HDF5 array.
 
 ::
 
-  h5readArray(filename, datasetname)
+  h5readArray(filename, arrayname)
 
-  h5readArray(filename, datasetname, first, last)
+  h5readArray(filename, arrayname, first, last)
 
-  h5readArray(filename, datasetname, first, last, step)
+  h5readArray(filename, arrayname, first, last, step)
+
+
+.. todo:: *Everything below is out of date. Fix this!*
   
 .. rubric:: Input Arguments
 
