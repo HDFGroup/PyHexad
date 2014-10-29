@@ -4,17 +4,18 @@ import logging
 import h5py
 from pyxll import xl_func
 
+from config import Limits
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
 from renderer import draw_table
-from type_helpers import excel_dtype, is_supported_h5table_type 
+from type_helpers import excel_dtype, is_supported_h5table_type
 
 logger = logging.getLogger(__name__)
 
 #==============================================================================
 
 
-def get_table(loc, path, columns, first=None, last=None, step=None):
+def get_table(loc, path, columns=None, first=None, last=None, step=None):
     """
     Returns a tuple of a list of rows (lists) and an error message.
     """
@@ -48,12 +49,16 @@ def get_table(loc, path, columns, first=None, last=None, step=None):
 
     col_names = None
     if columns is not None:
-        for c in columns:
-            if c[0] not in file_type.names:
+        flattened = [c for cl in columns for c in cl]
+        for c in flattened:
+            if c not in file_type.names:
                 return (None, "Unknown column '%s'." % (c))
-        col_names = [c[0] for c in columns]
+        col_names = tuple(flattened)
     else:
-        col_names = [n for n in mem_type.names]
+        col_names = tuple([n for n in mem_type.names])
+
+    if len(col_names) < 1:
+        raise ValueError('Invalid column specification.')
 
     # Is the hyperslab selection meaningful?
     # The hyperslab selection is 1-based => Convert it to 0-based notation.
@@ -67,15 +72,25 @@ def get_table(loc, path, columns, first=None, last=None, step=None):
 
     slc = slice(start, stop, stride)
 
-    y = [col_names]
+    # determine the number of rows expected
+    idx = slc.indices(dset.size)
+    if (idx[1]-idx[0])/idx[2] >= Limits.EXCEL_MAX_ROWS:
+        return (None, 'The requested number of rows exceeds the maximum '
+                'number of rows Excel can display.')
+
+    y = [list(col_names)]
     with dset.astype(mem_type):
         if columns is not None:
-            x = dset[slc]
+            x = dset[col_names][slc]
         else:
             x = dset[slc]
-        
-        for r in x:
-            y.append(r)
+
+        if len(col_names) > 1:
+            for r in x:
+                y.append(r)
+        else:
+            for r in x:
+                y.append((r,))
 
     return (y, '%d rows' % (len(y)-1))
 
@@ -101,7 +116,7 @@ def h5readTable(filename, tablename, columns, first=-1, last=-1, step=-1):
     :returns: A string
     """
 
-#===============================================================================
+#==============================================================================
 
     ret = '\0'
 
@@ -117,7 +132,6 @@ def h5readTable(filename, tablename, columns, first=-1, last=-1, step=-1):
         return "'tablename' must be a string."
 
     if columns is not None:
-        print type(columns)
         if not isinstance(columns, list):
             return "'columns' must be a string array."
         else:
@@ -143,7 +157,11 @@ def h5readTable(filename, tablename, columns, first=-1, last=-1, step=-1):
                            int(first) if first is not None else None,
                            int(last)  if last  is not None else None,
                            int(step)  if step  is not None else None)
-        print ret
+
+        # get_table returns None if there was an error
+        if x is None:
+            return ret
+
         draw_table(x)
 
     return ret

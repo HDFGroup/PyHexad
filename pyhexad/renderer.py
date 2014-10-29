@@ -91,7 +91,7 @@ def draw_table(x):
             num_rows = len(x)
             
             range = xl.Range(range.Resize(2, 1),
-                             range.Resize(num_rows+1, num_cols))
+                             range.Resize(num_rows + 1, num_cols))
             range.Value = x
 
         except Exception, ex:
