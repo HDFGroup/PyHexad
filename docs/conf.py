@@ -100,6 +100,9 @@ pygments_style = 'sphinx'
 
 todo_include_todos = True
 
+rst_epilog = u"""
+.. |product| replace:: PyHexad 
+"""
 
 # -- Options for HTML output ----------------------------------------------
 
