@@ -17,18 +17,26 @@ confines of a worksheet.
 
   h5showTree(filename)
 
-  h5showTree(filename, location)
+  h5showTree(filename [, location])
 
 
-.. rubric:: Input Arguments
+.. rubric:: Mandatory Arguments
 
-+----------+------------------------------------------------------------+
-|Argument  |Description                                                 |
-+==========+============================================================+
-|`filename`|A text string specifying the name of an HDF5 file.          |
-+----------+------------------------------------------------------------+
-|`location`|A text string (path) specifying where to begin the traversal|
-+----------+------------------------------------------------------------+
++------------+------------------------------------------------------------+
+|Argument    |Description                                                 |
++============+============================================================+
+|``filename``|A text string specifying the name of an HDF5 file.          |
++------------+------------------------------------------------------------+
+
+
+.. rubric:: Optional Arguments
+
++------------+------------------------------------------------------------+
+|Argument    |Description                                                 |
++============+============================================================+
+|``location``|A text string (path) specifying where to begin the traversal|
++------------+------------------------------------------------------------+
+
 
 .. rubric:: Return Value
 
@@ -36,6 +44,17 @@ On success, ``h5showTree`` populates a range of cells with the HDF5 path names
 of the objects visited.
 
 On error, an error message (string) is returned.
+
+
+.. rubric:: Examples
+
+Display the HDF5 hierarchy starting at the path ``/HDFEOS/GRIDS`` in
+file ``file.he5``.
+
+::
+   
+   h5showTree("file.he5", "/HDFEOS/GRIDS")
+
 
 .. rubric:: Error Conditions
 
@@ -52,15 +71,6 @@ The following conditions will create an error:
    
    * An empty string
    * No HDF5 object exists at the specified location
-
-.. rubric:: Examples
-
-Display the HDF5 hierarchy starting at the path ``/HDFEOS/GRIDS`` in
-file ``file.he5``.
-
-::
-   
-   h5showTree("file.he5", "/HDFEOS/GRIDS")
 
 
 .. rubric:: See Also

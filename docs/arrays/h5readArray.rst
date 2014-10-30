@@ -4,9 +4,10 @@
 Reading Arrays: ``h5readArray``
 -------------------------------
 
-``h5readArray`` reads elements of an HDF5 array. There are variants for
-reading all elements, a contiguous rectilinear subset (hyperslab), or
-a strided rectilinear subset of an HDF5 array.
+``h5readArray`` reads elements of one- and two-dimensional HDF5 arrays.
+There are variants for reading all elements, a contiguous rectilinear
+subset (hyperslab), or a strided rectilinear subset of an :term:`HDF5 array`.
+
 
 .. rubric:: Excel UDF Syntax
 
@@ -14,31 +15,69 @@ a strided rectilinear subset of an HDF5 array.
 
   h5readArray(filename, arrayname)
 
-  h5readArray(filename, arrayname, first, last)
+  h5readArray(filename, arrayname [, first, last, step])
 
-  h5readArray(filename, arrayname, first, last, step)
-
-
-.. todo:: *Everything below is out of date. Fix this!*
   
-.. rubric:: Input Arguments
+.. rubric:: Mandatory Arguments
 
-+------------+---------------------------------------------------------------+
-|Argument    |Description                                                    |
-+============+===============================================================+
-|``filename``|A text string specifying the name of an HDF5 file              |
-+------------+---------------------------------------------------------------+
-|``location``|A text string (path) specifying the location of an HDF5 object |
-+------------+---------------------------------------------------------------+
-|``attr``    |A text string, the attribute's name                            |
-+------------+---------------------------------------------------------------+
++-------------+---------------------------------------------------------------+
+|Argument     |Description                                                    |
++=============+===============================================================+
+|``filename`` |A text string specifying the name of an HDF5 file              |
++-------------+---------------------------------------------------------------+
+|``arrayname``|A text string (path) specifying the location of an HDF5 array  |
++-------------+---------------------------------------------------------------+
 
+
+.. rubric:: Optional Arguments
+
++---------+----------------------------------------------------------------------------------------------------+
+|Argument |Description                                                                                         |
++=========+====================================================================================================+
+|``first``|An integer array specifying the position of the first element to be read                            |
++---------+----------------------------------------------------------------------------------------------------+
+|``last`` |An integer array specifying the position of the last element to be read                             |
++---------+----------------------------------------------------------------------------------------------------+
+|``step`` |An integer array specifying the number of positions to skip in each dimension for each element read |
++---------+----------------------------------------------------------------------------------------------------+
+
+.. note:: The optional arguments are integer arrays whose length must be equal
+	  the rank (number of dimensions)
+	  of the HDF5 array.
+
+   
 .. rubric:: Return Value
 
-On success, ``h5readArray`` populates a cell with a string rendering of
-the attribute value.
+On success, ``h5readArray`` populates a cell range with the requested
+elements.
 
 On error, an error message (string) is returned.
+
+
+.. rubric:: Examples
+
+Read all elements of the ``Tot_Precip_Water`` array.
+
+::
+
+   h5readArray("GSSTF.2b.2008.01.01.he5", \
+               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water")
+   
+Read only every other element of the ``Tot_Precip_Water`` array.
+
+::
+
+   h5readArray("GSSTF.2b.2008.01.01.he5", \
+               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", , , {2,2})
+
+Read a contiguous rectangular region of the ``Tot_Precip_Water`` array.
+
+::
+
+   h5readArray("GSSTF.2b.2008.01.01.he5", \
+               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", \
+	       {25,10}, {356, 89})
+
 
 .. rubric:: Error Conditions
 	    
@@ -51,34 +90,26 @@ The following conditions will create an error:
    * It refers to a file system location for which the user has insufficient
      access privileges
      
-2. An invalid location
+2. An invalid array name
    
    * An empty string
    * No HDF5 object exists at the specified location
+   * The HDF5 object at the specified location is not an HDF5 array
 
-3. An invalid attribute name
-
-   * An empty string
-   * The HDF5 object doesn't have an attribute of that name
-
-4. The attribute size exceeds XXX KB.
+3. The number of elements requested exceeds the maximum Excel row
+   or column count
      
-.. rubric:: Examples
+4. An invalid first position
 
-Read the ``Units`` attribute of a dataset.
+   * The position is not empty and not an array of non-negative integers
 
-::
+5. An invalid last position
 
-   h5readArray("GSSTF.2b.2008.01.01.he5", \
-                   "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", \
-		   "Units")
+   * The position is not empty and not an array of non-negative integers
+       
+6. An invalid step
 
-Read the ``HDFEOSVersion`` attribute of the object at ``/HDFEOS INFORMATION``.
+   * The position is not empty and not an array of positive integers
 
-::
-
-   h5readArray(Sheet1!A1,"/HDFEOS INFORMATION", "HDFEOSVersion")
-   		   
-.. note:: The file name is retrieved from cell ``A1`` on the worksheet ``Sheet1``
 
 .. rubric:: See Also

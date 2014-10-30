@@ -17,7 +17,7 @@ reading a subset of columns or a contiguous or strided range of rows.
   h5readTable(filename, tablename [, columns, first, last, step])
 
  
-.. rubric:: Input Arguments
+.. rubric:: Mandatory Arguments
 
 +-------------+-------------------------------------------------------------------+
 |Argument     |Description                                                        |
@@ -26,6 +26,13 @@ reading a subset of columns or a contiguous or strided range of rows.
 +-------------+-------------------------------------------------------------------+
 |``tablename``|A text string (path) specifying the location of an HDF5 table      |
 +-------------+-------------------------------------------------------------------+
+
+
+.. rubric:: Optional Arguments
+
++-------------+-------------------------------------------------------------------+
+|Argument     |Description                                                        |
++=============+===================================================================+
 |``columns``  |An array of text strings specifying the columns to be read         |
 +-------------+-------------------------------------------------------------------+
 |``first``    |An integer specifying the first row to be read                     |
@@ -94,11 +101,11 @@ The following conditions will create an error:
    * An empty array
    * A column name that is not defined in the HDF5 table
 
-5. An invalid first position
+5. An invalid first row index
 
-   * The is not empty and not a non-negative integer
+   * The argument is not empty and not a non-negative integer
 
-6. An invalid last position
+6. An invalid last row index
 
    * The argument is not empty and not a non-negative integer
        

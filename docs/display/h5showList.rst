@@ -17,18 +17,26 @@ The specifics displayed depend on the HDF5 object kind.
 
   h5showTree(filename)
 
-  h5showTree(filename, location)
+  h5showTree(filename [, location])
 
 
-.. rubric:: Input Arguments
+.. rubric:: Mandatory Arguments
 
-+----------+------------------------------------------------------------+
-|Argument  |Description                                                 |
-+==========+============================================================+
-|`filename`|A text string specifying the name of an HDF5 file.          |
-+----------+------------------------------------------------------------+
-|`location`|A text string (path) specifying where to begin the traversal|
-+----------+------------------------------------------------------------+
++------------+------------------------------------------------------------+
+|Argument    |Description                                                 |
++============+============================================================+
+|``filename``|A text string specifying the name of an HDF5 file.          |
++------------+------------------------------------------------------------+
+
+
+.. rubric:: Optional Arguments
+
++------------+------------------------------------------------------------+
+|Argument    |Description                                                 |
++============+============================================================+
+|``location``|A text string (path) specifying where to begin the traversal|
++------------+------------------------------------------------------------+
+
 
 .. rubric:: Return Value
 
@@ -36,6 +44,18 @@ On success, ``h5showList`` populates a range of cells with different
 HDF5 object properties in tabular form.
 
 On error, an error message (string) is returned.
+
+
+.. rubric:: Examples
+
+Display in table form information about the HDF5 objects in file ``file.h5``,
+beginning traversal at location ``/HDFEOS/GRIDS/SET2/Data Fields``.
+
+::
+   
+   h5showList("file.h5", "/HDFEOS/GRIDS/SET2/Data Fields")
+
+
 
 .. rubric:: Error Conditions
 
@@ -52,15 +72,6 @@ The following conditions will create an error:
    
    * An empty string
    * No HDF5 object exists at the specified location
-
-.. rubric:: Examples
-
-Display in table form information about the HDF5 objects in file ``file.h5``,
-beginning traversal at location ``/HDFEOS/GRIDS/SET2/Data Fields``.
-
-::
-   
-   h5showList("file.h5", "/HDFEOS/GRIDS/SET2/Data Fields")
 
 
 .. rubric:: See Also

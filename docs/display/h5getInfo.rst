@@ -8,21 +8,24 @@ Item Details: ``h5getInfo``
 HDF5 file. The specifics depend on the kind of HDF5 item, such as
 HDF5 group, dataset, or external link.
 
+
 .. rubric:: Excel UDF Syntax
 
 ::
 
   h5getInfo(filename, location)
 
-.. rubric:: Input Arguments
+  
+.. rubric:: Mandatory Arguments
 
-+----------+---------------------------------------------------------------+
-|Argument  |Description                                                    |
-+==========+===============================================================+
-|`filename`|A text string specifying the name of an HDF5 file.             |
-+----------+---------------------------------------------------------------+
-|`location`|A text string (path) specifying the location of an HDF5 object |
-+----------+---------------------------------------------------------------+
++------------+---------------------------------------------------------------+
+|Argument    |Description                                                    |
++============+===============================================================+
+|``filename``|A text string specifying the name of an HDF5 file.             |
++------------+---------------------------------------------------------------+
+|``location``|A text string (path) specifying the location of an HDF5 object |
++------------+---------------------------------------------------------------+
+
 
 .. rubric:: Return Value
 
@@ -30,6 +33,17 @@ On success, ``h5getInfo`` populates a range of cells with detailed information
 about an HDF5 object.
 
 On error, an error message (string) is returned.
+
+
+.. rubric:: Examples
+
+Display detailed information about the HDF5 object at location
+``/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Pressure`` in file ``file.he5``.
+
+::
+   
+   h5showTree("file.he5", "/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Pressure")
+
 
 .. rubric:: Error Conditions
 	    
@@ -46,15 +60,6 @@ The following conditions will create an error:
    
    * An empty string
    * No HDF5 object exists at the specified location
-
-.. rubric:: Examples
-
-Display detailed information about the HDF5 object at location
-``/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Pressure`` in file ``file.he5``.
-
-::
-   
-   h5showTree("file.he5", "/HDFEOS/SWATHS/HIRDLS/Geolocation Fields/Pressure")
 
 
 .. rubric:: See Also
