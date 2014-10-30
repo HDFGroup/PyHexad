@@ -4,8 +4,8 @@
 Reading Images: ``h5readImage``
 -------------------------------
 
-``h5readImage`` reads an :term:`HDF5 image` and renders it as Portable Network
-Graphics (PNG) image in an Excel cell.
+``h5readImage`` reads an :term:`HDF5 image` and renders it as Graphics
+Interchange Format (GIF) image in an Excel cell.
 
 .. rubric:: Excel UDF Syntax
 
