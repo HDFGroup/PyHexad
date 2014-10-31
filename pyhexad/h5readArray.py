@@ -9,7 +9,7 @@ from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
 import renderer
 from shape_helpers import is_valid_hyperslab_spec, lol_2_ndarray
-from type_helpers import is_supported_h5array_type
+from type_helpers import excel_dtype, is_supported_h5array_type
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +40,12 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
         return (None, 'Unsupported dataset shape.')
 
     # Does it have the right type?
-    dty = dst.dtype
-    if not is_supported_h5array_type(dty):
+    file_type = dst.dtype
+    if not is_supported_h5array_type(file_type):
         return None, 'Unsupported dataset element type.'
+        
+    # upgrade everything to string, int32, or float64
+    mem_type = excel_dtype(file_type)
 
     # Is the hyperslab selection meaningful?
     if not is_valid_hyperslab_spec(np.asarray(dsp), first, last, step):
@@ -58,9 +61,10 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
         stride = 1    if step  is None else step[0]
 
         slc = slice(start, stop, stride)
-        x = dst[slc]
 
-        return (x, '%d x 1' % x.size)
+        with dst.astype(mem_type):
+            x = dst[slc]
+            return (x, '%d x 1' % x.size)
 
     elif rk == 2:
 
@@ -70,9 +74,10 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
 
         slc0 = slice(start[0], stop[0], stride[0])
         slc1 = slice(start[1], stop[1], stride[1])
-        x = dst[slc0, slc1]
 
-        return (x, '%d x %d' % (x.shape[0], x.shape[1]))
+        with dst.astype(mem_type):
+            x = dst[slc0, slc1]
+            return (x, '%d x %d' % (x.shape[0], x.shape[1]))
 
     else:
         return (None, 'Unsupported HDF5 array rank.')

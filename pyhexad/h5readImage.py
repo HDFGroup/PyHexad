@@ -32,30 +32,33 @@ def get_image(loc, image_path, palette_path=None):
        (loc.get(image_path, getclass=True) != h5py.Dataset):
         return (None, "Can't open HDF5 image '%s'." % (image_path))
 
-    if palette_path is not None:
-        if (loc.get(palette_path) is None) or \
-           (loc.get(palette_path, getclass=True) != h5py.Dataset):
-            return (None, "Can't open HDF5 palette '%s'." % (palette_path))
+    #if palette_path is not None and palette_path != '':
+    #    if (loc.get(palette_path) is None) or \
+    #       (loc.get(palette_path, getclass=True) != h5py.Dataset):
+    #        return (None, "Can't open HDF5 palette '%s'." % (palette_path))
 
     # try to run h52gif
+    exe = "%s\\bin\\%s" % (Places.HDF5_HOME, Places.H52GIF)
+    if not os.path.exists(exe):
+        return (None, "Can't locate the h52gif executable. Check config.py!")
 
     img = None
 
     try:
 
-        exe = "%s\\bin\\%s" % (Places.HDF5_HOME, Places.H52GIF)
         gif = mktemp('.gif')
         cmd = '%s %s %s -i "%s"' % (exe, loc.file.filename, gif, image_path)
-        if palette_path is not None:
-            # There appears to be a bug in h52gif. The -p option is no longer
-            # supported?
-            #  cmd += ' -p "%s"' % (palette_path)
-            pass
 
+        # There appears to be a bug in h52gif. The -p option is no longer
+        # supported?
+        # if palette_path is not None:
+        #    cmd += ' -p "%s"' % (palette_path)
+         
         os.system(cmd)
         img = gif
 
     except Exception, e:
+        logger.info(e)
         return (None, str(e))
 
     return (img, '\0')
@@ -64,7 +67,8 @@ def get_image(loc, image_path, palette_path=None):
 #===============================================================================
 
 
-@xl_func("string filename, string imagename, string palettename: string", category="HDF5")
+@xl_func("string filename, string imagename, string palettename: string",
+         category="HDF5")
 def h5readImage(filename, imagename, palettename=None):
     """
     Reads an HDF5 image
@@ -105,5 +109,6 @@ def h5readImage(filename, imagename, palettename=None):
 
     except Exception, e:
         logger.info(e)
+        ret = 'Internal error. Contact support!'
 
     return ret

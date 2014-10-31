@@ -43,12 +43,7 @@ def draw(x):
             else:
                 raise ValueError('Array rank must be 1 or 2.')
 
-            # Question: should the caller do this???
-            # we can handle only strings, int32, and float64
-            if y.dtype != h5py.special_dtype(vlen=str):
-                range.Value = np.asarray(y, dtype=excel_dtype(y.dtype))
-            else:
-                range.Value = y
+            range.Value = y
 
         except Exception, ex:
             logger.info(ex)
