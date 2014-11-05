@@ -21,7 +21,7 @@ def new_group(loc, path):
     loc: h5py.File or h5py.Group
         An open file handle where to start.
     path: str
-        the path where to the new group.
+        the path where to create the new group.
     """
 
     if not is_h5_location_handle(loc):

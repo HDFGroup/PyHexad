@@ -22,7 +22,6 @@ class H5readImageTest(unittest.TestCase):
 
         with h5py.File(file_name) as loc:
             a, msg = get_image(loc, '/image8bit')
-            print a
             self.assertTrue(os.path.exists(a))
 
     def test2(self):

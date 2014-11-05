@@ -14,6 +14,7 @@ Contents:
    attributes/index.rst
    images/index.rst
    groups/index.rst
+   types
    glossary
    references
    
