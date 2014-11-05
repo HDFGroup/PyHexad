@@ -1,6 +1,7 @@
 from .automation      import xl_app
 from .config          import Limits
 from .h5getInfo       import h5getInfo
+from .h5newGroup      import h5newGroup
 from .h5readArray     import h5readArray
 from .h5readAttribute import h5readAttribute
 from .h5readImage     import h5readImage

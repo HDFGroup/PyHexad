@@ -1,16 +1,51 @@
 
-import pyxll
-from pyxll import xl_arg_doc, xl_func
-import h5py
-import h5xl
-
 import logging
-_log = logging.getLogger(__name__)
 
-#===============================================================================
+import h5py
+import pyxll
+from pyxll import xl_func
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("groupname", "The name of the HDF5 group.")
+from h5_helpers import is_h5_location_handle, path_is_available_for_obj
+
+logger = logging.getLogger(__name__)
+
+#==============================================================================
+
+
+def new_group(loc, path):
+    """
+    Creates a new HDF5 group and returns a message (string)
+
+    Parameters
+    ----------
+    loc: h5py.File or h5py.Group
+        An open file handle where to start.
+    path: str
+        the path where to the new group.
+    """
+
+    if not is_h5_location_handle(loc):
+        raise TypeError('Location handle expected.')
+
+    # check if the group already exists
+    if path in loc:
+        try:
+            if (loc.get(path, getclass=True) == h5py.Group):
+                return path
+        except KeyError:  # h5py throws a KeyError for a dangling link
+            pass
+
+    # check if the path is available
+
+    if path_is_available_for_obj(loc, path, h5py.Group):
+        loc.require_group(path)
+        return path
+    else:
+        return "Can't create group at '%s'." % (path)
+
+#==============================================================================
+
+
 @xl_func("string filename, string groupname: string",
          category="HDF5",
          thread_safe=False,
@@ -18,39 +53,35 @@ _log = logging.getLogger(__name__)
 def h5newGroup(filename, groupname):
     """
     Creates an HDF5 group (and missing intermediate groups or the file)
+
+    :param filename: the name of an HDF5 file
+    :param groupname: the name of the HDF5 group to be created
+    :returns: A string
     """
 
-#===============================================================================
+#==============================================================================
+
+    # sanity check
 
     if not isinstance(filename, str):
-        raise TypeError, 'String expected.'
-
+        raise TypeError("'filename' must be a string.")
     if not isinstance(groupname, str):
-        raise TypeError, 'String expected.'
+        raise TypeError("'groupname' must be a string.")
 
-    # WHAT COULD GO WRONG?
-    #
-    # 1. the file can't be created or opened
-    # 2. the path name is in use and is not a group
-
-    ret = groupname
+    ret = '\0'
 
     if filename.strip() == '':
         return 'Missing file name.'
-    if groupname.strip() == '':
-        return 'Missing group name.'
 
     try:
         with h5py.File(filename, 'a') as f:
-            if h5xl.path_is_available_for_obj(f, groupname, h5py.Group):
-                f.require_group(groupname)
-                return groupname
-            else:
-                return "Can't create group."
+            ret = new_group(f, groupname)
 
     except IOError, e:
-        _log.info(e)
-        ret = "Can't open/create file."
+        logger.info(e)
+        ret = "Can't open/create file '%s'." % (filename)
     except Exception, e:
-        _log.info(e)
+        logger.info(e)
         return "Internal error."
+
+    return ret

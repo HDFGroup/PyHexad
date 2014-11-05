@@ -13,6 +13,7 @@ Contents:
    tables/index.rst
    attributes/index.rst
    images/index.rst
+   groups/index.rst
    glossary
    references
    
