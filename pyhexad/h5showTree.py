@@ -61,13 +61,8 @@ def render_tree(loc, path):
                 path = posixpath.join(grp.name, name)
                 col = path.count('/')
 
-                # render the full path only for groups
-                # otherwise just the link name
-
-                if grp.get(name, getclass=True) == h5py.Group:
-                    result.append((col, path))
-                else:
-                    result.append((col, path.split('/')[-1]))
+                # render just the link name
+                result.append((col, path.split('/')[-1]))
             #
             #==================================================================
 
