@@ -23,11 +23,11 @@ def new_array(loc, path, size, plist=''):
     loc: h5py.File or h5py.Group
         An open file handle where to start.
     path: str
-        the path where to the new array.
+        The path where to create the new array.
     size: list of lists
-        the dimensions of the new array
+        The dimensions of the new array.
     plist: string
-        a list of creation dataset properties
+        A list of dataset creation properties.
     """
 
     ret = path

@@ -6,3 +6,4 @@ Working with HDF5 Tables
    :maxdepth: 2
 
    h5readTable
+   h5newTable

@@ -6,5 +6,5 @@ class Limits(object):
 
 class Places(object):
 
-    HDF5_HOME = 'C:\\Progra~1\\HDF_Group\\HDF5\\1.8.13'
+    HDF5_HOME = 'C:\\Progra~1\\HDF_Group\\HDF5\\1.8.14'
     H52GIF = 'h52gifdll.exe'
