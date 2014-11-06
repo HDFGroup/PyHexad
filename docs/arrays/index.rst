@@ -7,3 +7,4 @@ Working with HDF5 Arrays
 
    h5readArray
    h5newArray
+   h5writeArray

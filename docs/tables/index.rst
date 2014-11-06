@@ -7,3 +7,5 @@ Working with HDF5 Tables
 
    h5readTable
    h5newTable
+   h5appendRows
+   h5writeTable
