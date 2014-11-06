@@ -6,3 +6,4 @@ Working with HDF5 Attributes
    :maxdepth: 2
 
    h5readAttribute
+   h5writeAttribute

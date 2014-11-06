@@ -1,69 +1,117 @@
 
-import h5py
-import h5xl
 import logging
+
+import h5py
 import numpy as np
-import pyxll
-from pyxll import xl_arg_doc, xl_func
+from pyxll import xl_func
 
-_log = logging.getLogger(__name__)
+from h5_helpers import is_h5_location_handle, resolvable
 
-#===============================================================================
+logger = logging.getLogger(__name__)
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("location", "The location of the object (attribute owner).")
-@xl_arg_doc("attname", "The attribute name.")
-@xl_arg_doc("attvalue", "The attribute value.")
+#==============================================================================
+
+
+def set_attribute(loc, path, attname, attvalue):
+    """
+    Creates a new HDF5 array and returns a message (string)
+
+    Parameters
+    ----------
+    loc: h5py.File or h5py.Group
+        An open file handle where to start.
+    path: str
+        The path where to the attributee.
+    attname: string
+        The attribute name.
+    attvalue: var
+        The attribute value.
+    """
+
+    ret = attname
+    
+    if not is_h5_location_handle(loc):
+        raise TypeError('Location handle expected.')
+
+    if not isinstance(path, str):
+        raise TypeError, 'String expected.'
+    
+    if not isinstance(attname, str) or attname == '':
+        raise TypeError, 'String expected.'
+
+    if attname == '':
+        return 'Empty attribute name.'
+
+    if attvalue is None:
+        raise ValueError, 'Value expected.'
+
+    if not resolvable(loc, path):
+        return "The path '%s' does not refer to an object." % (path)
+
+    obj = loc[path]
+    
+    # determine the attribute type, at the moment (string, int, float)
+    # TODO: provide an optional argument to force a certain type
+
+    if isinstance(attvalue, (int, float)):
+        if float(int(attvalue)) == float(attvalue):
+            if attname in obj.attrs:
+                del obj.attrs[attname]
+            obj.attrs.create(attname, int(attvalue), dtype='i4')
+        else:
+            obj.attrs[attname] = attvalue
+    else:
+        obj.attrs[attname] = str(attvalue)
+       
+    return ret
+
+#==============================================================================
+
+
 @xl_func("string filename, string location, string attname, var attvalue: var",
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
-def h5writeAttribute(filename, location, attname, attvalue):
+def h5writeAttribute(filename, path, attname, attvalue):
     """
-    Writes the value of an HDF5 attribute
+    Writes the value of an HDF5 attribute. Attributes will be created and
+    overwritten as necessary.
 
-    Existing attributes will be overwritten.
+    :param filename: the name of an HDF5 file
+    :param path: the path name of an HDF5 object
+    :param attname:  the name of an HDF5 attribute
+    :param attvalue: the vale of the HDF5 attribute
+    :returns: A string
     """
 
-#===============================================================================
+#==============================================================================
 
     if not isinstance(filename, str):
         raise TypeError, 'String expected.'
         
-    if not isinstance(location, str):
+    if not isinstance(path, str):
         raise TypeError, 'String expected.'
         
     if not isinstance(attname, str):
         raise TypeError, 'String expected.'
 
-    if attval is None:
+    if attvalue is None:
         raise ValueError, 'Value expected.'
-        
-    ret = None
 
-    if not h5xl.file_exists(filename):
-        return "Can't open file."
+    ret = attname
+
+    if filename.strip() == '':
+        return 'Missing file name.'
 
     try:
-        with h5py.File(filename) as f:
-            if location in f:
-                # see if we've got a number or a string
-                if isinstance(attvalue, (int, long, float)):
-                    # it's an integer
-                    if float(int(attvalue)) == float(attvalue):
-                        f[location].attrs.create(attname, int(attvalue),
-                                                 dtype='i4')
-                    else:
-                        f[location].attrs[attname] = attvalue
-                else:
-                    f[location].attrs[attname] = str(attvalue)
+        with h5py.File(filename, 'a') as f:
+            ret = set_attribute(f, path, attname, attvalue)
 
-                ret = attvalue
-            else:
-                return "Invalid location '%s'." % (location)
-                    
-    except Exception, ex:
-        _log.info(ex)
+    except IOError, e:
+        logger.info(e)
+        ret = "Can't open/create file '%s'." % (filename)
+    except Exception, e:
+        logger.info(e)
         return 'Internal error.'
 
     return ret
