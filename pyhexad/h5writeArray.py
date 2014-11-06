@@ -10,10 +10,7 @@ _log = logging.getLogger(__name__)
 
 #==============================================================================
 
-@xl_arg_doc("filename", "The name of an HDF5 file.")
-@xl_arg_doc("datasetname", "The name of the dataset.")
-@xl_arg_doc("data", "The data to be written.")
-@xl_func("string filename, string datasetname, numpy_array data : string",
+@xl_func("string filename, string datasetname, var[] data : string",
          category="HDF5",
          thread_safe=False,
          disable_function_wizard_calc=True)
@@ -21,12 +18,10 @@ def h5writeArray(filename, datasetname, data):
     """
     Writes data to an HDF5 dataset
 
-    If the file doesn't exist, a new file will be created.
-
-    h5write supports only floating-point and integer datasets.
-
-    For exisiting datasets an error will be generated, if there is an
-    element type or shape mismatch.
+    :param filename: the name of an HDF5 file
+    :param arrayname: the path name of an HDF5 array
+    :param data: an Excel range of data to be written
+    :returns: A string
     """
 
 #==============================================================================

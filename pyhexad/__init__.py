@@ -1,5 +1,6 @@
 from .automation       import xl_app
 from .config           import Limits
+from .h5appendRows     import h5appendRows
 from .h5getInfo        import h5getInfo
 from .h5newArray       import h5newArray
 from .h5newGroup       import h5newGroup
@@ -11,3 +12,5 @@ from .h5readTable      import h5readTable
 from .h5showList       import h5showList
 from .h5showTree       import h5showTree
 from .h5writeAttribute import h5writeAttribute
+from .h5writeArray     import h5writeArray
+from .h5writeTable     import h5writeTable
