@@ -216,3 +216,26 @@ def lol_2_ndarray(lol):
         ret = 'Not an integer array.'
 
     return (a, ret)
+
+#==============================================================================
+
+
+def try_intarray(x):
+    """
+    Converts a float or list or list of lists into an ndarray of int32.
+
+    Returns a tuple with the ndarray and an error message.
+    """
+
+    if x is None or not isinstance(x, (float, list)):
+        raise TypeError('Invalid argument type. Expected float or list.')
+
+    a = None
+    ret = '\0'
+
+    try:
+        a = np.asarray(x, dtype=np.int32).flatten()
+    except:
+        ret = 'Unable to convert the argment to an integer array.'
+
+    return (a, ret)

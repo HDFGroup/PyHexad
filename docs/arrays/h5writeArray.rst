@@ -4,9 +4,18 @@
 Writing Arrays: ``h5writeArray``
 --------------------------------
 
-``h5writeArray`` writes data to one- and two-dimensional HDF5 arrays.
-There are variants for writing all elements, a contiguous rectilinear
-subset (hyperslab), or a strided rectilinear subset of an :term:`HDF5 array`.
+``h5writeArray`` writes data from an Excel range to one- or two-dimensional
+HDF5 arrays. There are variants for writing all elements, a contiguous
+rectilinear subset (hyperslab), or a strided rectilinear subset of
+an :term:`HDF5 array`.
+
+If the HDF5 array does not already exist, it will be created and optional
+arguments will be ignored.
+
+Shape mismatches are handled within the extensibility limits of the destination
+array. That is, an extensible array will be reshaped automatically to
+accomodate the data within its specified bounds. For a fixed-shape array, a
+shape mismatch will generate an error.
 
 
 .. rubric:: Excel UDF Syntax
@@ -47,8 +56,7 @@ subset (hyperslab), or a strided rectilinear subset of an :term:`HDF5 array`.
 +---------+-------------------------------------------------------------------+
 
 .. note:: The optional arguments are integer arrays whose length must be equal
-	  the rank (number of dimensions)
-	  of the HDF5 array.
+	  to the rank (number of dimensions) of the HDF5 array.
 
    
 .. rubric:: Return Value
