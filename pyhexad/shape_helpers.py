@@ -239,3 +239,97 @@ def try_intarray(x):
         ret = 'Unable to convert the argment to an integer array.'
 
     return (a, ret)
+
+#==============================================================================
+
+
+def normalize_first(first, shape):
+    """
+    Switch from 1-based to 0-based indexing as part of the normalization
+    """
+
+    if not isinstance(shape, tuple) and len(shape) > 0 and len(shape) < 32:
+        raise TypeError("Invalid 'shape' found.")
+
+    if first is None:
+        return tuple([0 for i in shape])    
+    elif not isinstance(first, (float, list)):
+        raise TypeError, "'first' must be an integer or integer array."
+    else:
+        npfirst, ret = try_intarray(first)
+        if npfirst is None:
+            raise TypeError, "'first' must be an integer or integer array."
+        else:
+            if len(npfirst) != len(shape):
+                raise TypeError, "Invalid 'first' position."
+            else:
+                return tuple([i-1 for i in npfirst])
+
+#==============================================================================
+
+
+def normalize_last(last, shape):
+
+    if not isinstance(shape, tuple) and len(shape) > 0 and len(shape) < 32:
+        raise TypeError("Invalid 'shape' found.")
+
+    if last is None:
+        return tuple([shape[i] for i in shape])    
+    elif not isinstance(last, (float, list)):
+        raise TypeError, "'last' must be an integer or integer array."
+    else:
+        nplast, ret = try_intarray(last)
+        if nplast is None:
+            raise TypeError, "'last' must be an integer or integer array."
+        else:
+            if len(nplast) != len(shape):
+                raise TypeError, "Invalid 'last' position."
+            else:
+                return tuple([i for i in nplast])
+
+#==============================================================================
+
+
+def normalize_step(step, shape):
+
+    if not isinstance(shape, tuple) and len(shape) > 0 and len(shape) < 32:
+        raise TypeError("Invalid 'shape' found.")
+
+    if step is None:
+        return tuple([1 for i in shape])    
+    elif not isinstance(step, (float, list)):
+        raise TypeError, "'step' must be an integer or integer array."
+    else:
+        npstep, ret = try_intarray(step)
+        if npstep is None:
+            raise TypeError, "'step' must be an integer or integer array."
+        else:
+            if len(npstep) != len(shape):
+                raise TypeError, "Invalid 'step' found."
+            else:
+                return tuple([i for i in npstep])
+
+#==============================================================================
+
+
+def can_reshape(shape, maxshape):
+    """
+    Determines if SHAPE is "less or equal" to MAXSHAPE
+
+    Caution: a None entry in maxshape means unlimited.
+    """
+
+    if not isinstance(shape, tuple) or not isinstance(maxshape, tuple):
+        return false
+    if len(shape) != len(maxshape):
+        return false
+    if None in shape:
+        return false
+
+    ret = True
+    for i in range(len(shape)):
+        if maxshape[i] is None or shape[i] <= maxshape[i]:
+            continue
+        else:
+            break
+    return ret

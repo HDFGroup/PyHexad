@@ -9,7 +9,7 @@ from pyxll import xl_func
 
 from h5_helpers import is_h5_location_handle, path_is_available_for_obj, \
     resolvable
-from shape_helpers import try_intarray
+from shape_helpers import try_intarray, can_reshape
 from type_helpers import is_supported_h5array_type
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,51 @@ logger = logging.getLogger(__name__)
 #==============================================================================
 
 
-def write_array(loc, path, data, first, last, step):
+def create_array(loc, path, data):
+    """
+    Creates and writes data to an HDF5 array, and returns a
+    message (string)
+
+    Parameters
+    ----------
+    loc: h5py.File or h5py.Group
+        An open file handle where to start.
+    path: str
+        The path of the HDF5 array.
+    data: var[]
+        The data to be written.
+    """
+
+    ret = path
+
+    if not is_h5_location_handle(loc):
+        raise TypeError('Location handle expected.')
+
+    if not isinstance(path, str):
+        raise TypeError, 'String expected.'
+
+    if not path_is_available_for_obj(loc, path, h5py.Dataset): 
+        return "Unable to create an HDF5 array at '%s'." % (path)
+  
+    try:
+        file_type = data.dtype
+        # store strings in UTF-8 encoding
+        if file_type.char in ('S', 'U'):
+            file_type = h5py.special_dtype(vlen=unicode)
+
+        loc.create_dataset(path, data.shape, dtype=file_type,
+                           data=data.astype(file_type))
+    except Exception, e:
+        logger.info(e)
+        print e
+        ret = 'Array creation faild.'
+            
+    return ret
+
+#==============================================================================
+
+
+def write_array(loc, path, data, slice_tuple):
     """
     Creates (as needed) and writes data to an HDF5 array, and returns a
     message (string)
@@ -30,12 +74,8 @@ def write_array(loc, path, data, first, last, step):
         The path of the HDF5 array.
     data: var[]
         The data to be written.
-    first: numpy_array<int> (or None)
-        The position of the first element to be written.
-    last: numpy_array<int> (or None)
-        The position of the last element to be written.
-    step: numpy_array<int> (or None)
-        The write stride.
+    slice_tuple: tuple of slices
+        The destination indices to be written.
     """
 
     ret = path
@@ -47,32 +87,29 @@ def write_array(loc, path, data, first, last, step):
         raise TypeError, 'String expected.'
 
     # is the location valid?
-    create_dset = False
     if not resolvable(loc, path):
-        if not path_is_available_for_obj(loc, path, h5py.Dataset): 
-            return "Unable to create an HDF5 array at '%s'." % (path)
-        else:
-            create_dset = True
-    else:
-        if loc.get(path, getclass=True) != h5py.Dataset:
-            return "The object at '%s' is not an HDF5 array." % (path)
+        return "HDF5 array at '%s' not found." % (path)
+    if loc.get(path, getclass=True) != h5py.Dataset:
+        return "The object at '%s' is not an HDF5 array." % (path)
 
-    # if the dataset doesn't exist, we're ready to roll
-    if create_dset:
-        try:
-            loc.create_dataset(path, data.shape, dtype=data.dtype,
-                               data=data)
-        except Exception, e:
-            print e
-            logger.info(e)
-            ret = 'Internal error.'
-    else:
+    dset = loc[path]
+    file_type = dset.dtype
+    try:
+        x = data.astype(file_type)
+    except:
+        return "Can't convert data to element type in the file."
 
-        # examine the file and memory type compatibility
+    try:
 
-        # examine the shape and hyperslab specifications
-        
-        pass
+        rk = len(dset.shape)
+        rshape = tuple([(slice_tuple[i].stop-slice_tuple[i].start)/ \
+                        slice_tuple[i].step for i in range(rk)])
+        dset[slice_tuple] = data.reshape(rshape).astype(file_type)
+
+    except Exception, e:
+        print e
+        logger.info(e)
+        ret = 'Write failed.'
 
     return ret
 
@@ -92,7 +129,7 @@ def h5writeArray(filename, arrayname, data, first, last, step):
     :param data: an Excel range of data to be written
     :param first: the (1-based) index of the first element to be written (optional)
     :param last: the (1-based) index of the last element to be written (optional)
-    :param stride: the write stride in each dimension (optional)
+    :param step: the write stride in each dimension (optional)
     :returns: A string
     """
 
@@ -106,59 +143,38 @@ def h5writeArray(filename, arrayname, data, first, last, step):
     if not isinstance(arrayname, str):
         raise TypeError, "'arrayname' must be a string."
 
-    # 'data' must be a 1D or 2D array of a supported type
-
-    if not isinstance(data, list):
-        raise TypeError, "'data' must be a list."
-    
-    npdata = None
     try:
-        npdata = np.asarray(data)
-    except:
-        return 'Invalid (non-array) data found.'
-    if npdata.size == 0:
-        return 'No data found.'
-    if not is_supported_h5array_type(npdata.dtype):
-        return "Unsupported element type '%s' found." % (npdata.dtype)    
-    if npdata.ndim < 1 or npdata.ndim > 2:
-        return 'The data range must be one- or two-dimensional.'
-
-    # 'first' must be a 1D array of integers (or empty)
-    npfirst = None
-    if first is not None:
-        if not isinstance(first, (float, list)):
-            raise TypeError, "'first' must be an integer or integer array."
-        else:
-            npfirst, ret = try_intarray(first)
-            if npfirst is None:
-                return ret
-            
-    # 'last' must be a 1D array of integers (or empty)
-    nplast = None
-    if last is not None:
-        if not isinstance(last, (float, list)):
-            raise TypeError, "'last' must be an integer or integer array."
-        else:
-            nplast, ret = try_intarray(last)
-            if nplast is None:
-                return ret
-
-    # 'step' must be a 1D array of integers (or empty)
-    npstep = None
-    if step is not None:
-        if not isinstance(step, (float, list)):
-            raise TypeError, "'step' must be an integer or integer array."
-        else:
-            npstep, ret = try_intarray(step)
-            if npstep is None:
-                return ret
-    
-    if filename.strip() == '':
-        return 'Missing file name.'
-
-    try:
+        
         with h5py.File(filename, 'a') as f:
-            ret = write_array(f, arrayname, npdata, npfirst, nplast, npstep)
+            
+            # does the array exist?
+            create = False
+            if not resolvable(f, arrayname):
+                if not path_is_available_for_obj(f, arrayname, h5py.Dataset): 
+                    return "Unable to create an HDF5 array at '%s'." % (arrayname)
+                else:
+                    create = True
+            else:
+                if f.get(arrayname, getclass=True) != h5py.Dataset:
+                    return "The object at '%s' is not an HDF5 array." % (arrayname)
+
+
+            # if the array doesn't exist, we can ignore the optional parameters
+            # and are ready to roll
+            if create:
+                ret = create_array(f, arrayname, data)
+                
+            else:  # more checking...
+
+                dset = f[arrayname]
+                
+                # normalize the optional parameters and try to write
+                start = normalize_first(first, dset.shape)
+                stop = normalize_last(last, dset.shape)
+                stride = normalize_step(step, dset.shape)
+                slc = [slice(start[i], stop[i], step[i]) for i in range(len(start))] 
+
+                ret = write_array(f, arrayname, data, tuple(slc))
 
     except IOError, e:
         logger.info(e)

@@ -80,7 +80,11 @@ def is_supported_h5array_type(dty):
     if not isinstance(dty, np.dtype):
         return False
 
-    return (dty in h5array_dtypes.values())
+    if dty in h5array_dtypes.values():
+        return True
+    elif dty.char in ('S', 'U'):
+        return True
+    return False
 
 #==============================================================================
 
