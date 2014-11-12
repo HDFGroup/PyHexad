@@ -2,16 +2,13 @@
 import logging
 
 import h5py
-import h5xl
 import numpy as np
-import pyxll
 from pyxll import xl_func
 
 from h5_helpers import is_h5_location_handle, path_is_available_for_obj, \
     resolvable
 from shape_helpers import can_reshape, normalize_first, normalize_last, \
-    normalize_step, try_intarray
-from type_helpers import is_supported_h5array_type
+    normalize_step
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +36,11 @@ def create_array(loc, path, data):
         raise TypeError('Location handle expected.')
 
     if not isinstance(path, str):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
 
-    if not path_is_available_for_obj(loc, path, h5py.Dataset): 
+    if not path_is_available_for_obj(loc, path, h5py.Dataset):
         return "Unable to create an HDF5 array at '%s'." % (path)
-  
+
     try:
         file_type = data.dtype
         # store strings in UTF-8 encoding
@@ -54,9 +51,8 @@ def create_array(loc, path, data):
                            data=data.astype(file_type))
     except Exception, e:
         logger.info(e)
-        print e
         ret = 'Array creation faild.'
-            
+
     return ret
 
 #==============================================================================
@@ -89,7 +85,7 @@ def write_array(loc, path, data, slice_tuple):
         raise TypeError('Location handle expected.')
 
     if not isinstance(path, str):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
 
     # is the location valid?
     if not resolvable(loc, path):
@@ -101,7 +97,7 @@ def write_array(loc, path, data, slice_tuple):
     file_type = dset.dtype
     x = None
     try:
-        x = np.asarray(data).real.astype(file_type)
+        x = np.asarray(data).astype(file_type)
     except Exception, e:
         logger.info(e)
         return "Can't convert data to element type in the file."
@@ -109,8 +105,16 @@ def write_array(loc, path, data, slice_tuple):
     try:
 
         rk = len(dset.shape)
-        rshape = tuple([(slice_tuple[i].stop-slice_tuple[i].start)/ \
+        rshape = tuple([(slice_tuple[i].stop-slice_tuple[i].start) /
                         slice_tuple[i].step for i in range(rk)])
+
+        # degenerate?
+        if not np.greater(rshape, 0).all():
+            return 'Degenerate hyperslab found.'
+
+        # do the counts match?
+        if not np.prod(rshape) == np.prod(x.shape):
+            return 'Count mismatch between source and destination ranges.'
 
         # do we need to extend the dataset?
         rmaxshape = tuple([slice_tuple[i].stop for i in range(rk)])
@@ -154,44 +158,46 @@ def h5writeArray(filename, arrayname, data, first, last, step):
     ret = arrayname
 
     if not isinstance(filename, str):
-        raise TypeError, "'filename' must be a string."
+        raise TypeError("'filename' must be a string.")
 
     if not isinstance(arrayname, str):
-        raise TypeError, "'arrayname' must be a string."
+        raise TypeError("'arrayname' must be a string.")
 
     try:
-        
+
         with h5py.File(filename, 'a') as f:
-            
+
             # does the array exist?
             create = False
             if not resolvable(f, arrayname):
-                if not path_is_available_for_obj(f, arrayname, h5py.Dataset): 
-                    return "Unable to create an HDF5 array at '%s'." % (arrayname)
+                if not path_is_available_for_obj(f, arrayname, h5py.Dataset):
+                    return "Unable to create an HDF5 array at '%s'." % \
+                        (arrayname)
                 else:
                     create = True
             else:
                 if f.get(arrayname, getclass=True) != h5py.Dataset:
-                    return "The object at '%s' is not an HDF5 array." % (arrayname)
-
+                    return "The object at '%s' is not an HDF5 array." % \
+                        (arrayname)
 
             # if the array doesn't exist, we can ignore the optional parameters
             # and are ready to roll
             if create:
                 ret = create_array(f, arrayname, data)
-                
+
             else:  # more checking needed...
 
                 dset = f[arrayname]
-                
+
                 # normalize the optional parameters and try to write
 
                 start = normalize_first(first, dset.shape)
                 stop = normalize_last(last, dset.shape)
                 stride = normalize_step(step, dset.shape)
 
-                slc = [slice(start[i], stop[i], stride[i]) for i in range(len(start))] 
-                
+                slc = [slice(start[i], stop[i], stride[i])
+                       for i in range(len(start))]
+
                 ret = write_array(f, arrayname, data, tuple(slc))
 
     except IOError, e:

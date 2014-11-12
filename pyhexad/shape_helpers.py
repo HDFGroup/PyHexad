@@ -246,7 +246,7 @@ def try_intarray(x):
 def normalize_first(first, shape):
     """
     FIRST must be a non-negative array of the same length as SHAPE.
-    
+
     Switch from 1-based to 0-based indexing as part of the normalization
     """
 
@@ -281,7 +281,7 @@ def normalize_last(last, shape):
         raise TypeError("Invalid 'shape' found.")
 
     if last is None:  # the default is shape
-        return tuple([shape[i] for i in range(len(shape))])    
+        return tuple([shape[i] for i in range(len(shape))])
     elif not isinstance(last, (float, list)):
         raise TypeError("'last' must be an integer or integer array.")
     else:
