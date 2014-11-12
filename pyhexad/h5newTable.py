@@ -2,7 +2,6 @@
 import logging
 
 import h5py
-import numpy as np
 from pyxll import xl_func
 
 from h5_helpers import is_h5_location_handle, path_is_available_for_obj
@@ -41,33 +40,33 @@ def new_table(loc, path, heading, plist=''):
 
     plist_ht = {}
     if plist.strip() != '':
-        if len(plist.split(','))%2 != 0:
+        if len(plist.split(',')) % 2 != 0:
             return 'Invalid property list.'
         # convert the property list into a hashtable
         a = plist.split(',')
-        for i in range(0,len(a),2):
+        for i in range(0, len(a), 2):
             plist_ht[a[i].strip().upper()] = a[i+1].strip()
 
     try:
-        
+
         # get type
         file_type = None
-        
+
         try:
             file_type = dtype_from_heading(heading),
         except:
             return 'Unsupported datatype found.'
-           
+
         # parse property list
 
         kwargs = {}
-            
+
         # chunking?
         if 'CHUNKSIZE' in plist_ht.keys():
             try:
                 chunk = "[%s]" % plist_ht['CHUNKSIZE']
                 chunkdims = get_chunk_dimensions(chunk)
-                if chunkdims == None:
+                if chunkdims is None:
                     return "Invalid chunk dimensions."
                 if len(chunkdims) != 1:
                     return "Chunk rank must equal dataset rank (1)."
@@ -86,7 +85,7 @@ def new_table(loc, path, heading, plist=''):
                 return "Invalid compression level ([0-9])."
         else:
             kwargs['compression'] = 4
-                    
+
         # Fletcher32 check sum
         if 'FLETCHER32' in plist_ht.keys():
             bool = plist_ht['FLETCHER32']
@@ -99,7 +98,7 @@ def new_table(loc, path, heading, plist=''):
     except Exception, e:
         logger.info(e)
         ret = 'Internal error.'
-        
+
     return ret
 
 #==============================================================================

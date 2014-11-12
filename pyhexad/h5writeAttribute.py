@@ -2,7 +2,6 @@
 import logging
 
 import h5py
-import numpy as np
 from pyxll import xl_func
 
 from h5_helpers import is_h5_location_handle, resolvable
@@ -29,27 +28,27 @@ def set_attribute(loc, path, attname, attvalue):
     """
 
     ret = attname
-    
+
     if not is_h5_location_handle(loc):
         raise TypeError('Location handle expected.')
 
     if not isinstance(path, str):
-        raise TypeError, 'String expected.'
-    
+        raise TypeError('String expected.')
+
     if not isinstance(attname, str) or attname == '':
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
 
     if attname == '':
         return 'Empty attribute name.'
 
     if attvalue is None:
-        raise ValueError, 'Value expected.'
+        raise ValueError('Value expected.')
 
     if not resolvable(loc, path):
         return "The path '%s' does not refer to an object." % (path)
 
     obj = loc[path]
-    
+
     # determine the attribute type, at the moment (string, int, float)
     # TODO: provide an optional argument to force a certain type
 
@@ -62,7 +61,7 @@ def set_attribute(loc, path, attname, attvalue):
             obj.attrs[attname] = attvalue
     else:
         obj.attrs[attname] = str(attvalue)
-       
+
     return ret
 
 #==============================================================================
@@ -87,16 +86,16 @@ def h5writeAttribute(filename, path, attname, attvalue):
 #==============================================================================
 
     if not isinstance(filename, str):
-        raise TypeError, 'String expected.'
-        
+        raise TypeError('String expected.')
+
     if not isinstance(path, str):
-        raise TypeError, 'String expected.'
-        
+        raise TypeError('String expected.')
+
     if not isinstance(attname, str):
-        raise TypeError, 'String expected.'
+        raise TypeError('String expected.')
 
     if attvalue is None:
-        raise ValueError, 'Value expected.'
+        raise ValueError('Value expected.')
 
     ret = attname
 

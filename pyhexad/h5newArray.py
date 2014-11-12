@@ -31,7 +31,7 @@ def new_array(loc, path, size, plist=''):
     """
 
     ret = path
-    
+
     if not is_h5_location_handle(loc):
         raise TypeError('Location handle expected.')
 
@@ -42,11 +42,11 @@ def new_array(loc, path, size, plist=''):
     # parse the property list
     plist_ht = {}
     if plist.strip() != '':
-        if len(plist.split(','))%2 != 0:
+        if len(plist.split(',')) % 2 != 0:
             return 'Invalid property list.'
         # convert the property list into a hashtable
         a = plist.split(',')
-        for i in range(0,len(a),2):
+        for i in range(0, len(a), 2):
             plist_ht[a[i].strip().upper()] = a[i+1].strip()
 
     try:
@@ -55,12 +55,12 @@ def new_array(loc, path, size, plist=''):
                 
         # get shape
         dims, maxdims = get_dimensions(size)
-        if dims == None:
+        if dims is None:
             return 'Invalid dimensions specified.'
         kwargs['shape'] = tuple(dims)
         kwargs['maxshape'] = tuple(maxdims)
-                
-        # assemble property list                
+
+        # assemble property list
 
         # get type, default is float64
         file_type = np.dtype('double')
@@ -76,7 +76,7 @@ def new_array(loc, path, size, plist=''):
         if 'CHUNKSIZE' in plist_ht.keys():
             chunk = plist_ht['CHUNKSIZE']
             chunkdims = get_chunk_dimensions(chunk)
-            if chunkdims == None:
+            if chunkdims is None:
                 return 'Invalid chunk dimensions specified.'
             if len(chunkdims) != len(dims):
                 return 'Chunk rank must equal array rank.'
@@ -120,7 +120,7 @@ def new_array(loc, path, size, plist=''):
 
         # showtime!
         loc.create_dataset(path, **kwargs)
-                   
+
     except Exception, e:
         logger.info(e)
         ret = 'Internal error.'

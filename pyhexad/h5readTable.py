@@ -63,9 +63,9 @@ def get_table(loc, path, columns=None, first=None, last=None, step=None):
     # Is the hyperslab selection meaningful?
     # The hyperslab selection is 1-based => Convert it to 0-based notation.
 
-    start = 0     if first is None else first-1
-    stop = dsp[0] if last  is None else last
-    stride = 1    if step  is None else step
+    start = 0 if first is None else first-1
+    stop = dsp[0] if last is None else last
+    stride = 1 if step is None else step
 
     if start > stop:
         return (None, 'Empty hyperslab selection.')
@@ -155,8 +155,8 @@ def h5readTable(filename, tablename, columns, first=-1, last=-1, step=-1):
 
         x, ret = get_table(f, tablename, columns,
                            int(first) if first is not None else None,
-                           int(last)  if last  is not None else None,
-                           int(step)  if step  is not None else None)
+                           int(last) if last is not None else None,
+                           int(step) if step is not None else None)
 
         # get_table returns None if there was an error
         if x is None:

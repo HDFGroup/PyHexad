@@ -13,7 +13,7 @@ from h5_helpers import path_is_valid_wrt_loc
 
 logger = logging.getLogger(__name__)
 
-#===============================================================================
+#==============================================================================
 
 
 def get_image(loc, image_path, palette_path=None):
@@ -53,7 +53,7 @@ def get_image(loc, image_path, palette_path=None):
         # supported?
         # if palette_path is not None:
         #    cmd += ' -p "%s"' % (palette_path)
-         
+
         os.system(cmd)
         img = gif
 
@@ -64,7 +64,7 @@ def get_image(loc, image_path, palette_path=None):
     return (img, '\0')
 
 
-#===============================================================================
+#==============================================================================
 
 
 @xl_func("string filename, string imagename, string palettename: string",
@@ -104,7 +104,7 @@ def h5readImage(filename, imagename, palettename=None):
                 return ret
             if not os.path.exists(img):
                 return 'Failed to create image file.'
-            
+
             xl_app().ActiveSheet.Pictures().Insert(img)
 
     except Exception, e:

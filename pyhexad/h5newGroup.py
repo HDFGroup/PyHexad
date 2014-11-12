@@ -2,7 +2,6 @@
 import logging
 
 import h5py
-import pyxll
 from pyxll import xl_func
 
 from h5_helpers import is_h5_location_handle, path_is_available_for_obj

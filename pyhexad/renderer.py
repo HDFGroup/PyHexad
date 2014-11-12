@@ -1,12 +1,10 @@
 
 import logging
 
-import h5py
 import numpy as np
 import pyxll
 
 import automation
-from type_helpers import excel_dtype
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +54,7 @@ def draw(x):
 
 #==============================================================================
 
-    
+
 def draw_table(x):
     """
     Renders a table = list of rows = list of lists.
@@ -84,7 +82,7 @@ def draw_table(x):
             header = x[0]
             num_cols = len(header)
             num_rows = len(x)
-            
+
             range = xl.Range(range.Resize(2, 1),
                              range.Resize(num_rows + 1, num_cols))
             range.Value = x

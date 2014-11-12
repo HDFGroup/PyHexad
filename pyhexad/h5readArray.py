@@ -43,7 +43,7 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
     file_type = dst.dtype
     if not is_supported_h5array_type(file_type):
         return None, 'Unsupported dataset element type.'
-        
+
     # upgrade everything to string, int32, or float64
     mem_type = excel_dtype(file_type)
 
@@ -56,9 +56,9 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
     rk = len(dsp)
     if rk == 1:
 
-        start = 0     if first is None else first[0]-1
-        stop = dsp[0] if last  is None else last[0]
-        stride = 1    if step  is None else step[0]
+        start = 0 if first is None else first[0]-1
+        stop = dsp[0] if last is None else last[0]
+        stride = 1 if step is None else step[0]
 
         slc = slice(start, stop, stride)
 
@@ -68,9 +68,9 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
 
     elif rk == 2:
 
-        start = [0, 0]          if first is None else [first[0]-1, first[1]-1]
-        stop = [dsp[0], dsp[1]] if last  is None else [last[0]   , last[1]]
-        stride = [1, 1]         if step  is None else [step[0]   , step[1]]
+        start = [0, 0] if first is None else [first[0]-1, first[1]-1]
+        stop = [dsp[0], dsp[1]] if last is None else [last[0], last[1]]
+        stride = [1, 1] if step  is None else [step[0], step[1]]
 
         slc0 = slice(start[0], stop[0], stride[0])
         slc1 = slice(start[1], stop[1], stride[1])
@@ -103,7 +103,7 @@ def h5readArray(filename, arrayname, first, last, step):
     :returns: A string
     """
 
-#===============================================================================
+#==============================================================================
 
     # sanity check
 
