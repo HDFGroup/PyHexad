@@ -9,7 +9,8 @@ from pyxll import xl_func
 
 from h5_helpers import is_h5_location_handle, path_is_available_for_obj, \
     resolvable
-from shape_helpers import try_intarray, can_reshape
+from shape_helpers import can_reshape, normalize_first, normalize_last, \
+    normalize_step, try_intarray
 from type_helpers import is_supported_h5array_type
 
 logger = logging.getLogger(__name__)
@@ -76,6 +77,10 @@ def write_array(loc, path, data, slice_tuple):
         The data to be written.
     slice_tuple: tuple of slices
         The destination indices to be written.
+
+    Comments
+    --------
+    The destination can be of a different rank than the data range.
     """
 
     ret = path
@@ -94,9 +99,11 @@ def write_array(loc, path, data, slice_tuple):
 
     dset = loc[path]
     file_type = dset.dtype
+    x = None
     try:
-        x = data.astype(file_type)
-    except:
+        x = np.asarray(data).real.astype(file_type)
+    except Exception, e:
+        logger.info(e)
         return "Can't convert data to element type in the file."
 
     try:
@@ -104,7 +111,16 @@ def write_array(loc, path, data, slice_tuple):
         rk = len(dset.shape)
         rshape = tuple([(slice_tuple[i].stop-slice_tuple[i].start)/ \
                         slice_tuple[i].step for i in range(rk)])
-        dset[slice_tuple] = data.reshape(rshape).astype(file_type)
+
+        # do we need to extend the dataset?
+        rmaxshape = tuple([slice_tuple[i].stop for i in range(rk)])
+        if np.greater(rmaxshape, dset.shape).any():  # we need to extend
+            if can_reshape(rmaxshape, dset.maxshape):
+                dset.resize(np.maximum(rmaxshape, dset.shape))
+            else:
+                return "Can't extend the dataset to accomodate the data range."
+
+        dset[slice_tuple] = x.reshape(rshape)
 
     except Exception, e:
         print e
@@ -164,16 +180,18 @@ def h5writeArray(filename, arrayname, data, first, last, step):
             if create:
                 ret = create_array(f, arrayname, data)
                 
-            else:  # more checking...
+            else:  # more checking needed...
 
                 dset = f[arrayname]
                 
                 # normalize the optional parameters and try to write
+
                 start = normalize_first(first, dset.shape)
                 stop = normalize_last(last, dset.shape)
                 stride = normalize_step(step, dset.shape)
-                slc = [slice(start[i], stop[i], step[i]) for i in range(len(start))] 
 
+                slc = [slice(start[i], stop[i], stride[i]) for i in range(len(start))] 
+                
                 ret = write_array(f, arrayname, data, tuple(slc))
 
     except IOError, e:

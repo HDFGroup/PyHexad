@@ -31,30 +31,33 @@ class H5writeArrayTest(unittest.TestCase):
 
         with h5py.File(file_name) as loc:
 
-            shape = (128)
+            # float64
+            shape = (64)
             a = np.zeros(shape)
             path = '/A/B/C/1D'
             msg = create_array(loc, path, a)
             self.assertEqual(msg, path)
 
-            shape = (1, 128)
+            shape = (1, 32)
             a = np.zeros(shape)
             path = '/A/B/C/1C'
             msg = create_array(loc, path, a)
             self.assertEqual(msg, path)
             
-            shape = (128, 256)
+            shape = (32, 16)
             a = np.zeros(shape)
             path = '/A/B/C/2D'
             msg = create_array(loc, path, a)
             self.assertEqual(msg, path)
 
-            shape = (128, 256, 64)
+            # this will not happen in Excel, but...
+            shape = (2, 3, 4)
             a = np.zeros(shape)
             path = '/A/B/C/3D'
             msg = create_array(loc, path, a)
             self.assertEqual(msg, path)
 
+            # strings
             shape = (128, 1)
             a = np.zeros(shape, dtype=h5py.special_dtype(vlen=unicode))
             a[...] = u"Hello, World!"
@@ -62,6 +65,7 @@ class H5writeArrayTest(unittest.TestCase):
             msg = create_array(loc, path, a)
             self.assertEqual(msg, path)
 
+            # uint8
             shape = (128, 1)
             a = np.zeros(shape, dtype=np.uint8)
             a[:] = 254
@@ -70,7 +74,7 @@ class H5writeArrayTest(unittest.TestCase):
             self.assertEqual(msg, path)
 
 
-    def test_write_array(self):
+    def test_write_array1D(self):
         file_name = get_temp_file()
 
         with h5py.File(file_name) as loc:
@@ -90,9 +94,16 @@ class H5writeArrayTest(unittest.TestCase):
             self.assertEqual(msg, path)
             b = np.zeros(64)
             b[:] = 1.0
+            # [0:64] -> [0:1:1,0:64:1]
             msg = write_array(loc, path, b, (slice(0, 1, 1), slice(0,64,1)))
             self.assertEqual(msg, path)
-            
+
+
+    def test_write_array2D(self):
+        file_name = get_temp_file()
+
+        with h5py.File(file_name) as loc:
+
             shape = (1, 128, 64)
             a = np.zeros(shape)
             path = '/1CC'
@@ -100,7 +111,9 @@ class H5writeArrayTest(unittest.TestCase):
             self.assertEqual(msg, path)
             b = np.zeros(64)
             b[:] = 1.0
-            msg = write_array(loc, path, b, (slice(0, 1, 1), slice(2,3,1), slice(0, 64, 1)))
+            # [0:64] -> [0:1:1, 2:3:1, 0:64:1]
+            msg = write_array(loc, path, b, (slice(0, 1, 1), slice(2,3,1), \
+                                             slice(0, 64, 1)))
             self.assertEqual(msg, path)
 
             shape = (16, 32)
@@ -110,9 +123,64 @@ class H5writeArrayTest(unittest.TestCase):
             self.assertEqual(msg, path)
             b = np.zeros(64)
             b[:] = 1.0
+            # [0:64] -> [0:8:1, 0:8:1]
             msg = write_array(loc, path, b, (slice(0, 8, 1), slice(0,8,1)))
             self.assertEqual(msg, path)
 
+
+    def test_write_array1D_w_extend(self):
+        file_name = get_temp_file()
+
+        with h5py.File(file_name) as loc:
+
+            path = '/1D'
+            size = [[-12]]
+            plist = 'Datatype,single,Chunksize,[3]'
+            msg = new_array(loc, path, size, plist)
+            self.assertEqual(msg, path)
+            a = np.zeros(128)
+            a[:] = 123.45
+            msg = write_array(loc, path, a, (slice(0, 128, 1),))
+            self.assertEqual(msg, path)
+
+            path = '/1C'
+            size = [[-1,-24]]
+            plist = 'Datatype,single,Chunksize,[2 3]'
+            msg = new_array(loc, path, size, plist)
+            self.assertEqual(msg, path)
+            b = np.zeros(64)
+            b[:] = 1.0
+            # [0:64] -> [0:1:1,0:64:1]
+            msg = write_array(loc, path, b, (slice(0, 1, 1), slice(0,64,1)))
+            self.assertEqual(msg, path)
+
+    def test_write_array2D_w_extend(self):
+        file_name = get_temp_file()
+
+        with h5py.File(file_name) as loc:
+
+            path = '/1CC'
+            size = [[-1, 12, -32]]
+            plist = 'Datatype,single'
+            msg = new_array(loc, path, size, plist)
+            self.assertEqual(msg, path)            
+            b = np.zeros(64)
+            b[:] = 1.0
+            # [0:64] -> [0:1:1, 2:3:1, 0:64:1]
+            msg = write_array(loc, path, b, (slice(0, 1, 1), slice(2,3,1), \
+                                             slice(0, 64, 1)))
+            self.assertEqual(msg, path)
+
+            path = '/2D'
+            size = [[-3, -3]]
+            plist = 'Datatype,single,Deflate,6'
+            msg = new_array(loc, path, size, plist)
+            self.assertEqual(msg, path)            
+            b = np.zeros(64)
+            b[:] = 1.0
+            # [0:64] -> [0:8:1, 0:8:1]
+            msg = write_array(loc, path, b, (slice(0, 8, 1), slice(0,8,1)))
+            self.assertEqual(msg, path)
 
             
 if __name__ == '__main__':

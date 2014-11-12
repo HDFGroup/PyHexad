@@ -245,47 +245,56 @@ def try_intarray(x):
 
 def normalize_first(first, shape):
     """
+    FIRST must be a non-negative array of the same length as SHAPE.
+    
     Switch from 1-based to 0-based indexing as part of the normalization
     """
 
     if not isinstance(shape, tuple) and len(shape) > 0 and len(shape) < 32:
         raise TypeError("Invalid 'shape' found.")
 
-    if first is None:
-        return tuple([0 for i in shape])    
+    if first is None:  # the default is (0,...,0)
+        return tuple([0 for i in shape])
     elif not isinstance(first, (float, list)):
-        raise TypeError, "'first' must be an integer or integer array."
+        raise TypeError("'first' must be an integer or integer array.")
     else:
         npfirst, ret = try_intarray(first)
         if npfirst is None:
-            raise TypeError, "'first' must be an integer or integer array."
+            raise TypeError("'first' must be an integer or integer array.")
         else:
             if len(npfirst) != len(shape):
-                raise TypeError, "Invalid 'first' position."
-            else:
+                raise TypeError("Invalid 'first' position.")
+            elif np.greater_equal(npfirst, 1).all():  # Excel positions are 1+
                 return tuple([i-1 for i in npfirst])
+            else:
+                raise TypeError("'first' must be a non-negative array.")
 
 #==============================================================================
 
 
 def normalize_last(last, shape):
+    """
+    LAST must be a positive array of the same length as SHAPE.
+    """
 
     if not isinstance(shape, tuple) and len(shape) > 0 and len(shape) < 32:
         raise TypeError("Invalid 'shape' found.")
 
-    if last is None:
-        return tuple([shape[i] for i in shape])    
+    if last is None:  # the default is shape
+        return tuple([shape[i] for i in range(len(shape))])    
     elif not isinstance(last, (float, list)):
-        raise TypeError, "'last' must be an integer or integer array."
+        raise TypeError("'last' must be an integer or integer array.")
     else:
         nplast, ret = try_intarray(last)
         if nplast is None:
-            raise TypeError, "'last' must be an integer or integer array."
+            raise TypeError("'last' must be an integer or integer array.")
         else:
             if len(nplast) != len(shape):
-                raise TypeError, "Invalid 'last' position."
-            else:
+                raise TypeError("Invalid 'last' position.")
+            elif np.greater_equal(nplast, 1).all():
                 return tuple([i for i in nplast])
+            else:
+                raise TypeError("'last' must be a positive array.")
 
 #==============================================================================
 
@@ -295,19 +304,21 @@ def normalize_step(step, shape):
     if not isinstance(shape, tuple) and len(shape) > 0 and len(shape) < 32:
         raise TypeError("Invalid 'shape' found.")
 
-    if step is None:
-        return tuple([1 for i in shape])    
+    if step is None:  # the default is (1,...,1)
+        return tuple([1 for i in shape])
     elif not isinstance(step, (float, list)):
-        raise TypeError, "'step' must be an integer or integer array."
+        raise TypeError("'step' must be an integer or integer array.")
     else:
         npstep, ret = try_intarray(step)
         if npstep is None:
-            raise TypeError, "'step' must be an integer or integer array."
+            raise TypeError("'step' must be an integer or integer array.")
         else:
             if len(npstep) != len(shape):
-                raise TypeError, "Invalid 'step' found."
-            else:
+                raise TypeError("Invalid 'step' found.")
+            elif np.greater_equal(npstep, 1).all():
                 return tuple([i for i in npstep])
+            else:
+                raise TypeError("'step' must be a positive array.")
 
 #==============================================================================
 
@@ -320,11 +331,11 @@ def can_reshape(shape, maxshape):
     """
 
     if not isinstance(shape, tuple) or not isinstance(maxshape, tuple):
-        return false
+        return False
     if len(shape) != len(maxshape):
-        return false
+        return False
     if None in shape:
-        return false
+        return False
 
     ret = True
     for i in range(len(shape)):
