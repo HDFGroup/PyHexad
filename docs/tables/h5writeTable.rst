@@ -4,14 +4,14 @@
 Writing to a Table: ``h5writeTable``
 ------------------------------------
 
-``h5writeTable`` writes rows to an HDF5 table. Existing rows will
-be overwritten, or the table extended as necessary. The write
+``h5writeTable`` writes rows to an existing HDF5 table. The write
 operation can be restricted to a subset of columns.
 
 .. caution::
-   Unless the table is empty, this is generally not an append operation
-   and will result in existing rows being overwritten. Use
-   :ref:`h5appendRows` for appending rows to an HDF5 table.
+   **This is a destructive operation.** Existing rows will be overwritten, or
+   the table extended as necessary. Unless the table is empty, this is
+   not an append operation. Use `h5appendRows` to append rows to an HDF5 table.
+
 
 .. rubric:: Excel UDF Syntax
 
@@ -53,28 +53,14 @@ On error, an error message (string) is returned.
 
 .. rubric:: Examples
 
-Read all elements of the ``Tot_Precip_Water`` array.
+Overwrite the `Ask` column in the HDF5 table at `/Ask & Bid/20140423` in the
+file `tickdata.h5` with data from the Excel range `B1:B23581` on worksheet
+`Sheet2`.
 
 ::
 
-   h5writeTable("GSSTF.2b.2008.01.01.he5", \
-               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water")
+   h5appendRows("tickdata.h5", "/Ask & Bid/20140423", Sheet2!$B1:B23581, "Ask")
    
-Read only every other element of the ``Tot_Precip_Water`` array.
-
-::
-
-   h5writeTable("GSSTF.2b.2008.01.01.he5", \
-               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", , , {2,2})
-
-Read a contiguous rectangular region of the ``Tot_Precip_Water`` array.
-
-::
-
-   h5writeTable("GSSTF.2b.2008.01.01.he5", \
-               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", \
-	       {25,10}, {356, 89})
-
 
 .. rubric:: Error Conditions
 	    
@@ -86,27 +72,22 @@ The following conditions will create an error:
      the operating system
    * It refers to a file system location for which the user has insufficient
      access privileges
-     
-2. An invalid array name
+
+2. An invalid table name
    
    * An empty string
    * No HDF5 object exists at the specified location
-   * The HDF5 object at the specified location is not an HDF5 array
+   * The HDF5 object at the specified location is not an HDF5 table
 
-3. The number of elements requested exceeds the maximum Excel row
-   or column count
-     
-4. An invalid first position
+3. An invalid row set
 
-   * The position is not empty and not an array of non-negative integers
+   * The number or type of columns in the rows set does not match the
+     number or type of columns in the file
 
-5. An invalid last position
+4. An invalid set of columns.
 
-   * The position is not empty and not an array of non-negative integers
-       
-6. An invalid step
-
-   * The position is not empty and not an array of positive integers
+   * One or more of the column names provided do not match the
+     column names of the HDF5 table in the file.
 
 
 .. rubric:: See Also
