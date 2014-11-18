@@ -11,13 +11,21 @@ HDF5 objects are clustered by their "parent HDF5 group", and object
 properties, such as HDF5 attribute count, are shown in cells to the right.
 The specifics displayed depend on the HDF5 object kind.
 
+.. _fig-h5showList:
+
+.. figure:: ./h5showList.png
+   :align: center
+
+   Excel `h5showList` screenshot.
+
+
 .. rubric:: Excel UDF Syntax
 
 ::
 
-  h5showTree(filename)
+  h5showList(filename)
 
-  h5showTree(filename [, location])
+  h5showList(filename [, location])
 
 
 .. rubric:: Mandatory Arguments

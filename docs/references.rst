@@ -5,6 +5,7 @@ References
 .. [Enthought] `<https://www.enthought.com/>`_
 .. [The HDF Group] `<http://www.hdfgroup.org/>`_
 .. [HDF5] `<http://www.hdfgroup.org/HDF5/>`_
+.. [HDFView] `<http://www.hdfgroup.org/products/java/hdfview/>`_
 .. [h5py] `<http://www.h5py.org/>`_
 .. [PyXLL] `<https://www.pyxll.com/>`_
 .. [Excel] `<http://office.microsoft.com/en-us/excel/>`_

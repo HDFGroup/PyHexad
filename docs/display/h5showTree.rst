@@ -11,6 +11,14 @@ of HDF5 objects which are "deeper" in the HDF5 group hierarchy appear on a
 worksheet in cells farther to the right, which mimics a tree-view within the
 confines of a worksheet.
 
+.. _fig-h5showTree:
+
+.. figure:: ./h5showTree.png
+   :align: center
+
+   Excel `h5showTree` screenshot.
+
+
 .. rubric:: Excel UDF Syntax
 
 ::

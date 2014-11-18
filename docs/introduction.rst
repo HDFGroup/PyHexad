@@ -70,8 +70,10 @@ follows:
 
 
 Parameters in brackets, such as ``C``, ``D``, ``E`` in the previous example, are
-**optional** parameters. They are also **positional** parameters and must be
-used accordingly. An example might help to illustrate their use. The call
+**optional** parameters as opposed to mandatory parameters (``A`` and ``B``).
+
+All parameters are **positional** parameters and must be used accordingly.
+An example might help to illustrate their use. The call
 
 ::
 

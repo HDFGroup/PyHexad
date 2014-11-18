@@ -4,9 +4,17 @@
 Item Details: ``h5getInfo``
 ---------------------------
 
-``h5showTree`` displays detailed information about an HDF5 item in an
+``h5getInfo`` displays detailed information about an HDF5 item in an
 HDF5 file. The specifics depend on the kind of HDF5 item, such as
 HDF5 group, dataset, or external link.
+
+.. _fig-h5getInfo:
+
+.. figure:: ./h5getInfo.png
+   :width: 90%
+   :align: center
+
+   Excel `h5getInfo` screenshot.
 
 
 .. rubric:: Excel UDF Syntax
