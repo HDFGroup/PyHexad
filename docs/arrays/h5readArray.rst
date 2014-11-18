@@ -31,15 +31,19 @@ subset (hyperslab), or a strided rectilinear subset of an :term:`HDF5 array`.
 
 .. rubric:: Optional Arguments
 
-+---------+----------------------------------------------------------------------------------------------------+
-|Argument |Description                                                                                         |
-+=========+====================================================================================================+
-|``first``|An integer array specifying the position of the first element to be read                            |
-+---------+----------------------------------------------------------------------------------------------------+
-|``last`` |An integer array specifying the position of the last element to be read                             |
-+---------+----------------------------------------------------------------------------------------------------+
-|``step`` |An integer array specifying the number of positions to skip in each dimension for each element read |
-+---------+----------------------------------------------------------------------------------------------------+
++---------+-------------------------------------------------------------------+
+|Argument |Description                                                        |
++=========+===================================================================+
+|``first``|An integer array specifying the position of the first element to   |
+|         |be read                                                            |
++---------+-------------------------------------------------------------------+
+|``last`` |An integer array specifying the position of the last element to be |
+|         |read                                                               |
++---------+-------------------------------------------------------------------+
+|``step`` |An integer array specifying the number of positions to skip in     |
+|         |each dimension for each element read                               |
++---------+-------------------------------------------------------------------+
+
 
 .. note:: The optional arguments are integer arrays whose length must be equal
 	  the rank (number of dimensions)
@@ -63,7 +67,8 @@ Read all elements of the ``Tot_Precip_Water`` array.
    h5readArray("GSSTF.2b.2008.01.01.he5", \
                "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water")
    
-Read only every other element of the ``Tot_Precip_Water`` array.
+Read only every other element of the two-dimensional ``Tot_Precip_Water``
+array.
 
 ::
 
@@ -113,3 +118,6 @@ The following conditions will create an error:
 
 
 .. rubric:: See Also
+
+:ref:`h5readTable <h5readTable>`, :ref:`h5readAttribute <h5readAttribute>`,
+:ref:`h5readImage <h5readImage>`

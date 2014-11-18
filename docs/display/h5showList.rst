@@ -84,4 +84,4 @@ The following conditions will create an error:
 
 .. rubric:: See Also
 
-:ref:`h5getInfo`, :ref:`h5showTree`
+:ref:`h5getInfo <h5getInfo>`, :ref:`h5showTree <h5showTree>`

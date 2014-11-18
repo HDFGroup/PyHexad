@@ -19,6 +19,9 @@ customized via a creation property list.
  
 .. rubric:: Mandatory Arguments
 
+.. tabularcolumns::
+   |p{0.2\textwidth}|p{0.7\textwidth}|
+
 +-------------+---------------------------------------------------------------+
 |Argument     |Description                                                    |
 +=============+===============================================================+
@@ -39,6 +42,9 @@ customized via a creation property list.
 
 .. rubric:: Optional Arguments
 
+.. tabularcolumns::
+   |p{0.2\textwidth}|p{0.7\textwidth}|
+   
 +---------------+-------------------------------------------------------------+
 |Argument       |Description                                                  |
 +===============+=============================================================+
@@ -51,6 +57,9 @@ customized via a creation property list.
 
 .. rubric:: Properties
 
+.. tabularcolumns::
+   |p{0.15\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|p{0.15\textwidth}|
+   
 +--------------+---------------------------+--------------------+-------------+
 |Name          |Description                |Values              |   Default   |
 +==============+===========================+====================+=============+
@@ -106,7 +115,7 @@ extent of the dataset is 12x16 and a chunk size will be chosen automatically.
 
 Create a three-dimensional, extendible (in the first dimension), gzip compressed
 (level 6) dataset of double-precision floating-point numbers with chunked
-(4x4 chunks) layout and Fletcher32 checksums generated.
+(4x4x64 chunks) layout and Fletcher32 checksums generated.
 
 ::
 
@@ -144,3 +153,5 @@ The following conditions will create an error:
    * A value which is outside the admissible range for the corresponding key
 
 .. rubric:: See Also
+
+:ref:`h5newTable <h5newTable>`, :ref:`h5newGroup <h5newGroup>`

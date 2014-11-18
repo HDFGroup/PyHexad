@@ -125,3 +125,4 @@ The following conditions will create an error:
 
 
 .. rubric:: See Also
+:ref:`h5writeTable <h5writeTable>`, :ref:`h5writeAttribute <h5writeAttribute>`

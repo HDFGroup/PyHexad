@@ -72,4 +72,4 @@ The following conditions will create an error:
 
 .. rubric:: See Also
 
-:ref:`h5showList`, :ref:`h5showTree`
+:ref:`h5showList <h5showList>`, :ref:`h5showTree <h5showTree>`
