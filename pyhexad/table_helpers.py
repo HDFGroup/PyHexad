@@ -2,6 +2,53 @@
 import numpy as np
 from type_helpers import parse_dtype
 
+
+#==============================================================================
+
+
+def parse_col_names(s):
+    """
+    When passed a string containing a comma-separated list of column names,
+    this function returns a Python list of strings.
+    """
+    if not isinstance(s, str):
+        raise TypeError('String expected')
+
+    slen = len(s)
+    if slen == 0:
+        raise Exception('Empty string')
+
+    lst = []
+
+    low = 0
+    high = 0
+    while high < slen:
+        high += 1
+
+        if high == slen:
+            if high == low:
+                raise Exception('Empty column name found.')
+            lst.append(s[low:high])
+            break
+
+        if s[high] == ',':
+            if s[high-1] == '\\':  # escaped delimiter
+                continue
+            else:  # valid delimiter
+                if high == low:
+                    raise Exception('Empty column name found.')
+                else:
+                    lst.append(s[low:high])
+                    low = high+1
+        else:
+            continue
+
+    # replace escaped commas in column names
+    for i in range(len(lst)):
+        lst[i] = lst[i].replace('\\,', ',')
+
+    return lst
+
 #==============================================================================
 
 
