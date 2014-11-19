@@ -16,7 +16,7 @@ confines of a worksheet.
 .. figure:: ./h5showTree.png
    :align: center
 
-   Excel `h5showTree` screenshot.
+   An Excel `h5showTree` screenshot.
 
 
 .. rubric:: Excel UDF Syntax

@@ -9,6 +9,14 @@ There are variants for reading all elements, a contiguous rectilinear
 subset (hyperslab), or a strided rectilinear subset of an :term:`HDF5 array`.
 
 
+.. _fig-h5readArray:
+
+.. figure:: ./h5readArray.png
+   :align: center
+
+   An Excel `h5readArray` screenshot.
+
+
 .. rubric:: Excel UDF Syntax
 
 ::
