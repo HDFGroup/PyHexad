@@ -1,4 +1,3 @@
-from .automation       import xl_app
 from .config           import Limits
 from .h5appendRows     import h5appendRows
 from .h5getInfo        import h5getInfo
