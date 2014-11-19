@@ -68,27 +68,18 @@ On error, an error message (string) is returned.
 
 .. rubric:: Examples
 
-Read all elements of the ``Tot_Precip_Water`` array.
+Write the content of cell range `$D3:I11` to HDF5 array at `/A/B/9 x 6`
+in file `file.h5`. The array will be created if it doesn't exist already.
 
 ::
 
-   h5writeArray("GSSTF.2b.2008.01.01.he5", \
-               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water")
-   
-Read only every other element of the ``Tot_Precip_Water`` array.
+   h5writeArray("file.h5", "/A/B/9 x 6", $D3:I11)
+
+Overwrite the fith row with values from range `$D24:I24`.
 
 ::
 
-   h5writeArray("GSSTF.2b.2008.01.01.he5", \
-               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", , , {2,2})
-
-Read a contiguous rectangular region of the ``Tot_Precip_Water`` array.
-
-::
-
-   h5writeArray("GSSTF.2b.2008.01.01.he5", \
-               "/HDFEOS/GRIDS/SET2/Data Fields/Tot_Precip_Water", \
-	       {25,10}, {356, 89})
+   h5writeArray("file.h5", "/A/B/9 x 6", $D24:I24, {5,1}, {5,6}, {1,1})
 
 
 .. rubric:: Error Conditions
@@ -108,9 +99,10 @@ The following conditions will create an error:
    * No HDF5 object exists at the specified location
    * The HDF5 object at the specified location is not an HDF5 array
 
-3. The number of elements requested exceeds the maximum Excel row
-   or column count
-     
+3. An invalid data range
+
+   * The cell content cannot be cast to a supported HDF5 array element type.
+   
 4. An invalid first position
 
    * The position is not empty and not an array of non-negative integers
