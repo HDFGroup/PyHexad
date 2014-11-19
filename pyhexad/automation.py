@@ -41,10 +41,13 @@ def xl_app():
     """returns a Dispatch object for the current Excel instance"""
     # get the Excel application object from PyXLL and wrap it
     xl_window = pyxll.get_active_object()
-    xl_app = win32com.client.Dispatch(xl_window).Application
+    dispatch = win32com.client.Dispatch(xl_window)
+    if dispatch is not None and hasattr(dispatch, 'Application'):
+        xl_app = dispatch.Application
+        # it's helpful to make sure the gen_py wrapper has been created
+        # as otherwise things like constants and event handlers won't work.
+        win32com.client.gencache.EnsureDispatch(xl_app)
+        return xl_app
+    else:
+        return None
 
-    # it's helpful to make sure the gen_py wrapper has been created
-    # as otherwise things like constants and event handlers won't work.
-    win32com.client.gencache.EnsureDispatch(xl_app)
-
-    return xl_app

@@ -62,7 +62,7 @@ def is_positive_dims_array(a):
 #==============================================================================
 
 
-def is_valid_hyperslab_spec(shape, first=None, last=None, step=None):
+def is_valid_hyperslab_spec(shape, first, last, step):
     """
     Determines if (first, last, step) describe a valid hyperslab selection
     on shape.

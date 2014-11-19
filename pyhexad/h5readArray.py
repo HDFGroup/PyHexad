@@ -47,14 +47,19 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
     # upgrade everything to string, int32, or float64
     mem_type = excel_dtype(file_type)
 
+    rk = len(dsp)
+
     # Is the hyperslab selection meaningful?
-    if not is_valid_hyperslab_spec(np.asarray(dsp), first, last, step):
-        return None, 'Invalid hyperslab specification.'
+    if rk != 0:
+        if not is_valid_hyperslab_spec(np.asarray(dsp), first, last, step):
+            return None, 'Invalid hyperslab specification.'
 
     # The hyperslab selection is 1-based => Convert it to 0-based notation.
+    if rk == 0:
+        x = np.asarray([dst[()]])
+        return(x, '1 x 1')
 
-    rk = len(dsp)
-    if rk == 1:
+    elif rk == 1:
 
         start = 0 if first is None else first[0]-1
         stop = dsp[0] if last is None else last[0]
@@ -70,7 +75,7 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
 
         start = [0, 0] if first is None else [first[0]-1, first[1]-1]
         stop = [dsp[0], dsp[1]] if last is None else [last[0], last[1]]
-        stride = [1, 1] if step  is None else [step[0], step[1]]
+        stride = [1, 1] if step is None else [step[0], step[1]]
 
         slc0 = slice(start[0], stop[0], stride[0])
         slc1 = slice(start[1], stop[1], stride[1])

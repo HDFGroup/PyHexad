@@ -9,11 +9,11 @@ import automation
 logger = logging.getLogger(__name__)
 
 
-def draw(x):
+def draw(arr):
     """ Renders a one- or twodimensional scalar array.
     """
 
-    if not isinstance(x, np.ndarray):
+    if not isinstance(arr, np.ndarray):
         raise TypeError('Numpy ndarray expected.')
 
     # get the address of the calling cell using xlfCaller
@@ -23,39 +23,40 @@ def draw(x):
     #=======================================================================
     # the update is done asynchronously so as not to block some
     # versions of Excel by updating the worksheet from a worksheet function
-    def update_func():
+    def update_func(x):
         xl = automation.xl_app()
-        range = xl.Range(address)
-        y = None
+        if xl is not None:
+            range = xl.Range(address)
+            y = None
 
-        try:
-            if x.ndim == 1:
-                range = xl.Range(range.Resize(2, 1),
-                                 range.Resize(x.shape[0]+1, 1))
-                # we need to reshape a 1D vector into a 2D array
-                y = np.reshape(x, (x.shape[0], 1))
-            elif x.ndim == 2:
-                range = xl.Range(range.Resize(2, 1),
-                                 range.Resize(x.shape[0]+1, x.shape[1]))
-                y = x
-            else:
-                raise ValueError('Array rank must be 1 or 2.')
+            try:
+                if x.ndim == 1:
+                    range = xl.Range(range.Resize(2, 1),
+                                     range.Resize(x.shape[0]+1, 1))
+                    # we need to reshape a 1D vector into a 2D array
+                    y = np.reshape(x, (x.shape[0], 1))
+                elif x.ndim == 2:
+                    range = xl.Range(range.Resize(2, 1),
+                                     range.Resize(x.shape[0]+1, x.shape[1]))
+                    y = x
+                else:
+                    raise ValueError('Array rank must be 1 or 2.')
 
-            range.Value = y
+                range.Value = y
 
-        except Exception, ex:
-            logger.info(ex)
+            except Exception, ex:
+                logger.info(ex)
     #
     #=======================================================================
 
     # kick off the asynchronous call to the update function
-    pyxll.async_call(update_func)
+    pyxll.async_call(update_func, arr)
 
 
 #==============================================================================
 
 
-def draw_table(x):
+def draw_table(tbl):
     """
     Renders a table = list of rows = list of lists.
 
@@ -63,7 +64,7 @@ def draw_table(x):
     (We can handle strings, int32, and float64 colums.)
     """
 
-    if not isinstance(x, list):
+    if not isinstance(tbl, list):
         raise TypeError('List expected.')
 
     # get the address of the calling cell using xlfCaller
@@ -73,24 +74,26 @@ def draw_table(x):
     #=======================================================================
     # the update is done asynchronously so as not to block some
     # versions of Excel by updating the worksheet from a worksheet function
-    def update_func():
+    def update_func(x):
         xl = automation.xl_app()
-        range = xl.Range(address)
 
-        try:
+        if xl is not None:
+            range = xl.Range(address)
 
-            header = x[0]
-            num_cols = len(header)
-            num_rows = len(x)
+            try:
 
-            range = xl.Range(range.Resize(2, 1),
-                             range.Resize(num_rows + 1, num_cols))
-            range.Value = x
+                header = x[0]
+                num_cols = len(header)
+                num_rows = len(x)
 
-        except Exception, ex:
-            logger.info(ex)
+                range = xl.Range(range.Resize(2, 1),
+                                 range.Resize(num_rows + 1, num_cols))
+                range.Value = x
+
+            except Exception, ex:
+                logger.info(ex)
     #
     #=======================================================================
 
     # kick off the asynchronous call to the update function
-    pyxll.async_call(update_func)
+    pyxll.async_call(update_func, tbl)

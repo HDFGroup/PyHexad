@@ -116,6 +116,8 @@ def excel_dtype(dty):
     if dty.fields is None:
         if dty in dtype_excel_substitute.keys():
             return dtype_excel_substitute[dty]
+        elif dty.char == 'S':
+            return scalar_dtypes['STRING']
         else:
             raise Exception('Unsupported scalar type.')
     else:
