@@ -82,9 +82,10 @@ def is_supported_h5array_type(dty):
 
     if dty in h5array_dtypes.values():
         return True
-    elif dty.char in ('S', 'U'):
+    elif dty.char in ('S', 'U') or dty == scalar_dtypes['STRING']:
         return True
-    return False
+    else:
+        return False
 
 #==============================================================================
 
@@ -116,7 +117,7 @@ def excel_dtype(dty):
     if dty.fields is None:
         if dty in dtype_excel_substitute.keys():
             return dtype_excel_substitute[dty]
-        elif dty.char == 'S':
+        elif dty.char in ('S', 'U') or dty == scalar_dtypes['STRING']:
             return scalar_dtypes['STRING']
         else:
             raise Exception('Unsupported scalar type.')

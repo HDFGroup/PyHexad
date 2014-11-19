@@ -54,8 +54,9 @@ subset (hyperslab), or a strided rectilinear subset of an :term:`HDF5 array`.
 
 
 .. note:: The optional arguments are integer arrays whose length must be equal
-	  the rank (number of dimensions)
-	  of the HDF5 array.
+	  the rank (number of dimensions) of the HDF5 array. This includes the
+          case of a one-dimensional array, e.g., a `first` argument of 5 must
+          be specified as the Excel array literal `{5}`.
 
    
 .. rubric:: Return Value

@@ -42,13 +42,13 @@ def create_array(loc, path, data):
         return "Unable to create an HDF5 array at '%s'." % (path)
 
     try:
-        file_type = data.dtype
+        x = np.asarray(data)
+        file_type = x.dtype
         # store strings in UTF-8 encoding
         if file_type.char in ('S', 'U'):
             file_type = h5py.special_dtype(vlen=unicode)
-
-        loc.create_dataset(path, data.shape, dtype=file_type,
-                           data=data.astype(file_type))
+        loc.create_dataset(path, x.shape, dtype=file_type,
+                           data=x.astype(file_type))
     except Exception, e:
         logger.info(e)
         ret = 'Array creation faild.'
@@ -162,6 +162,9 @@ def h5writeArray(filename, arrayname, data, first, last, step):
 
     if not isinstance(arrayname, str):
         raise TypeError("'arrayname' must be a string.")
+
+    if not isinstance(data, list):
+        raise TypeError("'data' must be a list.")
 
     try:
 

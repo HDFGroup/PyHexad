@@ -3,6 +3,7 @@ from .config           import Limits
 from .h5appendRows     import h5appendRows
 from .h5getInfo        import h5getInfo
 from .h5newArray       import h5newArray
+from .h5newFile        import h5newFile
 from .h5newGroup       import h5newGroup
 from .h5newTable       import h5newTable
 from .h5readArray      import h5readArray

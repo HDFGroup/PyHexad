@@ -100,8 +100,7 @@ contiguous layout:
 
 ::
 
-   h5newArray("sample.h5", "/My/new/HDF5 group")"file.h5", "/A", {12, 13}, \
-              "Datatype,uint8")
+   h5newArray("file.h5", "/A", {12, 13}, "Datatype,uint8")
    
 
 Create a two-dimensional, extendible (in the second dimension) dataset of
