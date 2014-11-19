@@ -1,17 +1,36 @@
 
 import logging
 
+logger = logging.getLogger(__name__)
+
+try:
+    import win32com.client
+except ImportError:
+    logger.warning("*** win32com.client could not be imported          ***")
+    logger.warning("*** some of the automation examples will not work  ***")
+    logger.warning("*** to fix this, install the pywin32 extensions.   ***")
+
 import numpy as np
 import pyxll
 
-import automation
+#==============================================================================
 
-logger = logging.getLogger(__name__)
+def xl_app():
+    """returns a Dispatch object for the current Excel instance"""
+    # get the Excel application object from PyXLL and wrap it
+    xl_window = pyxll.get_active_object()
+    xl_app = win32com.client.Dispatch(xl_window).Application
+    # it's helpful to make sure the gen_py wrapper has been created
+    # as otherwise things like constants and event handlers won't work.
+    win32com.client.gencache.EnsureDispatch(xl_app)
+    
+    return xl_app
+
+#==============================================================================
 
 
 def draw(arr):
-    """ Renders a one- or twodimensional scalar array.
-    """
+    """Renders a one- or twodimensional scalar array."""
 
     if not isinstance(arr, np.ndarray):
         raise TypeError('Numpy ndarray expected.')
@@ -19,12 +38,14 @@ def draw(arr):
     # get the address of the calling cell using xlfCaller
     caller = pyxll.xlfCaller()
     address = caller.address
-
+    
     #=======================================================================
     # the update is done asynchronously so as not to block some
     # versions of Excel by updating the worksheet from a worksheet function
     def update_func(x):
-        xl = automation.xl_app()
+
+        xl = xl_app()
+
         if xl is not None:
             range = xl.Range(address)
             y = None
@@ -75,7 +96,8 @@ def draw_table(tbl):
     # the update is done asynchronously so as not to block some
     # versions of Excel by updating the worksheet from a worksheet function
     def update_func(x):
-        xl = automation.xl_app()
+
+        xl = xl_app()
 
         if xl is not None:
             range = xl.Range(address)
