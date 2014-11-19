@@ -26,54 +26,6 @@ def get_temp_file():
 
 class H5writeArrayTest(unittest.TestCase):
 
-    def test_create_array(self):
-        file_name = get_temp_file()
-
-        with h5py.File(file_name) as loc:
-
-            # float64
-            shape = (64)
-            a = np.zeros(shape)
-            path = '/A/B/C/1D'
-            msg = create_array(loc, path, a)
-            self.assertEqual(msg, path)
-
-            shape = (1, 32)
-            a = np.zeros(shape)
-            path = '/A/B/C/1C'
-            msg = create_array(loc, path, a)
-            self.assertEqual(msg, path)
-            
-            shape = (32, 16)
-            a = np.zeros(shape)
-            path = '/A/B/C/2D'
-            msg = create_array(loc, path, a)
-            self.assertEqual(msg, path)
-
-            # this will not happen in Excel, but...
-            shape = (2, 3, 4)
-            a = np.zeros(shape)
-            path = '/A/B/C/3D'
-            msg = create_array(loc, path, a)
-            self.assertEqual(msg, path)
-
-            # strings
-            shape = (128, 1)
-            a = np.zeros(shape, dtype=h5py.special_dtype(vlen=unicode))
-            a[...] = u"Hello, World!"
-            path = '/A/B/C/1R'
-            msg = create_array(loc, path, a)
-            self.assertEqual(msg, path)
-
-            # uint8
-            shape = (128, 1)
-            a = np.zeros(shape, dtype=np.uint8)
-            a[:] = 254
-            path = '/A/B/C/1U'
-            msg = create_array(loc, path, a)
-            self.assertEqual(msg, path)
-
-
     def test_write_array1D(self):
         file_name = get_temp_file()
 
