@@ -6,7 +6,7 @@ from tempfile import mktemp
 import h5py
 from pyxll import xl_func
 
-from automation import xl_app
+from renderer import xl_app
 from config import Places
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
