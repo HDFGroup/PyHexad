@@ -197,6 +197,8 @@ def h5showList(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
+        ret = f.filename
+
         path = location
         if path != '':
             if path not in f:
