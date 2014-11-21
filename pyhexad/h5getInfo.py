@@ -137,6 +137,8 @@ def h5getInfo(filename, location):
         if not is_valid:
             return 'Invalid location specified.'
 
+        ret = path
+        
         # generate the display - at the moment there are only two columns
 
         lines = render_info(f, path)
