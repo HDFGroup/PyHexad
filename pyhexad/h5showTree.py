@@ -126,6 +126,8 @@ def h5showTree(filename, location):
 
     with h5py.File(filename, 'r') as f:
 
+        ret = f.filename
+
         # normalize the HDF5 path
 
         path = location
