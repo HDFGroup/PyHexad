@@ -7,6 +7,14 @@ Reading Images: ``h5readImage``
 ``h5readImage`` reads an :term:`HDF5 image` and renders it as Graphics
 Interchange Format (GIF) image on an Excel worksheet.
 
+.. _fig-h5readImage:
+
+.. figure:: ./h5readImage.png
+   :align: center
+
+   An Excel `h5readImage` screenshot.
+
+
 .. rubric:: Excel UDF Syntax
 
 ::
@@ -16,8 +24,6 @@ Interchange Format (GIF) image on an Excel worksheet.
   h5readImage(filename, imagename [, palettename])
 
 
-.. todo:: *What about hyperslabs?*
-  
 .. rubric:: Mandatory Arguments
 
 +-------------+---------------------------------------------------------------+
@@ -82,4 +88,3 @@ The following conditions will create an error:
 
 :ref:`h5readArray <h5readArray>`, :ref:`h5readAttribute <h5readAttribute>`,
 :ref:`h5readTable <h5readTable>`
-

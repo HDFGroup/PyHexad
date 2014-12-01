@@ -1,4 +1,5 @@
-from .config           import Limits
+from .config           import Limits, h5py_is_installed, h5py_version, \
+		              numpy_version
 from .h5appendRows     import h5appendRows
 from .h5getInfo        import h5getInfo
 from .h5newArray       import h5newArray
