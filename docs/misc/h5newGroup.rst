@@ -63,3 +63,5 @@ The following conditions will create an error:
 
 
 .. rubric:: See Also
+
+:ref:`h5newFile <h5newFile>`

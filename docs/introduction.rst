@@ -1,59 +1,33 @@
 
-Introduction
-============
+What is |product|?
+==================
 
-The introduction goes here.
+|product| is an Excel add-in for accessing data stored in HDF5 files.
+It provides about a dozen functions for reading and writing data,
+and to create new HDF5 items from Excel. It aims to combine the ease of
+use, and convenience of Excel with the performance and efficiency of
+HDF5 smart data containers.
 
-Installation
-------------
+In its current form, the main audience might be intermediate Excel users
+who like to spice up their workbooks with Excel functions and who might
+have worked with external data sources such as relational databases.
+These users will have a natural aversion against
+"hardcoding", they understand what a refresh dependence is, and they have
+some fluency in the symbology of referencing the content of cells on other
+worksheets, etc. Of course, all |product| functions can be used with hand-coded
+arguments, but users will soon realize that automation is the real source
+of productivity gains.
 
-To run |product| you need Excel, Python, NumPy, h5py, and PyXLL. (And you know
-how to install those...)
+On the other end of the spectrum, for intermediate HDF5 users,
+a "backstairs leading to an old ideal" is open again: For a lot of data
+stored in HDF5 files, a spreadsheet software such as Excel is a very nice
+user interface. Check it out!
 
-We have developed and tested |product| with the following configuration:
-
-* Windows 8.1 Pro (64-bit)
-* Excel 2013 (32-bit)
-* Python 2.7.6.9 (32-bit)
-* NumPy 1.8.1 (32-bit)
-* h5py 2.3.1 (32-bit)
-* PyXLL 2.2.1 (32-bit)
-
-Other versions/combination will most likely work, but I have not tested them.
-
-.. warning:: Don't try to mix architectures! It won't work. The components must
-	     all be either 32-bit or 64-bit. (Yes, there is a 64-bit version of
-	     PyXLL for the 64-bit version of Excel, but we haven't tried that
-	     yet.)
-
-Update your ``pyxll.cfg`` file:
-
-1. Make sure that the directory containing the ``pyhexad`` module is listed
-   in the ``pythonpath`` section.
-
-2. Add the ``pyhexad`` module to the ``modules`` section.
-
-For example, the ``pyxll.cfg`` might look like this:
-
-::
-
-  [PYXLL]
-  developer_mode = 1
-  pythonpath =
-	        ../../PyHexad
-
-  modules =
-        pyhexad
-
-  [LOG]
-  verbosity = info
-  format = %(asctime)s - %(levelname)s : %(message)s
-  path = ./logs
-  file = pyxll.%(date)s.log
+`Wherever you are coming from, welcome to` |product|! Please help us improve
+this product by sharing user stories, reporting issues, requesting new
+features, and supporting the development.
 
 
-
-  
 Conventions
 -----------
 

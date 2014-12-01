@@ -4,8 +4,8 @@
 A Hierarchical View: ``h5showTree``
 -----------------------------------
 
-``h5showTree`` displays the contents of an HDF5 file in *hierarchical* or tree
-view form. Starting at the HDF5 root group or any other HDF5 group in the
+``h5showTree`` displays the contents of an HDF5 file in *hierarchical* or
+tree-view form. Starting at the HDF5 root group or any other HDF5 group in the
 file, all reachable HDF5 objects are visited recursively. The HDF5 path names
 of HDF5 objects which are "deeper" in the HDF5 group hierarchy appear on a
 worksheet in cells farther to the right, which mimics a tree-view within the

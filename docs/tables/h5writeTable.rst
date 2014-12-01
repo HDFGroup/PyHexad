@@ -7,7 +7,7 @@ Writing to a Table: ``h5writeTable``
 ``h5writeTable`` writes rows to an existing HDF5 table. The write
 operation can be restricted to a subset of columns.
 
-.. caution::
+.. warning::
    **This is a destructive operation.** Existing rows will be overwritten, or
    the table extended as necessary. Unless the table is empty, this is
    not an append operation. Use `h5appendRows` to append rows to an HDF5 table.
@@ -91,3 +91,4 @@ The following conditions will create an error:
 
 
 .. rubric:: See Also
+:ref:`h5writeArray <h5writeArray>`, :ref:`h5writeAttribute <h5writeAttribute>`

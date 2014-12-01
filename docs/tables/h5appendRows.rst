@@ -67,5 +67,3 @@ The following conditions will create an error:
 
    * The number or type of columns in the rows set does not match the
      number or type of columns in the file
-     
-.. rubric:: See Also

@@ -5,7 +5,14 @@ Reading Tables: ``h5readTable``
 -------------------------------
 
 ``h5readTable`` reads rows from an :term:`HDF5 table`. There are variants for
-reading a subset of columns or a contiguous or strided range of rows.
+reading a subset of columns or reading a contiguous or strided range of rows.
+
+.. _fig-h5readTable:
+
+.. figure:: ./h5readTable.png
+   :align: center
+
+   An Excel `h5readTable` screenshot.
 
 
 .. rubric:: Excel UDF Syntax
@@ -19,28 +26,29 @@ reading a subset of columns or a contiguous or strided range of rows.
  
 .. rubric:: Mandatory Arguments
 
-+-------------+-------------------------------------------------------------------+
-|Argument     |Description                                                        |
-+=============+===================================================================+
-|``filename`` |A text string specifying the name of an HDF5 file                  |
-+-------------+-------------------------------------------------------------------+
-|``tablename``|A text string (path) specifying the location of an HDF5 table      |
-+-------------+-------------------------------------------------------------------+
++-------------+---------------------------------------------------------------+
+|Argument     |Description                                                    |
++=============+===============================================================+
+|``filename`` |A text string specifying the name of an HDF5 file              |
++-------------+---------------------------------------------------------------+
+|``tablename``|A text string (path) specifying the location of an HDF5 table  |
++-------------+---------------------------------------------------------------+
 
 
 .. rubric:: Optional Arguments
 
-+-------------+-------------------------------------------------------------------+
-|Argument     |Description                                                        |
-+=============+===================================================================+
-|``columns``  |An array of text strings specifying the columns to be read         |
-+-------------+-------------------------------------------------------------------+
-|``first``    |An integer specifying the first row to be read                     |
-+-------------+-------------------------------------------------------------------+
-|``last``     |An integer specifying the last row to be read                      |
-+-------------+-------------------------------------------------------------------+
-|``step``     |An integer specifying the number of rows to skip for each read row |
-+-------------+-------------------------------------------------------------------+
++-------------+---------------------------------------------------------------+
+|Argument     |Description                                                    |
++=============+===============================================================+
+|``columns``  |An array of text strings specifying the columns to be read     |
++-------------+---------------------------------------------------------------+
+|``first``    |An integer specifying the first row to be read                 |
++-------------+---------------------------------------------------------------+
+|``last``     |An integer specifying the last row to be read                  |
++-------------+---------------------------------------------------------------+
+|``step``     |An integer specifying the number of rows to skip for each read |
+|             |row.                                                           |
++-------------+---------------------------------------------------------------+
 
 .. rubric:: Return Value
 
@@ -52,29 +60,29 @@ On error, an error message (string) is returned.
 
 .. rubric:: Examples
 
-Read the tick data for the CAD/CHF exchange rate from September 22, 2011.
+Read tick data from September 22, 2011.
 	    
 ::
 
-   h5readTable("cadchftickdata.h5", "/22-09-2011")
+   h5readTable("tickdata.h5", "/22-09-2011")
 
 Sample the tickdata and read only every 10th value.
 	    
 ::
 
-   h5readTable("cadchftickdata.h5", "/22-09-2011", , , , 10)
+   h5readTable("tickdata.h5", "/22-09-2011", , , , 10)
 
 Read the timestamp and ask only.
 	    
 ::
 
-   h5readTable("cadchftickdata.h5", "/22-09-2011", {"Time", "Ask"})
+   h5readTable("tickdata.h5", "/22-09-2011", {"Time", "Ask"})
 
 Read only ticks between rows 1,000 and 15,000.
 	    
 ::
 
-   h5readTable("cadchftickdata.h5", "/22-09-2011", , 1000, 15000)
+   h5readTable("tickdata.h5", "/22-09-2011", , 1000, 15000)
 
 
 .. rubric:: Error Conditions
@@ -113,4 +121,8 @@ The following conditions will create an error:
    
    * The argument is not empty and not a positive integer
 
+
 .. rubric:: See Also
+
+:ref:`h5readArray <h5readArray>`, :ref:`h5readAttribute <h5readAttribute>`,
+:ref:`h5readImage <h5readImage>`

@@ -55,13 +55,13 @@ customized via a creation property list.
 +==============+===========================+====================+=============+
 |``Chunksize`` |Defines the chunk size for |A positive integer. |Auto.        |
 |              |the table.                 |positive integers   |             |
-+--------------+---------------------------+--------------------+-------------+   
++--------------+---------------------------+--------------------+-------------+ 
 |``Deflate``   |Enables GZIP compression   | (0-9)              |0 (no        |
 |              |sets level.                |                    |compression) |
-+--------------+---------------------------+--------------------+-------------+   
++--------------+---------------------------+--------------------+-------------+ 
 |``Fletcher32``|Enable Fletcher32 checksum |Boolean             |``false``    |
 |              |generation for the array.  |                    |             |
-+--------------+---------------------------+--------------------+-------------+   
++--------------+---------------------------+--------------------+-------------+
 
 
 .. rubric:: Return Value
@@ -90,7 +90,7 @@ Create a table with 5 columns of different types.
 
 
 Create a table with four columns and control the chunk size (= 128 rows),
-the compression level (= 6), and enable Fletche32 checksum generation.
+the compression level (= 6), and enable Fletcher32 checksum generation.
 
 ::
 
@@ -130,3 +130,5 @@ The following conditions will create an error:
    * A value which is outside the admissible range for the corresponding key
 
 .. rubric:: See Also
+
+:ref:`h5newArray <h5newArray>`, :ref:`h5newGroup <h5newGroup>`

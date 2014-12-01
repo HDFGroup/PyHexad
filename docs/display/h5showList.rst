@@ -4,12 +4,12 @@
 A Tabular View: ``h5showList``
 ------------------------------
 
-``h5showList`` displays the contents of an HDF5 file in *tabular* form. If no
-alternative location is specified, starting at the HDF5 root group,
-all HDF5 objects in the HDF5 file are visited recursively.
-HDF5 objects are clustered by their "parent HDF5 group", and object
-properties, such as HDF5 attribute count, are shown in cells to the right.
-The specifics displayed depend on the HDF5 object kind.
+``h5showList`` displays the contents of an HDF5 file in *tabular* form. Unless
+an alternative starting location is specified, all HDF5 objects in the
+HDF5 file are visited recursively. HDF5 objects are clustered by their
+"parent HDF5 group", and object properties, such as HDF5 attribute count,
+are shown in cells to the right. (The specifics displayed depend on the
+particular kind of HDF5 object or item.)
 
 .. _fig-h5showList:
 

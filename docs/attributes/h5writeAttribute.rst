@@ -80,3 +80,5 @@ The following conditions will create an error:
 
 
 .. rubric:: See Also
+
+:ref:`h5writeArray <h5writeArray>`, :ref:`h5writeTable <h5writeTable>`

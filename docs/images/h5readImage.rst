@@ -5,7 +5,7 @@ Reading Images: ``h5readImage``
 -------------------------------
 
 ``h5readImage`` reads an :term:`HDF5 image` and renders it as Graphics
-Interchange Format (GIF) image in an Excel cell.
+Interchange Format (GIF) image on an Excel worksheet.
 
 .. rubric:: Excel UDF Syntax
 
@@ -31,16 +31,17 @@ Interchange Format (GIF) image in an Excel cell.
 
 .. rubric:: Optional Arguments
 
-+---------------+----------------------------------------------------------------+
-|Argument       |Description                                                     |
-+===============+================================================================+
-|``palettename``|A text string (path) specifying the location of an HDF5 palette |
-+---------------+----------------------------------------------------------------+
++---------------+-------------------------------------------------------------+
+|Argument       |Description                                                  |
++===============+=============================================================+
+|``palettename``|A text string (path) specifying the location of an HDF5      |
+|               |palette                                                      |
++---------------+-------------------------------------------------------------+
 
-   
+
 .. rubric:: Return Value
 
-On success, ``h5readImage`` renders a PNG image in an Excel cell.
+On success, ``h5readImage`` renders a GIF image on an Excel worksheet.
 
 On error, an error message (string) is returned.
 
@@ -78,3 +79,7 @@ The following conditions will create an error:
    * The HDF5 object at the specified location is not an HDF5 palette
 
 .. rubric:: See Also
+
+:ref:`h5readArray <h5readArray>`, :ref:`h5readAttribute <h5readAttribute>`,
+:ref:`h5readTable <h5readTable>`
+

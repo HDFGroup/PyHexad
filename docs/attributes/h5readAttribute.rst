@@ -82,3 +82,7 @@ The following conditions will create an error:
 
 
 .. rubric:: See Also
+
+:ref:`h5readArray <h5readArray>`, :ref:`h5readAttribute <h5readAttribute>`,
+:ref:`h5readImage <h5readImage>`
+

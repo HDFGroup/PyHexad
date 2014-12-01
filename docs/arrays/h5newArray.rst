@@ -39,6 +39,11 @@ customized via a creation property list.
 |             |specified as a row or column cell range.                       |
 +-------------+---------------------------------------------------------------+
 
+.. caution::
+   Although the creation of HDF5 arrays of more than two dimensions is
+   supported, there is currently very little supporting functionality
+   in |product| for accessing such HDF5 arrays.
+
 
 .. rubric:: Optional Arguments
 

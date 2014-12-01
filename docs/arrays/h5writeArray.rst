@@ -9,7 +9,7 @@ HDF5 arrays. There are variants for writing all elements, a contiguous
 rectilinear subset (hyperslab), or a strided rectilinear subset of
 an :term:`HDF5 array`.
 
-If the HDF5 array does not already exist, it will be created and optional
+If the HDF5 array does not already exist it will be created, however, optional
 arguments will be ignored.
 
 Shape mismatches are handled within the extensibility limits of the destination
