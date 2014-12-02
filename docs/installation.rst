@@ -2,14 +2,25 @@
 Installation
 ============
 
-The installation is a two step process:
+Generally, the installation is a two step process:
 
 1. Verify that all the prerequisites are installed.
 2. Install the |product| Python module.
 
-At the moment, the first step is not automated and must be completed
-by the user. Step number two work like any other Python module
-installation.
+At the moment, the entire process is automated only for
+`Enthought Canopy <https://enthought.com/products/canopy/>`_.
+If you are one of the lucky Canopy users you can skip the
+remainder of this chapter after reading the next section.
+For all other Python installations, please continue reading on
+:ref:`sec-prerequisites` and the remainder of this chapter.
+
+Install PyHexad from the Canopy Package Manager
+-----------------------------------------------
+
+.. todo: Didrik will populate this section.
+
+
+.. _sec-prerequisites:
 
 Prerequisites
 -------------
@@ -41,46 +52,41 @@ Other versions/combination will most likely work, but I have not tested them.
 
 .. note::
    There are 64-bit versions of all components and there is a good chance
-   that they'll just work, but we have not tested them.
+   that they'll just work, but this has **not** been tested.
+
 
 The PyHexad Python Module
 -------------------------
 
-There are three options for installing the PyHexad module.
+There are at least two other options for installing the PyHexad module.
 
-.. rubric:: EasyInstall
+.. rubric:: Use ``pip`` or ``setup.py`` and install PyHexad from PyPI
 
-If you have `EasyInstall <http://peak.telecommunity.com/DevCenter/EasyInstall>`_
-run::
+We have created a repository for PyHexad on `PyPI <https://pypi.python.org/pypi>`_.
+If you have ``pip`` installed run::
 
-  easy_install -f https://enthought.com/pyhexad/package_index.html pyhexad
+  pip install pyhexad
 
+Otherwise, download the package ``pyhexad-0.0.1.zip``, unpack it, and run::
 
-or, assuming you've downloaded the Python egg file,::
+  python setup.py install
 
-  easy_install ./pyhexad-0.0.1-py2.7.egg
+.. rubric:: Use a Windows Installer
 
+Download and run the Windows installer ``pyhexad-0.0.1.win32.exe`` and follow the
+on-screen instructions.
 
-.. rubric:: Windows Installer
-
-Run the Windows installer ``pyhexad-0.0.1.win32.exe`` and follow the on-screen
-instructions.
-
-.. rubric:: Source Distribution
-
-Unzip the source ``pyhexad-0.0.1.zip`` and run ``python setup.py`` in the unzipped
-folder.
 
 Sanity Check
 ------------
 
-After completing the two previous steps, please verify that you have access
+After completing the installation, please verify that you have access
 to the |product| functions from Excel. Here's a simple test:
 
 1. Open a blank workbook in Excel.
 2. Place the cursor into a cell of a workbook, type ``=h5py_version()``, and hit enter.
 
 If the installation is "sane", while typing ``h5py_version``, AutoComplete will
-already have suggested all kinds of completions. The result should be the version
-of your ``h5py`` installation displayed in the cell where you placed that function
-call, e.g., ``2.3.1``.
+already have suggested all kinds of completions starting with the ``h5`` prefix.
+The result should be the version of your ``h5py`` installation displayed in the
+cell where you placed that function call, e.g., ``2.3.1``.

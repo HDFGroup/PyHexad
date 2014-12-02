@@ -1,5 +1,5 @@
 
-.. _glossary
+.. _glossary:
 
 Glossary
 ========

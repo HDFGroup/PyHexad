@@ -3,10 +3,19 @@ What is |product|?
 ==================
 
 |product| is an Excel add-in for accessing data stored in HDF5 files.
-It provides about a dozen functions for reading and writing data,
+It provides about a dozen functions (see :ref:`fig-PyHexad`)
+for reading and writing data,
 and to create new HDF5 items from Excel. It aims to combine the ease of
 use, and convenience of Excel with the performance and efficiency of
 HDF5 smart data containers.
+
+.. _fig-PyHexad:
+
+.. figure:: ./PyHexad.png
+   :align: center
+
+   An Overview of PyHexad.
+
 
 In its current form, the main audience might be intermediate Excel users
 who like to spice up their workbooks with Excel functions and who might
@@ -15,7 +24,7 @@ These users will have a natural aversion against
 "hardcoding", they understand what a refresh dependence is, and they have
 some fluency in the symbology of referencing the content of cells on other
 worksheets, etc. Of course, all |product| functions can be used with hand-coded
-arguments, but users will soon realize that automation is the real source
+arguments, but many users will soon realize that automation is the real source
 of productivity gains.
 
 On the other end of the spectrum, for intermediate HDF5 users,

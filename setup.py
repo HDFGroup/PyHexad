@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='pyhexad',
-    version='0.0.1',
+    version='0.1.0',
     author='The HDF Group, Enthought',
     author_email='gheber@hdfgroup.org, dpinte@enthought.com',
     url='http://www.hdfgroup.org/',
