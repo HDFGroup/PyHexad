@@ -17,5 +17,6 @@ Contents:
    misc/index.rst
    types
    glossary
-   references
    copyright
+   references
+

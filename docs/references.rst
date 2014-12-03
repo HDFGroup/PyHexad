@@ -1,7 +1,4 @@
 
-References
-==========
-
 .. [Enthought] `<https://www.enthought.com/>`_
 .. [The HDF Group] `<http://www.hdfgroup.org/>`_
 .. [HDF5] `<http://www.hdfgroup.org/HDF5/>`_

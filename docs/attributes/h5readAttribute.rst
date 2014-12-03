@@ -78,7 +78,7 @@ The following conditions will create an error:
    * An empty string
    * The HDF5 object doesn't have an attribute of that name
 
-4. The attribute size exceeds XXX KB.
+4. The attribute size exceeds 32 KB.
 
 
 .. rubric:: See Also
