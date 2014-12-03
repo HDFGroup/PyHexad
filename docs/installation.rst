@@ -19,6 +19,7 @@ Install PyHexad from the Canopy Package Manager
 
 .. todo: Didrik will populate this section.
 
+*TBD*
 
 .. _sec-prerequisites:
 
