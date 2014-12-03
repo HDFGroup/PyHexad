@@ -18,3 +18,4 @@ Contents:
    types
    glossary
    references
+   copyright
