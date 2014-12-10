@@ -19,6 +19,9 @@ customized via a creation property list.
  
 .. rubric:: Mandatory Arguments
 
+.. tabularcolumns::
+   |p{0.2\textwidth}|p{0.75\textwidth}|
+   
 +-------------+---------------------------------------------------------------+
 |Argument     |Description                                                    |
 +=============+===============================================================+
@@ -38,6 +41,9 @@ customized via a creation property list.
 
 .. rubric:: Optional Arguments
 
+.. tabularcolumns::
+   |p{0.2\textwidth}|p{0.75\textwidth}|
+
 +---------------+-------------------------------------------------------------+
 |Argument       |Description                                                  |
 +===============+=============================================================+
@@ -50,6 +56,9 @@ customized via a creation property list.
 
 .. rubric:: Properties
 
+.. tabularcolumns::
+   |p{0.15\textwidth}|p{0.4\textwidth}|p{0.2\textwidth}|p{0.1\textwidth}|
+   
 +--------------+---------------------------+--------------------+-------------+
 |Name          |Description                |Values              |   Default   |
 +==============+===========================+====================+=============+

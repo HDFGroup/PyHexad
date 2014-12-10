@@ -16,6 +16,9 @@ Creating Groups: ``h5newGroup``
 
 .. rubric:: Mandatory Arguments
 
+.. tabularcolumns::
+   |p{0.2\textwidth}|p{0.75\textwidth}|
+
 +-------------+---------------------------------------------------------------+
 |Argument     |Description                                                    |
 +=============+===============================================================+
