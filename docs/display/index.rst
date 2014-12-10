@@ -1,4 +1,6 @@
 
+.. _chap-display:
+
 Displaying the Contents of an HDF5 File
 ***************************************
 

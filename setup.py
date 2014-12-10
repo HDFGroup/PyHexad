@@ -14,10 +14,17 @@ from distutils.core import setup
 
 setup(
     name='pyhexad',
-    version='0.1.0',
+    version='0.0.1',
     author='The HDF Group, Enthought',
     author_email='gheber@hdfgroup.org, dpinte@enthought.com',
     url='http://www.hdfgroup.org/',
     description='An HDF5 Excel add-in using PyXLL',
+    license='BSD',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python :: 2.7',
+    ],
+    keywords='excel hdf5 pyxll',
     packages=setuptools.find_packages(),
 )
