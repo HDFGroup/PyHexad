@@ -2,17 +2,17 @@
 Installation
 ============
 
-Generally, the installation is a two step process:
+Currently, the installation is a two step process:
 
 1. Verify that all the prerequisites are installed.
 2. Install the |product| Python module.
 
-At the moment, the entire process is automated only for
+The entire procedure is automated only for
 `Enthought Canopy <https://enthought.com/products/canopy/>`_.
 If you are one of the lucky Canopy users you can skip the
 remainder of this chapter.
-For all other Python installations, please continue reading
-the remainder of this chapter.
+For all other Python installations, take a deep breath and continue reading
+the remainder of this chapter!
 
 .. _sec-prerequisites:
 
@@ -32,7 +32,7 @@ Our reference platform for |product| is configured as follows:
 * Windows 8.1 Pro (64-bit)
 * Excel 2013 (:strong:`32-bit`)
 * Python 2.7.6.9 (:strong:`32-bit`)
-* NumPy 1.8.2 (:strong:`32-bit`)
+* NumPy 1.9.1 (:strong:`32-bit`)
 * h5py 2.3.1 (:strong:`32-bit`)
 * PyXLL 2.2.2 (:strong:`32-bit`)
 * [ HDF5 1.8.14 (64-bit) (see :ref:`sec-finishing-touches`) ]
@@ -58,18 +58,20 @@ There are at least two other options for installing the PyHexad module.
 
 We have created a repository for PyHexad on
 `PyPI <https://pypi.python.org/pypi/pyhexad>`_.
-If you have ``pip`` installed run::
+If you have ``pip`` (`pip <https://pip.pypa.io/en/latest/installing.html>`_
+is a tool recommended for installing and managing Python packages.)
+installed run::
 
   pip install pyhexad
 
-Otherwise, download the package ``pyhexad-0.0.1.zip``, unpack it, and run::
+Otherwise, download the package ``pyhexad-0.1.0.zip``, unpack it, and run::
 
   python setup.py install
 
 .. rubric:: Use a Windows Installer
 
-Download and run the Windows installer ``pyhexad-0.0.1.win32.exe`` and follow the
-on-screen instructions.
+Download and run the Windows installer ``pyhexad-0.1.0.win32.exe`` and follow
+the on-screen instructions.
 
 .. rubric:: Tell PyXLL about ``pyhexad``
 
