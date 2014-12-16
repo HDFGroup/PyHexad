@@ -100,7 +100,7 @@ Please add ``pyhexad`` to the ``modules`` section of the file.::
   modules =
           module1
           module2
-          pyhead
+          pyhexad
   
   [LOG]
   verbosity = info
