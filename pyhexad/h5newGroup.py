@@ -37,12 +37,11 @@ def new_group(loc, path):
         raise TypeError('Location handle expected.')
 
     # check if the group already exists
-    if path in loc:
-        try:
-            if (loc.get(path, getclass=True) == h5py.Group):
-                return path
-        except KeyError:  # h5py throws a KeyError for a dangling link
-            pass
+    try:
+        if (loc.get(path, getclass=True) == h5py.Group):
+            return path
+    except RuntimeError, KeyError: # h5py throws a KeyError for a dangling link
+        pass
 
     # check if the path is available
 

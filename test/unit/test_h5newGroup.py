@@ -39,7 +39,7 @@ class H5newGroupTest(unittest.TestCase):
         file_name = get_temp_file()
 
         with h5py.File(file_name) as loc:
-            
+
             # vanilla
 
             path = '/A/B/C/D'
