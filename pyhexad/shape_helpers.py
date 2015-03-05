@@ -354,3 +354,26 @@ def can_reshape(shape, maxshape):
         else:
             break
     return ret
+
+#==============================================================================
+
+
+def tuple_to_excel(shape):
+    """
+    Convert a tuple into Excel array notation
+    """
+
+    if not isinstance(shape, tuple):
+        raise TypeError("Invalid 'shape' found.")
+
+    if len(shape) > 0:
+        ret = '{ '
+        size = len(shape)
+        for i in range(size):
+            ret += str(shape[i])
+            if i < size-1:
+                ret += ", "
+        ret += ' }'
+        return ret
+    else:
+        return '{}'

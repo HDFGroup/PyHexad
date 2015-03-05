@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyhexad',
-    version='0.1.3',
+    version='0.1.4',
     author='The HDF Group, Enthought Inc.',
     author_email='gheber@hdfgroup.org, dpinte@enthought.com',
     url='http://www.hdfgroup.org/',

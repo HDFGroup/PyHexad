@@ -28,6 +28,7 @@ from h5_helpers import path_is_valid_wrt_loc
 import renderer
 from type_helpers import is_supported_h5array_type, is_supported_h5table_type, \
     dtype_to_hexad
+from shape_helpers import tuple_to_excel
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,7 @@ def render_row(grp, name):
             '#ATTR': len(obj.attrs.keys()),
             'DTYPE': dtype_to_hexad(obj.dtype),
             'RANK': len(obj.shape),
-            'DSPACE': str(obj.shape)
+            'DSPACE': tuple_to_excel(obj.shape)
         }
 
     elif obj_type == h5py.Datatype:
