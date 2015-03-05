@@ -14,7 +14,7 @@ from setuptools import setup, find_packages
 setup(
     name='pyhexad',
     version='0.1.3',
-    author='The HDF Group, Enthought',
+    author='The HDF Group, Enthought Inc.',
     author_email='gheber@hdfgroup.org, dpinte@enthought.com',
     url='http://www.hdfgroup.org/',
     description='An HDF5 Excel add-in using PyXLL',
