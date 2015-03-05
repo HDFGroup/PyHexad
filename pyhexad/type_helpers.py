@@ -207,3 +207,36 @@ def parse_dtype(s):
             return scalar_dtypes[btype.upper()]
         else:
             return np.dtype(('(%s)%s' % (dims, t[0:alow])))
+
+#==============================================================================
+
+
+def dtype_to_hexad(dt):
+    """
+    Given a NumPy dtype object, this function returns a PyHexad string
+    rendering.
+    """
+    if not isinstance(dt, np.dtype):
+        raise TypeError('NumPy dtype expected.')
+
+    if dt.kind in ('i', 'u', 'f', 'S'):
+        if dt.kind != 'S':
+            return dt.name
+        else:
+            if dt.isbuiltin == 1:
+                return "string"
+            else:
+                return "string%d" % (dt.itemsize)
+    elif dt.subdtype is not None:
+        return str(dt)
+    elif dt.fields is not None:
+        ret = ''
+        size = len(dt.fields)
+        for i in range(size):
+            k = dt.names[i]
+            ret += '%s,%s' % (k, dtype_to_hexad(dt.fields[k][0]))
+            if i < size-1:
+                ret += ','
+        return str(ret)
+    else:
+        return str(dt)

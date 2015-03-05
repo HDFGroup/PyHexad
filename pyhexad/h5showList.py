@@ -26,7 +26,8 @@ from config import Limits
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
 import renderer
-from type_helpers import is_supported_h5array_type, is_supported_h5table_type
+from type_helpers import is_supported_h5array_type, is_supported_h5table_type, \
+    dtype_to_hexad
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +90,7 @@ def render_row(grp, name):
             'OBJ_TYPE': flavor,
             'NAME': name.split('/')[-1],
             '#ATTR': len(obj.attrs.keys()),
-            'DTYPE': str(obj.dtype),
+            'DTYPE': dtype_to_hexad(obj.dtype),
             'RANK': len(obj.shape),
             'DSPACE': str(obj.shape)
         }
@@ -100,7 +101,7 @@ def render_row(grp, name):
             'OBJ_TYPE': obj_type,
             'NAME': name.split('/')[-1],
             '#ATTR': len(obj.attrs.keys()),
-            'DTYPE': str(obj.dtype),
+            'DTYPE': dtype_to_hexad(obj.dtype),
         }
 
     else:
