@@ -9,26 +9,7 @@
 # request a copy from help@hdfgroup.org.                                     #
 ##############################################################################
 
-from setuptools import setup, find_packages
+def load():
+    """ Loads the PyXLL modules to be exposed to Excel. """
 
-setup(
-    name='pyhexad',
-    version='0.1.1',
-    author='The HDF Group, Enthought',
-    author_email='gheber@hdfgroup.org, dpinte@enthought.com',
-    url='http://www.hdfgroup.org/',
-    description='An HDF5 Excel add-in using PyXLL',
-    license='BSD',
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 2.7',
-    ],
-    keywords='excel hdf5 pyxll',
-    packages=find_packages(),
-    entry_points = {
-        'pyxll.extensions': [
-            'pyhexad = pyhexad.pyxll_extension:load'
-        ]
-    }
-)
+    import pyhexad
