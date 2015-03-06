@@ -19,6 +19,8 @@ from config import Limits
 from file_helpers import file_exists
 from h5_helpers import path_is_valid_wrt_loc
 import renderer
+from type_helpers import dtype_to_hexad
+from shape_helpers import tuple_to_excel
 
 logger = logging.getLogger(__name__)
 
@@ -74,12 +76,12 @@ def render_info(loc, path):
         elif isinstance(hnd, h5py.Dataset):
 
             result.append(('Number of elements:', hnd.size))
-            result.append(('Shape:', str(hnd.shape)))
-            result.append(('Type:', str(hnd.dtype)))
+            result.append(('Shape:', tuple_to_excel(hnd.shape)))
+            result.append(('Type:', dtype_to_hexad(hnd.dtype)))
 
         elif isinstance(hnd, h5py.Datatype):
 
-            result.append(('Type:', str(hnd.dtype)))
+            result.append(('Type:', dtype_to_hexad(hnd.dtype)))
 
         else:  # we should never get here
             raise ValueError('What kind of hardlink is this???')
@@ -148,7 +150,7 @@ def h5getInfo(filename, location):
             return 'Invalid location specified.'
 
         ret = path
-        
+
         # generate the display - at the moment there are only two columns
 
         lines = render_info(f, path)

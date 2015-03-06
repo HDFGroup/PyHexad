@@ -234,7 +234,8 @@ def dtype_to_hexad(dt):
         size = len(dt.fields)
         for i in range(size):
             k = dt.names[i]
-            ret += '%s,%s' % (k, dtype_to_hexad(dt.fields[k][0]))
+            dp = k.replace(',','\,')
+            ret += '%s,%s' % (dp, dtype_to_hexad(dt.fields[k][0]))
             if i < size-1:
                 ret += ','
         return str(ret)
