@@ -9,11 +9,12 @@
 # request a copy from help@hdfgroup.org.                                     #
 ##############################################################################
 
-from setuptools import setup, find_packages
+import setuptools
+from distutils.core import setup
 
 setup(
     name='pyhexad',
-    version='0.1.4',
+    version='0.1.5',
     author='The HDF Group, Enthought Inc.',
     author_email='gheber@hdfgroup.org, dpinte@enthought.com',
     url='http://www.hdfgroup.org/',
@@ -25,10 +26,5 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     keywords='excel hdf5 pyxll',
-    packages=find_packages(),
-    entry_points = {
-        'pyxll.extensions': [
-            'pyhexad = pyhexad.pyxll_extension:load'
-        ]
-    }
+    packages=setuptools.find_packages()
 )
