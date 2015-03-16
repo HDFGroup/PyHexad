@@ -2,17 +2,15 @@
 Installation
 ============
 
-Currently, the installation is a two step process:
+Currently, the PyHexad installation is an manual process.
+We are working to simplify and automate the installation process,
+but decided against delaying this pre-release until a better
+deployment experience became available.
 
-1. Verify that all the prerequisites are installed.
+The PyHexad installation is a two step process:
+
+1. Install/verify the prerequisites.
 2. Install the |product| Python module.
-
-The entire procedure is automated only for
-`Enthought Canopy <https://enthought.com/products/canopy/>`_.
-If you are one of the lucky Canopy users you can skip the
-remainder of this chapter.
-For all other Python installations, take a deep breath and continue reading
-the remainder of this chapter!
 
 .. _sec-prerequisites:
 
@@ -24,20 +22,20 @@ Please download the prerequisites from the links provided below and follow
 the respective installation instructions.
 
 * `NumPy and h5py <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_
-* `PyXLL <http://pyxll.com/download.html>`_
+* `PyXLL <http://pyxll.com/download.html>`_ (The 30 day trial version is sufficient for testing.)
 * `HDF5 <http://www.hdfgroup.org/HDF5/release/obtain5.html>`_
 
 Our reference platform for |product| is configured as follows:
 
 * Windows 8.1 Pro (64-bit)
 * Excel 2013 (:strong:`32-bit`)
-* Python 2.7.6.9 (:strong:`32-bit`)
+* ActivePython 2.7.6.9 (:strong:`32-bit`)
 * NumPy 1.9.1 (:strong:`32-bit`)
-* h5py 2.3.1 (:strong:`32-bit`)
+* h5py 2.4.0 (:strong:`32-bit`)
 * PyXLL 2.2.2 (:strong:`32-bit`)
 * [ HDF5 1.8.14 (64-bit) (see :ref:`sec-finishing-touches`) ]
 
-Other versions/combination will most likely work, but I have not tested them.
+Other versions/combination will most likely work, but we have not tested them.
 
 .. warning::
    Don't try to mix architectures! It won't work. With the exception of the
@@ -52,7 +50,7 @@ Other versions/combination will most likely work, but I have not tested them.
 The ``pyhexad`` Python Module
 -----------------------------
 
-There are at least two other options for installing the PyHexad module.
+There are at least two options for installing the PyHexad module.
 
 .. rubric:: Use ``pip`` or ``setup.py`` and install PyHexad from PyPI
 
@@ -64,19 +62,19 @@ installed run::
 
   pip install pyhexad
 
-Otherwise, download the package ``pyhexad-0.1.0.zip``, unpack it, and run::
+Otherwise, download the package ``pyhexad-0.1.x.zip``, unpack it, and run::
 
   python setup.py install
 
 .. rubric:: Use a Windows Installer
 
-Download and run the Windows installer ``pyhexad-0.1.0.win32.exe`` and follow
+Download and run the Windows installer ``pyhexad-0.1.x.win32.exe`` and follow
 the on-screen instructions.
 
-.. rubric:: Tell PyXLL about ``pyhexad``
+.. rubric:: Final Step: Tell PyXLL about ``pyhexad``
 
 The PyXLL settings are controlled from a configuration file, ``pyxll.cfg``, in
-the PyXLL installation directory. Your ``pyxll.cfg`` might look similar to the
+the PyXLL installation directory. Your ``pyxll.cfg`` will be similar to the
 following::
 
   [PYXLL]
@@ -125,7 +123,7 @@ to the |product| functions from Excel. Here's a simple test:
 If the installation is "sane", while typing ``h5py_version``, AutoComplete will
 already have suggested all kinds of completions starting with the ``h5`` prefix.
 The result should be the version of your ``h5py`` installation displayed in the
-cell where you placed that function call, e.g., ``2.3.1``.
+cell where you placed that function call, e.g., ``2.4.0``.
 
 .. _sec-finishing-touches:
 
