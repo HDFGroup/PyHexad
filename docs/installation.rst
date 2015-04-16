@@ -21,11 +21,16 @@ Prerequisites
 Please download the prerequisites from the links provided below and follow
 the respective installation instructions.
 
-* `NumPy and h5py <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_
-* `PyXLL <http://pyxll.com/download.html>`_ (The 30 day trial version is sufficient for testing.)
-* `HDF5 <http://www.hdfgroup.org/HDF5/release/obtain5.html>`_
+* `NumPy <http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy>`_ and `h5py <https://pypi.python.org/pypi/h5py/2.4.0>`_ 
+* `PyXLL <http://pyxll.com/download.html>`_ (The 30 day trial version is sufficient for testing.) See `Installing the Excel Addin <https://www.pyxll.com/docs/index.html#installing-the-excel-addin>`_ for PyXLL installation instructions.
+* [ `HDF5 <http://www.hdfgroup.org/HDF5/release/obtain5.html>`_ This is optional and only required, if you are interested in importing HDF5 images into Excel. See :ref:`sec-finishing-touches`. ]
 
-Our reference platform for |product| is configured as follows:
+.. warning::
+   Don't try to mix architectures! It won't work. With the exception of the
+   operating system and the HDF5 tools, all components must be either
+   32-bit or 64-bit.
+
+Our *reference platform* for |product| is configured as follows:
 
 * Windows 8.1 Pro (64-bit)
 * Excel 2013 (:strong:`32-bit`)
@@ -33,19 +38,9 @@ Our reference platform for |product| is configured as follows:
 * NumPy 1.9.1 (:strong:`32-bit`)
 * h5py 2.4.0 (:strong:`32-bit`)
 * PyXLL 2.2.2 (:strong:`32-bit`)
-* [ HDF5 1.8.14 (64-bit) (see :ref:`sec-finishing-touches`) ]
+* HDF5 1.8.14 (64-bit)
 
 Other versions/combination will most likely work, but we have not tested them.
-
-.. warning::
-   Don't try to mix architectures! It won't work. With the exception of the
-   operating system and the HDF5 tools, all components must be either
-   32-bit or 64-bit.
-
-.. note::
-   There are 64-bit versions of all components and there is a good chance
-   that they'll just work, but this has **not** been tested.
-
 
 The ``pyhexad`` Python Module
 -----------------------------
@@ -61,7 +56,6 @@ is a tool recommended for installing and managing Python packages.)
 installed run::
 
   pip install pyhexad
-
 Otherwise, download the package ``pyhexad-0.1.x.zip``, unpack it, and run::
 
   python setup.py install
@@ -74,32 +68,51 @@ the on-screen instructions.
 .. rubric:: Final Step: Tell PyXLL about ``pyhexad``
 
 The PyXLL settings are controlled from a configuration file, ``pyxll.cfg``, in
-the PyXLL installation directory. Your ``pyxll.cfg`` will be similar to the
-following::
+the PyXLL installation directory. (This is the directory into which you unpacked
+the PyXLL module.) Your ``pyxll.cfg`` will be similar to the
+following: ::
 
   [PYXLL]
-  developer_mode = 0
+  developer_mode = 1
   pythonpath =
+      ./examples
   modules =
-          module1
-          module2
-
+      misc
+      worksheetfuncs
+      customtypes
+      asyncfunc
+      menus
+      automation
+      callbacks
+      objectcache
+      tools.eclipse_debug
+      tools.reload
+  
   [LOG]
   verbosity = info
   format = %(asctime)s - %(levelname)s : %(message)s
   path = ./logs
   file = pyxll.%(date)s.log
 
-Please add ``pyhexad`` to the ``modules`` section of the file.::
+Please add ``pyhexad`` to the ``modules`` section of the file. ::
 
   [PYXLL]
-  developer_mode = 0
+  developer_mode = 1
   pythonpath =
+      ./examples
   modules =
-          module1
-          module2
-          pyhexad
-  
+      misc
+      worksheetfuncs
+      customtypes
+      asyncfunc
+      menus
+      automation
+      callbacks
+      objectcache
+      tools.eclipse_debug
+      tools.reload
+      pyhexad
+
   [LOG]
   verbosity = info
   format = %(asctime)s - %(levelname)s : %(message)s
