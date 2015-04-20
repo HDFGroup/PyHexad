@@ -9,6 +9,7 @@ Contents:
 
    introduction
    installation
+   known_issues
    display/index.rst
    arrays/index.rst
    tables/index.rst

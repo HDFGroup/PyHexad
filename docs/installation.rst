@@ -18,8 +18,14 @@ Prerequisites
 -------------
 
 |product| depends on Microsoft Excel, Python 2.x, NumPy, h5py, PyXLL, and HDF5.
-Please download the prerequisites from the links provided below and follow
-the respective installation instructions.
+The recommended installation tool for installing Python packages is
+`pip <https://pip.pypa.io/en/stable/installing.html>`_. Unfortunately, not all
+packages support ``pip`` (yet). Please download the prerequisites from the
+links provided below and follow the respective installation instructions.
+Some of them come as Windows installers others as so-called ``wheel`` files,
+for example, NumPy.
+They can be installed by first installing the ``wheel`` module via
+``pip install wheel`` and then running ``pip install some-package.whl``.
 
 * `NumPy <http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy>`_ and `h5py <https://pypi.python.org/pypi/h5py/2.4.0>`_ 
 * `PyXLL <http://pyxll.com/download.html>`_ (The 30 day trial version is sufficient for testing.) See `Installing the Excel Addin <https://www.pyxll.com/docs/index.html#installing-the-excel-addin>`_ for PyXLL installation instructions.
@@ -38,38 +44,30 @@ Our *reference platform* for |product| is configured as follows:
 * NumPy 1.9.1 (:strong:`32-bit`)
 * h5py 2.4.0 (:strong:`32-bit`)
 * PyXLL 2.2.2 (:strong:`32-bit`)
-* HDF5 1.8.14 (64-bit)
+* [ HDF5 1.8.14 (64-bit) ]
 
 Other versions/combination will most likely work, but we have not tested them.
 
 The ``pyhexad`` Python Module
 -----------------------------
 
-There are at least two options for installing the PyHexad module.
+There are three options for installing the PyHexad module.
 
-.. rubric:: Use ``pip`` or ``setup.py`` and install PyHexad from PyPI
-
-We have created a repository for PyHexad on
-`PyPI <https://pypi.python.org/pypi/pyhexad>`_.
-If you have ``pip`` (`pip <https://pip.pypa.io/en/latest/installing.html>`_
-is a tool recommended for installing and managing Python packages.)
-installed run::
-
-  pip install pyhexad
-Otherwise, download the package ``pyhexad-0.1.x.zip``, unpack it, and run::
-
-  python setup.py install
-
-.. rubric:: Use a Windows Installer
-
-Download and run the Windows installer ``pyhexad-0.1.x.win32.exe`` and follow
-the on-screen instructions.
+#. Use ``pip`` and install PyHexad from
+   `PyPI <https://pypi.python.org/pypi/pyhexad>`_.
+   Run ``pip install pyhexad``.
+#. Download the package ``pyhexad-0.1.x.zip`` from
+   `PyPI <https://pypi.python.org/pypi/pyhexad>`_, unpack it, and
+   run ``python setup.py install``
+#. Use the Windows Installer; download it from
+   `PyPI <https://pypi.python.org/pypi/pyhexad>`_, run
+   ``pyhexad-0.1.x.win32.exe`` and follow the on-screen instructions.
 
 .. rubric:: Final Step: Tell PyXLL about ``pyhexad``
 
 The PyXLL settings are controlled from a configuration file, ``pyxll.cfg``, in
-the PyXLL installation directory. (This is the directory into which you unpacked
-the PyXLL module.) Your ``pyxll.cfg`` will be similar to the
+the PyXLL installation directory, which is the directory where you unpacked
+the PyXLL module. Your ``pyxll.cfg`` will be similar to the
 following: ::
 
   [PYXLL]
@@ -139,6 +137,7 @@ The result should be the version of your ``h5py`` installation displayed in the
 cell where you placed that function call, e.g., ``2.4.0``.
 
 .. _sec-finishing-touches:
+
 
 Finishing Touches
 -----------------
