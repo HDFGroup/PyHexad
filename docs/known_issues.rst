@@ -2,7 +2,7 @@
 Known Issues and Limitations
 ============================
 
-.. important::
+.. warning::
    |product| has seen some basic testing, but it is not intended as a
    production solution. Use at your own risk!
 
