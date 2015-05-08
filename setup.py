@@ -14,7 +14,7 @@ from distutils.core import setup
 
 setup(
     name='pyhexad',
-    version='0.1.5',
+    version='0.1.6',
     author='The HDF Group, Enthought Inc.',
     author_email='gheber@hdfgroup.org, dpinte@enthought.com',
     url='http://www.hdfgroup.org/',
