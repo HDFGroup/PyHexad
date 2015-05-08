@@ -125,7 +125,17 @@ class H5readArrayTest(unittest.TestCase):
             self.assertEqual(a.shape[0], 2777)
             self.assertEqual(a.shape[1], 49)
 
-            
+            a, msg = get_ndarray(
+                loc, '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3',
+                np.asarray((1,1)), np.asarray((1,1)), None)
+            self.assertEqual(a.shape[0], 1)
+            self.assertEqual(a.shape[1], 1)
+
+            a, msg = get_ndarray(
+                loc, '/HDFEOS/SWATHS/HIRDLS/Data Fields/O3',
+                np.asarray((0,0)), np.asarray((1,1)), None)
+            self.assertEqual(a, None)
+
 if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)

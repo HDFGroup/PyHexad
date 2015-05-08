@@ -51,7 +51,7 @@ def is_non_negative_dims_array(a):
 
     if not is_dims_array(a):
         return False
-    if np.amax(a) >= 0:
+    if np.amin(a) >= 0:
         return True
 
     return False
@@ -64,7 +64,7 @@ def is_positive_dims_array(a):
 
     if not is_dims_array(a):
         return False
-    if np.amax(a) > 0:
+    if np.amin(a) > 0:
         return True
 
     return False
@@ -85,17 +85,17 @@ def is_valid_hyperslab_spec(shape, first, last, step):
 
     rk = len(shape)
     if first is not None:
-        if not is_non_negative_dims_array(first):
+        if not is_positive_dims_array(first):
             return False
         if len(first) != rk:
             return False
     if last is not None:
-        if not is_non_negative_dims_array(last):
+        if not is_positive_dims_array(last):
             return False
         if len(last) != rk:
             return False
     if step is not None:
-        if not is_non_negative_dims_array(step):
+        if not is_positive_dims_array(step):
             return False
         if len(step) != rk:
             return False

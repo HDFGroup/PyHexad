@@ -62,7 +62,7 @@ def get_ndarray(loc, path, first=None, last=None, step=None):
     # Is the hyperslab selection meaningful?
     if rk != 0:
         if not is_valid_hyperslab_spec(np.asarray(dsp), first, last, step):
-            return None, 'Invalid hyperslab specification.'
+            return (None, 'Invalid hyperslab specification.')
 
     # The hyperslab selection is 1-based => Convert it to 0-based notation.
     if rk == 0:
